@@ -32,8 +32,8 @@ import (
 	"time"
 )
 
-func resolveConfig() (*kafkaClient.ConsumerConfig, string, int, string, time.Duration) {
-	rawConfig, err := kafkaClient.LoadConfiguration("consumers.properties")
+func resolveConfig(conf string) (*kafkaClient.ConsumerConfig, string, int, string, time.Duration) {
+	rawConfig, err := kafkaClient.LoadConfiguration(conf)
 	if err != nil {
 		panic("Failed to load configuration file")
 	}
@@ -140,7 +140,12 @@ func setLogLevel(logLevel string) {
 }
 
 func main() {
-	config, topic, numConsumers, graphiteConnect, graphiteFlushInterval := resolveConfig()
+	if len(os.Args) < 2 {
+		panic("Conf file path must be provided")
+	}
+	conf := os.Args[1];
+
+	config, topic, numConsumers, graphiteConnect, graphiteFlushInterval := resolveConfig(conf)
 	if graphiteConnect != "" {
 		startMetrics(graphiteConnect, graphiteFlushInterval)
 	}
