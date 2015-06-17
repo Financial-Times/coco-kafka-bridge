@@ -4,9 +4,6 @@ import (
     "fmt"
     "io/ioutil"
     "testing"
-    "strings"
-    "net/http"
-    "time"
 )
 
 func TestParse(t *testing.T) {
@@ -17,27 +14,14 @@ func TestParse(t *testing.T) {
     }
     msg := string(buf)
 
-    fmt.Println(msg);
-    client := &http.Client{
-        Timeout: 5 * time.Second,
-    }
-    fmt.Println("Creating request.")
-    req, err := http.NewRequest("POST", "http://localhost:8080/notify", strings.NewReader("{\"uuid\" : \"test\"}"));
-
+    buf, err = ioutil.ReadFile("test_content.txt")
     if (err != nil) {
-        fmt.Printf("Error: %v\n", err.Error())
-        panic(err)
+        fmt.Print("Couldn't read content from file.")
     }
+    expectedContent := string(buf)
 
-    fmt.Println("Adding headers.")
-//    req.Header.Set("Host", "cms-notifier")
-    req.Header.Set("X-Origin-System-Id", "methode-web-pub")
-
-    resp, err := client.Do(req)
-    if (err != nil) {
-        fmt.Printf("Error: %v\n", err.Error())
-        panic(err)
+    actualContent := parseMsg(msg);
+    if (expectedContent != actualContent) {
+        t.Errorf("not equal")
     }
-
-    fmt.Printf("\nResponse: %v\n", resp)
 }

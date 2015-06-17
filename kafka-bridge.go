@@ -25,11 +25,13 @@ import (
 	metrics "github.com/rcrowley/go-metrics"
 	kafkaClient "github.com/stealthly/go_kafka_client"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
 	"strings"
 	"time"
+	_ "log"
 )
 
 func resolveConfig(conf string) (*kafkaClient.ConsumerConfig, string, int, string, time.Duration) {
@@ -197,8 +199,34 @@ func startNewConsumer(config kafkaClient.ConsumerConfig, topic string) *kafkaCli
 func GetStrategy(consumerId string) func(*kafkaClient.Worker, *kafkaClient.Message, kafkaClient.TaskId) kafkaClient.WorkerResult {
 	consumeRate := metrics.NewRegisteredMeter(fmt.Sprintf("%s-ConsumeRate", consumerId), metrics.DefaultRegistry)
 	return func(_ *kafkaClient.Worker, msg *kafkaClient.Message, id kafkaClient.TaskId) kafkaClient.WorkerResult {
-		kafkaClient.Infof("main", "Got a message: %s", string(msg.Value))
+		body := string(msg.Value)
+		kafkaClient.Infof("main", "Got a message: %s", body)
 		consumeRate.Mark(1)
+
+		//TODO: make http request a goroutine
+
+		client := &http.Client{}
+		fmt.Print("Creating request.\n")
+		req, err := http.NewRequest("POST", "http://localhost:8080/notify", strings.NewReader(parseMsg(body)));
+
+		if err != nil {
+			fmt.Printf("Error: %v\n", err.Error())
+			return kafkaClient.NewSuccessfulResult(id)
+		}
+
+		fmt.Print("Adding headers.\n")
+//		req.Header.Add("Host", "cms-notifier")
+
+		//TODO: parse this from msg
+		req.Header.Add("X-Origin-System-Id", "methode-web-pub")
+
+		resp, err := client.Do(req)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err.Error())
+			return kafkaClient.NewSuccessfulResult(id)
+		}
+
+		fmt.Printf("\nResponse: %v\n", resp)
 
 		return kafkaClient.NewSuccessfulResult(id)
 	}
@@ -214,4 +242,9 @@ func FailedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResu
 	kafkaClient.Info("main", "Failed attempt")
 
 	return kafkaClient.CommitOffsetAndContinue
+}
+
+func parseMsg(msg string) string {
+	i := strings.Index(msg, "{")
+	return msg[i:]
 }
