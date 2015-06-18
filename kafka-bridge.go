@@ -21,7 +21,6 @@
 package main
 
 import (
-    "code.google.com/p/go-uuid/uuid"
     "fmt"
     "github.com/dchest/uniuri"
     metrics "github.com/rcrowley/go-metrics"
