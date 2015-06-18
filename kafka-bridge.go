@@ -220,14 +220,14 @@ func GetStrategy(consumerId, httpEndpoint string) func(*kafkaClient.Worker, *kaf
         go func(kafkaMsg string) {
 			jsonContent, err := extractJSON(kafkaMsg)
 			if err != nil {
-				fmt.Errorf("Extracting JSON content failed. Skip forwarding message %s.\n", kafkaMsg)
+				fmt.Printf("Extracting JSON content failed. Skip forwarding message.\n")
 				return
 			}
             client := &http.Client{}
             req, err := http.NewRequest("POST", httpEndpoint, strings.NewReader(jsonContent));
 
             if err != nil {
-                fmt.Errorf("Error creating new request: %v\n", err.Error())
+                fmt.Printf("Error creating new request: %v\n", err.Error())
                 return
             }
 
@@ -235,12 +235,12 @@ func GetStrategy(consumerId, httpEndpoint string) func(*kafkaClient.Worker, *kaf
             req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
             req.Header.Add("X-Request-Id", "tid_kafka_bridge_" + uniuri.NewLen(8))
 
-            resp, err := client.Do(req)
+			resp, err := client.Do(req)
             if err != nil {
-                fmt.Errorf("Error: %v\n", err.Error())
+                fmt.Printf("Error: %v\n", err.Error())
                 return
             }
-            fmt.Printf("\nResponse: %v\n", resp)
+            fmt.Printf("\nResponse: %+v\n", resp)
         }(msg)
 
 		return kafkaClient.NewSuccessfulResult(id)
@@ -259,15 +259,16 @@ func FailedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResu
 	return kafkaClient.CommitOffsetAndContinue
 }
 
-func extractJSON(msg string) (jsContent string, err error) {
+func extractJSON(msg string) (jsonContent string, err error) {
 	startIndex := strings.Index(msg, "{")
 	endIndex := strings.LastIndex(msg, "}")
 
-	jsContent = msg[startIndex : endIndex + 1]
+	jsonContent = msg[startIndex : endIndex + 1]
 
-	if err = json.Unmarshal([]byte(jsContent), &jsContent); err != nil {
-		fmt.Errorf("Error: Not valid JSON")
+	var temp map[string]interface{}
+	if err = json.Unmarshal([]byte(jsonContent), &temp); err != nil {
+		fmt.Printf("Error: Not valid JSON: %s\n", err.Error())
 	}
 
-	return jsContent, err
+	return jsonContent, err
 }

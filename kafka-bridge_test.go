@@ -28,9 +28,9 @@ func TestExtractJSON(t *testing.T) {
     }
 
     for _, test := range tests {
-        actualJSONContent, _ := extractJSON(test.kafkaMsg);
-        if (test.expectedJsonContent != actualJSONContent) {
-            t.Errorf("not equal")
+        actualJSONContent, err := extractJSON(test.kafkaMsg);
+        if (err != nil || test.expectedJsonContent != actualJSONContent) {
+            t.Errorf("\nExpected: %s\nActual: %s", test.expectedJsonContent, actualJSONContent)
         }
     }
 }
