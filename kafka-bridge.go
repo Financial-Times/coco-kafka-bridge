@@ -35,6 +35,8 @@ import (
 	_ "log"
 )
 
+var httpEndpoint string
+
 func resolveConfig(conf string) (*kafkaClient.ConsumerConfig, string, int, string, time.Duration) {
 	rawConfig, err := kafkaClient.LoadConfiguration(conf)
 	if err != nil {
@@ -44,6 +46,8 @@ func resolveConfig(conf string) (*kafkaClient.ConsumerConfig, string, int, strin
 	setLogLevel(logLevel)
 	numConsumers, _ := strconv.Atoi(rawConfig["num_consumers"])
 	zkTimeout, _ := time.ParseDuration(rawConfig["zookeeper_timeout"])
+
+	httpEndpoint, _ = rawConfig["http_endpoint"]
 
 	numWorkers, _ := strconv.Atoi(rawConfig["num_workers"])
 	maxWorkerRetries, _ := strconv.Atoi(rawConfig["max_worker_retries"])
@@ -205,28 +209,22 @@ func GetStrategy(consumerId string) func(*kafkaClient.Worker, *kafkaClient.Messa
 		consumeRate.Mark(1)
 
 		//TODO: make http request a goroutine
-
 		client := &http.Client{}
-		fmt.Print("Creating request.\n")
-		req, err := http.NewRequest("POST", "http://localhost:8080/notify", strings.NewReader(extractJSON(msg)));
+		req, err := http.NewRequest("POST", httpEndpoint, strings.NewReader(extractJSON(msg)));
 
 		if err != nil {
 			fmt.Errorf("Error: %v\n", err.Error())
 			return kafkaClient.NewSuccessfulResult(id)
 		}
 
-		fmt.Print("Adding headers.\n")
-//		req.Header.Add("Host", "cms-notifier")
-
-		//TODO: parse this from msg
-		req.Header.Add("X-Origin-System-Id", "methode-web-pub")
+		req.Header.Add("Host", "cms-notifier") //this has no effect, as it gets overridden with the URL host by the http client
+		req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
 
 		resp, err := client.Do(req)
 		if err != nil {
 			fmt.Errorf("Error: %v\n", err.Error())
 			return kafkaClient.NewSuccessfulResult(id)
 		}
-
 		fmt.Printf("\nResponse: %v\n", resp)
 
 		return kafkaClient.NewSuccessfulResult(id)
@@ -249,7 +247,7 @@ func extractJSON(msg string) string {
 	startIndex := strings.Index(msg, "{")
 	endIndex := strings.LastIndex(msg, "}")
 
-	jsContent := msg[startIndex:endIndex + 1]
+	jsContent := msg[startIndex : endIndex + 1]
 
 	if err := json.Unmarshal([]byte(jsContent), &jsContent); err != nil {
 		fmt.Errorf("Error: Not valid JSON")
