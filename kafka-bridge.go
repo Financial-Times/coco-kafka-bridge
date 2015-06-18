@@ -210,11 +210,16 @@ func GetStrategy(consumerId string) func(*kafkaClient.Worker, *kafkaClient.Messa
 		consumeRate.Mark(1)
 
         go func(kafkaMsg string) {
+			jsonContent, err := extractJSON(kafkaMsg)
+			if err != nil {
+				fmt.Errorf("Extracting JSON content failed. Skip forwarding to cluster message %s.\n", kafkaMsg)
+				return
+			}
             client := &http.Client{}
-            req, err := http.NewRequest("POST", httpEndpoint, strings.NewReader(extractJSON(kafkaMsg)));
+            req, err := http.NewRequest("POST", httpEndpoint, strings.NewReader(jsonContent));
 
             if err != nil {
-                fmt.Errorf("Error: %v\n", err.Error())
+                fmt.Errorf("Error creating new request: %v\n", err.Error())
                 return
             }
 
@@ -246,15 +251,15 @@ func FailedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResu
 	return kafkaClient.CommitOffsetAndContinue
 }
 
-func extractJSON(msg string) string {
+func extractJSON(msg string) (jsContent string, err error) {
 	startIndex := strings.Index(msg, "{")
 	endIndex := strings.LastIndex(msg, "}")
 
-	jsContent := msg[startIndex : endIndex + 1]
+	jsContent = msg[startIndex : endIndex + 1]
 
-	if err := json.Unmarshal([]byte(jsContent), &jsContent); err != nil {
+	if err = json.Unmarshal([]byte(jsContent), &jsContent); err != nil {
 		fmt.Errorf("Error: Not valid JSON")
 	}
 
-	return jsContent
+	return jsContent, err
 }
