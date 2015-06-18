@@ -251,11 +251,9 @@ func extractJSON(msg string) string {
 
 	js := msg[startIndex:endIndex + 1]
 
-	fmt.Println(js)
-
 	if err := json.Unmarshal([]byte(js), &js); err != nil {
 		fmt.Errorf("Error: Not valid JSON")
 	}
 
-	return strings.TrimSpace(js)
+	return js
 }
