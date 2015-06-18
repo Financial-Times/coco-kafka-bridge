@@ -220,7 +220,7 @@ func GetStrategy(consumerId, httpEndpoint string) func(*kafkaClient.Worker, *kaf
         go func(kafkaMsg string) {
 			jsonContent, err := extractJSON(kafkaMsg)
 			if err != nil {
-				fmt.Errorf("Extracting JSON content failed. Skip forwarding to cluster message %s.\n", kafkaMsg)
+				fmt.Errorf("Extracting JSON content failed. Skip forwarding message %s.\n", kafkaMsg)
 				return
 			}
             client := &http.Client{}
