@@ -21,18 +21,20 @@
 package main
 
 import (
-	"fmt"
-	metrics "github.com/rcrowley/go-metrics"
-	kafkaClient "github.com/stealthly/go_kafka_client"
-	"encoding/json"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
-	"strconv"
-	"strings"
-	"time"
-	_ "log"
+    "code.google.com/p/go-uuid/uuid"
+    "fmt"
+    "github.com/dchest/uniuri"
+    metrics "github.com/rcrowley/go-metrics"
+    kafkaClient "github.com/stealthly/go_kafka_client"
+    "encoding/json"
+    "net"
+    "net/http"
+    "os"
+    "os/signal"
+    "strconv"
+    "strings"
+    "time"
+    _ "log"
 )
 
 var httpEndpoint string
@@ -219,6 +221,7 @@ func GetStrategy(consumerId string) func(*kafkaClient.Worker, *kafkaClient.Messa
 
             req.Header.Add("Host", "cms-notifier") //this has no effect, as it gets overridden with the URL host by the http client
             req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
+            req.Header.Add("X-Request-Id", "tid_kafka_bridge_" + uniuri.NewLen(8))
 
             resp, err := client.Do(req)
             if err != nil {
