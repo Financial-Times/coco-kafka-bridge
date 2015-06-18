@@ -24,6 +24,7 @@ import (
 	"fmt"
 	metrics "github.com/rcrowley/go-metrics"
 	kafkaClient "github.com/stealthly/go_kafka_client"
+	"encoding/json"
 	"net"
 	"net/http"
 	"os"
@@ -210,7 +211,7 @@ func GetStrategy(consumerId string) func(*kafkaClient.Worker, *kafkaClient.Messa
 		req, err := http.NewRequest("POST", "http://localhost:8080/notify", strings.NewReader(extractJSON(body)));
 
 		if err != nil {
-			fmt.Printf("Error: %v\n", err.Error())
+			fmt.Errorf("Error: %v\n", err.Error())
 			return kafkaClient.NewSuccessfulResult(id)
 		}
 
@@ -222,7 +223,7 @@ func GetStrategy(consumerId string) func(*kafkaClient.Worker, *kafkaClient.Messa
 
 		resp, err := client.Do(req)
 		if err != nil {
-			fmt.Printf("Error: %v\n", err.Error())
+			fmt.Errorf("Error: %v\n", err.Error())
 			return kafkaClient.NewSuccessfulResult(id)
 		}
 
@@ -245,6 +246,16 @@ func FailedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResu
 }
 
 func extractJSON(msg string) string {
-	i := strings.Index(msg, "{")
-	return msg[i:]
+	startIndex := strings.Index(msg, "{")
+	endIndex := strings.LastIndex(msg, "}")
+
+	js := msg[startIndex:endIndex + 1]
+
+	fmt.Println(js)
+
+	if err := json.Unmarshal([]byte(js), &js); err != nil {
+		fmt.Errorf("Error: Not valid JSON")
+	}
+
+	return strings.TrimSpace(js)
 }
