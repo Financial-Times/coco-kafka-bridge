@@ -36,9 +36,12 @@ import (
     _ "log"
 )
 
-var httpEndpoint string
+type BridgeConfig struct {
+	consumerConfig	*kafkaClient.ConsumerConfig
+	httpEndpoint	string
+}
 
-func resolveConfig(conf string) (*kafkaClient.ConsumerConfig, string, int, string, time.Duration) {
+func resolveConfig(conf string) (*BridgeConfig, string, int, string, time.Duration) {
 	rawConfig, err := kafkaClient.LoadConfiguration(conf)
 	if err != nil {
 		panic("Failed to load configuration file")
@@ -48,7 +51,7 @@ func resolveConfig(conf string) (*kafkaClient.ConsumerConfig, string, int, strin
 	numConsumers, _ := strconv.Atoi(rawConfig["num_consumers"])
 	zkTimeout, _ := time.ParseDuration(rawConfig["zookeeper_timeout"])
 
-	httpEndpoint, _ = rawConfig["http_endpoint"]
+	httpEndpoint, _ := rawConfig["http_endpoint"]
 
 	numWorkers, _ := strconv.Atoi(rawConfig["num_workers"])
 	maxWorkerRetries, _ := strconv.Atoi(rawConfig["max_worker_retries"])
@@ -91,39 +94,43 @@ func resolveConfig(conf string) (*kafkaClient.ConsumerConfig, string, int, strin
 		rawConfig["zookeeper_connect2"] }
 	zkConfig.ZookeeperTimeout = zkTimeout
 
-	config := kafkaClient.DefaultConsumerConfig()
-	config.Groupid = rawConfig["group_id"]
-	config.NumWorkers = numWorkers
-	config.MaxWorkerRetries = maxWorkerRetries
-	config.WorkerBackoff = workerBackoff
-	config.WorkerRetryThreshold = int32(workerRetryThreshold)
-	config.WorkerThresholdTimeWindow = workerConsideredFailedTimeWindow
-	config.WorkerTaskTimeout = workerTaskTimeout
-	config.WorkerManagersStopTimeout = workerManagersStopTimeout
-	config.BarrierTimeout = rebalanceBarrierTimeout
-	config.RebalanceMaxRetries = int32(rebalanceMaxRetries)
-	config.RebalanceBackoff = rebalanceBackoff
-	config.PartitionAssignmentStrategy = partitionAssignmentStrategy
-	config.ExcludeInternalTopics = excludeInternalTopics
-	config.NumConsumerFetchers = numConsumerFetchers
-	config.FetchBatchSize = fetchBatchSize
-	config.FetchMessageMaxBytes = int32(fetchMessageMaxBytes)
-	config.FetchMinBytes = int32(fetchMinBytes)
-	config.FetchBatchTimeout = fetchBatchTimeout
-	config.FetchTopicMetadataRetries = fetchMetadataRetries
-	config.FetchTopicMetadataBackoff = fetchMetadataBackoff
-	config.RequeueAskNextBackoff = requeueAskNextBackoff
-	config.FetchWaitMaxMs = int32(fetchWaitMaxMs)
-	config.SocketTimeout = socketTimeout
-	config.QueuedMaxMessages = int32(queuedMaxMessages)
-	config.RefreshLeaderBackoff = refreshLeaderBackoff
-	config.Coordinator = kafkaClient.NewZookeeperCoordinator(zkConfig)
-	config.AutoOffsetReset = rawConfig["auto_offset_reset"]
-	config.OffsetsCommitMaxRetries = offsetsCommitMaxRetries
-	config.DeploymentTimeout = deploymentTimeout
-	config.OffsetCommitInterval = 10 * time.Second
+	consumerConfig := kafkaClient.DefaultConsumerConfig()
+	consumerConfig.Groupid = rawConfig["group_id"]
+	consumerConfig.NumWorkers = numWorkers
+	consumerConfig.MaxWorkerRetries = maxWorkerRetries
+	consumerConfig.WorkerBackoff = workerBackoff
+	consumerConfig.WorkerRetryThreshold = int32(workerRetryThreshold)
+	consumerConfig.WorkerThresholdTimeWindow = workerConsideredFailedTimeWindow
+	consumerConfig.WorkerTaskTimeout = workerTaskTimeout
+	consumerConfig.WorkerManagersStopTimeout = workerManagersStopTimeout
+	consumerConfig.BarrierTimeout = rebalanceBarrierTimeout
+	consumerConfig.RebalanceMaxRetries = int32(rebalanceMaxRetries)
+	consumerConfig.RebalanceBackoff = rebalanceBackoff
+	consumerConfig.PartitionAssignmentStrategy = partitionAssignmentStrategy
+	consumerConfig.ExcludeInternalTopics = excludeInternalTopics
+	consumerConfig.NumConsumerFetchers = numConsumerFetchers
+	consumerConfig.FetchBatchSize = fetchBatchSize
+	consumerConfig.FetchMessageMaxBytes = int32(fetchMessageMaxBytes)
+	consumerConfig.FetchMinBytes = int32(fetchMinBytes)
+	consumerConfig.FetchBatchTimeout = fetchBatchTimeout
+	consumerConfig.FetchTopicMetadataRetries = fetchMetadataRetries
+	consumerConfig.FetchTopicMetadataBackoff = fetchMetadataBackoff
+	consumerConfig.RequeueAskNextBackoff = requeueAskNextBackoff
+	consumerConfig.FetchWaitMaxMs = int32(fetchWaitMaxMs)
+	consumerConfig.SocketTimeout = socketTimeout
+	consumerConfig.QueuedMaxMessages = int32(queuedMaxMessages)
+	consumerConfig.RefreshLeaderBackoff = refreshLeaderBackoff
+	consumerConfig.Coordinator = kafkaClient.NewZookeeperCoordinator(zkConfig)
+	consumerConfig.AutoOffsetReset = rawConfig["auto_offset_reset"]
+	consumerConfig.OffsetsCommitMaxRetries = offsetsCommitMaxRetries
+	consumerConfig.DeploymentTimeout = deploymentTimeout
+	consumerConfig.OffsetCommitInterval = 10 * time.Second
 
-	return config, rawConfig["topic"], numConsumers, rawConfig["graphite_connect"], flushInterval
+	bridgeConfig := &BridgeConfig{}
+	bridgeConfig.consumerConfig = consumerConfig
+	bridgeConfig.httpEndpoint = httpEndpoint
+
+	return bridgeConfig, rawConfig["topic"], numConsumers, rawConfig["graphite_connect"], flushInterval
 }
 
 func setLogLevel(logLevel string) {
@@ -190,19 +197,20 @@ func startMetrics(graphiteConnect string, graphiteFlushInterval time.Duration) {
 	})
 }
 
-func startNewConsumer(config kafkaClient.ConsumerConfig, topic string) *kafkaClient.Consumer {
-	config.Strategy = GetStrategy(config.Consumerid)
-	config.WorkerFailureCallback = FailedCallback
-	config.WorkerFailedAttemptCallback = FailedAttemptCallback
-	consumer := kafkaClient.NewConsumer(&config)
-	topics := map[string]int{topic: config.NumConsumerFetchers}
+func startNewConsumer(bridgeConfig BridgeConfig, topic string) *kafkaClient.Consumer {
+	consumerConfig := bridgeConfig.consumerConfig
+	consumerConfig.Strategy = GetStrategy(consumerConfig.Consumerid, bridgeConfig.httpEndpoint)
+	consumerConfig.WorkerFailureCallback = FailedCallback
+	consumerConfig.WorkerFailedAttemptCallback = FailedAttemptCallback
+	consumer := kafkaClient.NewConsumer(consumerConfig)
+	topics := map[string]int{topic: consumerConfig.NumConsumerFetchers}
 	go func() {
 		consumer.StartStatic(topics)
 	}()
 	return consumer
 }
 
-func GetStrategy(consumerId string) func(*kafkaClient.Worker, *kafkaClient.Message, kafkaClient.TaskId) kafkaClient.WorkerResult {
+func GetStrategy(consumerId, httpEndpoint string) func(*kafkaClient.Worker, *kafkaClient.Message, kafkaClient.TaskId) kafkaClient.WorkerResult {
 	consumeRate := metrics.NewRegisteredMeter(fmt.Sprintf("%s-ConsumeRate", consumerId), metrics.DefaultRegistry)
 	return func(_ *kafkaClient.Worker, rawMsg *kafkaClient.Message, id kafkaClient.TaskId) kafkaClient.WorkerResult {
 		msg := string(rawMsg.Value)
