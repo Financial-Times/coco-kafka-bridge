@@ -6,7 +6,7 @@ import (
     "testing"
 )
 
-func TestParse(t *testing.T) {
+func TestExtractJSON(t *testing.T) {
 
     buf, err := ioutil.ReadFile("test_msg.txt")
     if (err != nil) {
@@ -20,7 +20,7 @@ func TestParse(t *testing.T) {
     }
     expectedContent := string(buf)
 
-    actualContent := parseMsg(msg);
+    actualContent := extractJSON(msg);
     if (expectedContent != actualContent) {
         t.Errorf("not equal")
     }

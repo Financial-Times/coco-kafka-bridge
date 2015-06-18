@@ -207,7 +207,7 @@ func GetStrategy(consumerId string) func(*kafkaClient.Worker, *kafkaClient.Messa
 
 		client := &http.Client{}
 		fmt.Print("Creating request.\n")
-		req, err := http.NewRequest("POST", "http://localhost:8080/notify", strings.NewReader(parseMsg(body)));
+		req, err := http.NewRequest("POST", "http://localhost:8080/notify", strings.NewReader(extractJSON(body)));
 
 		if err != nil {
 			fmt.Printf("Error: %v\n", err.Error())
@@ -244,7 +244,7 @@ func FailedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResu
 	return kafkaClient.CommitOffsetAndContinue
 }
 
-func parseMsg(msg string) string {
+func extractJSON(msg string) string {
 	i := strings.Index(msg, "{")
 	return msg[i:]
 }
