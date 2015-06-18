@@ -208,24 +208,25 @@ func GetStrategy(consumerId string) func(*kafkaClient.Worker, *kafkaClient.Messa
 		kafkaClient.Infof("main", "Got a message: %s", msg)
 		consumeRate.Mark(1)
 
-		//TODO: make http request a goroutine
-		client := &http.Client{}
-		req, err := http.NewRequest("POST", httpEndpoint, strings.NewReader(extractJSON(msg)));
+        go func(kafkaMsg string) {
+            client := &http.Client{}
+            req, err := http.NewRequest("POST", httpEndpoint, strings.NewReader(extractJSON(kafkaMsg)));
 
-		if err != nil {
-			fmt.Errorf("Error: %v\n", err.Error())
-			return kafkaClient.NewSuccessfulResult(id)
-		}
+            if err != nil {
+                fmt.Errorf("Error: %v\n", err.Error())
+                return
+            }
 
-		req.Header.Add("Host", "cms-notifier") //this has no effect, as it gets overridden with the URL host by the http client
-		req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
+            req.Header.Add("Host", "cms-notifier") //this has no effect, as it gets overridden with the URL host by the http client
+            req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
 
-		resp, err := client.Do(req)
-		if err != nil {
-			fmt.Errorf("Error: %v\n", err.Error())
-			return kafkaClient.NewSuccessfulResult(id)
-		}
-		fmt.Printf("\nResponse: %v\n", resp)
+            resp, err := client.Do(req)
+            if err != nil {
+                fmt.Errorf("Error: %v\n", err.Error())
+                return
+            }
+            fmt.Printf("\nResponse: %v\n", resp)
+        }(msg)
 
 		return kafkaClient.NewSuccessfulResult(id)
 	}
