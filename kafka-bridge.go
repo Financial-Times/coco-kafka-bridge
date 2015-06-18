@@ -88,10 +88,7 @@ func resolveConfig(conf string) (*BridgeConfig, string, int, string, time.Durati
 	deploymentTimeout, _ := time.ParseDuration(rawConfig["deployment_timeout"])
 
 	zkConfig := kafkaClient.NewZookeeperConfig()
-	zkConfig.ZookeeperConnect = []string{
-		rawConfig["zookeeper_connect0"],
-		rawConfig["zookeeper_connect1"],
-		rawConfig["zookeeper_connect2"] }
+	zkConfig.ZookeeperConnect = strings.Split(rawConfig["zookeeper_connect"], ",")
 	zkConfig.ZookeeperTimeout = zkTimeout
 
 	consumerConfig := kafkaClient.DefaultConsumerConfig()
