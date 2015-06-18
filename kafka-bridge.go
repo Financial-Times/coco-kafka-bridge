@@ -199,16 +199,16 @@ func startNewConsumer(config kafkaClient.ConsumerConfig, topic string) *kafkaCli
 
 func GetStrategy(consumerId string) func(*kafkaClient.Worker, *kafkaClient.Message, kafkaClient.TaskId) kafkaClient.WorkerResult {
 	consumeRate := metrics.NewRegisteredMeter(fmt.Sprintf("%s-ConsumeRate", consumerId), metrics.DefaultRegistry)
-	return func(_ *kafkaClient.Worker, msg *kafkaClient.Message, id kafkaClient.TaskId) kafkaClient.WorkerResult {
-		body := string(msg.Value)
-		kafkaClient.Infof("main", "Got a message: %s", body)
+	return func(_ *kafkaClient.Worker, rawMsg *kafkaClient.Message, id kafkaClient.TaskId) kafkaClient.WorkerResult {
+		msg := string(rawMsg.Value)
+		kafkaClient.Infof("main", "Got a message: %s", msg)
 		consumeRate.Mark(1)
 
 		//TODO: make http request a goroutine
 
 		client := &http.Client{}
 		fmt.Print("Creating request.\n")
-		req, err := http.NewRequest("POST", "http://localhost:8080/notify", strings.NewReader(extractJSON(body)));
+		req, err := http.NewRequest("POST", "http://localhost:8080/notify", strings.NewReader(extractJSON(msg)));
 
 		if err != nil {
 			fmt.Errorf("Error: %v\n", err.Error())
@@ -249,11 +249,11 @@ func extractJSON(msg string) string {
 	startIndex := strings.Index(msg, "{")
 	endIndex := strings.LastIndex(msg, "}")
 
-	js := msg[startIndex:endIndex + 1]
+	jsContent := msg[startIndex:endIndex + 1]
 
-	if err := json.Unmarshal([]byte(js), &js); err != nil {
+	if err := json.Unmarshal([]byte(jsContent), &jsContent); err != nil {
 		fmt.Errorf("Error: Not valid JSON")
 	}
 
-	return js
+	return jsContent
 }
