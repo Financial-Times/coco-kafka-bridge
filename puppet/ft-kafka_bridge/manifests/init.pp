@@ -29,7 +29,7 @@ class kafka_bridge {
       mode    => "0664"
   }
 
-  exec { 'restart_nativerw':
+  exec { 'restart_kafka-bridge':
     command     => "supervisorctl restart $binary_name",
     path        => "/usr/bin:/usr/sbin:/bin",
     subscribe   => [
