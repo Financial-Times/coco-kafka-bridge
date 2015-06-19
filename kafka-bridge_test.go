@@ -1,17 +1,17 @@
 package main
 
 import (
-    "testing"
+	"testing"
 )
 
 func TestExtractJSON(t *testing.T) {
 
-    var tests = []struct {
-        kafkaMsg    string
-        expectedJsonContent string
-    } {
-        {
-            `
+	var tests = []struct {
+		kafkaMsg            string
+		expectedJsonContent string
+	}{
+		{
+			`
             FTMSG/1.0
             Message-Id: bb07b9ab-0ff6-4853-bdd1-104906d7d282
             Message-Timestamp: 2015-06-17T12:16:39.022Z
@@ -22,15 +22,14 @@ func TestExtractJSON(t *testing.T) {
 
             { "uuid":"f9d6eecc-14b4-11e5-973e-a0f360779259","type":"EOM::CompoundStory","value":"bodor_kafka_bridge_test","attributes":[],"linkedObjects":[] }
             `,
-            `{ "uuid":"f9d6eecc-14b4-11e5-973e-a0f360779259","type":"EOM::CompoundStory","value":"bodor_kafka_bridge_test","attributes":[],"linkedObjects":[] }`,
+			`{ "uuid":"f9d6eecc-14b4-11e5-973e-a0f360779259","type":"EOM::CompoundStory","value":"bodor_kafka_bridge_test","attributes":[],"linkedObjects":[] }`,
+		},
+	}
 
-        },
-    }
-
-    for _, test := range tests {
-        actualJSONContent, err := extractJSON(test.kafkaMsg);
-        if (err != nil || test.expectedJsonContent != actualJSONContent) {
-            t.Errorf("\nExpected: %s\nActual: %s", test.expectedJsonContent, actualJSONContent)
-        }
-    }
+	for _, test := range tests {
+		actualJSONContent, err := extractJSON(test.kafkaMsg)
+		if err != nil || test.expectedJsonContent != actualJSONContent {
+			t.Errorf("\nExpected: %s\nActual: %s", test.expectedJsonContent, actualJSONContent)
+		}
+	}
 }

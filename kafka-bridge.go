@@ -21,24 +21,24 @@
 package main
 
 import (
-    "fmt"
-    "github.com/dchest/uniuri"
-    metrics "github.com/rcrowley/go-metrics"
-    kafkaClient "github.com/stealthly/go_kafka_client"
-    "encoding/json"
-    "net"
-    "net/http"
-    "os"
-    "os/signal"
-    "strconv"
-    "strings"
-    "time"
-    _ "log"
+	"encoding/json"
+	"fmt"
+	"github.com/dchest/uniuri"
+	metrics "github.com/rcrowley/go-metrics"
+	kafkaClient "github.com/stealthly/go_kafka_client"
+	_ "log"
+	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	"strconv"
+	"strings"
+	"time"
 )
 
 type BridgeConfig struct {
-	consumerConfig	*kafkaClient.ConsumerConfig
-	httpEndpoint	string
+	consumerConfig *kafkaClient.ConsumerConfig
+	httpEndpoint   string
 }
 
 func resolveConfig(conf string) (*BridgeConfig, string, int, string, time.Duration) {
@@ -133,19 +133,19 @@ func resolveConfig(conf string) (*BridgeConfig, string, int, string, time.Durati
 func setLogLevel(logLevel string) {
 	var level kafkaClient.LogLevel
 	switch strings.ToLower(logLevel) {
-		case "trace":
+	case "trace":
 		level = kafkaClient.TraceLevel
-		case "debug":
+	case "debug":
 		level = kafkaClient.DebugLevel
-		case "info":
+	case "info":
 		level = kafkaClient.InfoLevel
-		case "warn":
+	case "warn":
 		level = kafkaClient.WarnLevel
-		case "error":
+	case "error":
 		level = kafkaClient.ErrorLevel
-		case "critical":
+	case "critical":
 		level = kafkaClient.CriticalLevel
-		default:
+	default:
 		level = kafkaClient.InfoLevel
 	}
 	kafkaClient.Logger = kafkaClient.NewDefaultLogger(level)
@@ -155,7 +155,7 @@ func main() {
 	if len(os.Args) < 2 {
 		panic("Conf file path must be provided")
 	}
-	conf := os.Args[1];
+	conf := os.Args[1]
 
 	config, topic, numConsumers, graphiteConnect, graphiteFlushInterval := resolveConfig(conf)
 	if graphiteConnect != "" {
@@ -214,31 +214,31 @@ func GetStrategy(consumerId, httpEndpoint string) func(*kafkaClient.Worker, *kaf
 		kafkaClient.Infof("main", "Got a message: %s", msg)
 		consumeRate.Mark(1)
 
-        go func(kafkaMsg string) {
+		go func(kafkaMsg string) {
 			jsonContent, err := extractJSON(kafkaMsg)
 			if err != nil {
 				fmt.Printf("Extracting JSON content failed. Skip forwarding message.\n")
 				return
 			}
-            client := &http.Client{}
-            req, err := http.NewRequest("POST", httpEndpoint, strings.NewReader(jsonContent));
+			client := &http.Client{}
+			req, err := http.NewRequest("POST", httpEndpoint, strings.NewReader(jsonContent))
 
-            if err != nil {
-                fmt.Printf("Error creating new request: %v\n", err.Error())
-                return
-            }
+			if err != nil {
+				fmt.Printf("Error creating new request: %v\n", err.Error())
+				return
+			}
 
-            req.Header.Add("Host", "cms-notifier") //this has no effect, as it gets overridden with the URL host by the http client
-            req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
-            req.Header.Add("X-Request-Id", "tid_kafka_bridge_" + uniuri.NewLen(8))
+			req.Header.Add("Host", "cms-notifier")                  //this has no effect, as it gets overridden with the URL host by the http client
+			req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
+			req.Header.Add("X-Request-Id", "tid_kafka_bridge_"+uniuri.NewLen(8))
 
 			resp, err := client.Do(req)
-            if err != nil {
-                fmt.Printf("Error: %v\n", err.Error())
-                return
-            }
-            fmt.Printf("\nResponse: %+v\n", resp)
-        }(msg)
+			if err != nil {
+				fmt.Printf("Error: %v\n", err.Error())
+				return
+			}
+			fmt.Printf("\nResponse: %+v\n", resp)
+		}(msg)
 
 		return kafkaClient.NewSuccessfulResult(id)
 	}
@@ -260,7 +260,7 @@ func extractJSON(msg string) (jsonContent string, err error) {
 	startIndex := strings.Index(msg, "{")
 	endIndex := strings.LastIndex(msg, "}")
 
-	jsonContent = msg[startIndex : endIndex + 1]
+	jsonContent = msg[startIndex : endIndex+1]
 
 	var temp map[string]interface{}
 	if err = json.Unmarshal([]byte(jsonContent), &temp); err != nil {
