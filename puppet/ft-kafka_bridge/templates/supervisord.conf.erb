@@ -1,0 +1,33 @@
+[unix_http_server]
+file=/var/run/supervisor.sock
+
+[inet_http_server]
+port=9001
+
+[supervisord]
+logfile=<%=supervisord_log_dir%>/supervisord.log
+logfile_maxbytes=5MB
+logfile_backups=30
+loglevel=info
+pidfile=/var/run/supervisord.pid
+childlogdir=/var/log/apps
+nocleanup=false
+umask=022
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix:///var/run/supervisor.sock ; use a unix:// URL  for a unix socket
+
+[program:<%=binary_name%>]
+command=<%=binary_file%> <%=config_file%>
+autorestart=true
+startsecs=20
+stdout_logfile=<%=log_dir%>/<%=binary_name%>-go-app.log
+stdout_logfile_maxbytes=5MB
+stdout_logfile_backups=30
+redirect_stderr=true
+stderr_logfile=<%=log_dir%>/<%=binary_name%>-go-app.err
+stderr_logfile_maxbytes=5MB
+stderr_logfile_backups=30
