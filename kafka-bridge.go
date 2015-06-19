@@ -36,12 +36,12 @@ import (
 	"time"
 )
 
-type BridgeConfig struct {
+type bridgeConfig struct {
 	consumerConfig *kafkaClient.ConsumerConfig
 	httpEndpoint   string
 }
 
-func resolveConfig(conf string) (*BridgeConfig, string, int, string, time.Duration) {
+func resolveConfig(conf string) (*bridgeConfig, string, int, string, time.Duration) {
 	rawConfig, err := kafkaClient.LoadConfiguration(conf)
 	if err != nil {
 		panic("Failed to load configuration file")
@@ -123,7 +123,7 @@ func resolveConfig(conf string) (*BridgeConfig, string, int, string, time.Durati
 	consumerConfig.DeploymentTimeout = deploymentTimeout
 	consumerConfig.OffsetCommitInterval = 10 * time.Second
 
-	bridgeConfig := &BridgeConfig{}
+	bridgeConfig := &bridgeConfig{}
 	bridgeConfig.consumerConfig = consumerConfig
 	bridgeConfig.httpEndpoint = httpEndpoint
 
@@ -194,11 +194,11 @@ func startMetrics(graphiteConnect string, graphiteFlushInterval time.Duration) {
 	})
 }
 
-func startNewConsumer(bridgeConfig BridgeConfig, topic string) *kafkaClient.Consumer {
+func startNewConsumer(bridgeConfig bridgeConfig, topic string) *kafkaClient.Consumer {
 	consumerConfig := bridgeConfig.consumerConfig
-	consumerConfig.Strategy = GetStrategy(consumerConfig.Consumerid, bridgeConfig.httpEndpoint)
-	consumerConfig.WorkerFailureCallback = FailedCallback
-	consumerConfig.WorkerFailedAttemptCallback = FailedAttemptCallback
+	consumerConfig.Strategy = getStrategy(consumerConfig.Consumerid, bridgeConfig.httpEndpoint)
+	consumerConfig.WorkerFailureCallback = failedCallback
+	consumerConfig.WorkerFailedAttemptCallback = failedAttemptCallback
 	consumer := kafkaClient.NewConsumer(consumerConfig)
 	topics := map[string]int{topic: consumerConfig.NumConsumerFetchers}
 	go func() {
@@ -207,8 +207,8 @@ func startNewConsumer(bridgeConfig BridgeConfig, topic string) *kafkaClient.Cons
 	return consumer
 }
 
-func GetStrategy(consumerId, httpEndpoint string) func(*kafkaClient.Worker, *kafkaClient.Message, kafkaClient.TaskId) kafkaClient.WorkerResult {
-	consumeRate := metrics.NewRegisteredMeter(fmt.Sprintf("%s-ConsumeRate", consumerId), metrics.DefaultRegistry)
+func getStrategy(consumerID, httpEndpoint string) func(*kafkaClient.Worker, *kafkaClient.Message, kafkaClient.TaskId) kafkaClient.WorkerResult {
+	consumeRate := metrics.NewRegisteredMeter(fmt.Sprintf("%s-ConsumeRate", consumerID), metrics.DefaultRegistry)
 	return func(_ *kafkaClient.Worker, rawMsg *kafkaClient.Message, id kafkaClient.TaskId) kafkaClient.WorkerResult {
 		msg := string(rawMsg.Value)
 		kafkaClient.Infof("main", "Got a message: %s", msg)
@@ -244,13 +244,13 @@ func GetStrategy(consumerId, httpEndpoint string) func(*kafkaClient.Worker, *kaf
 	}
 }
 
-func FailedCallback(wm *kafkaClient.WorkerManager) kafkaClient.FailedDecision {
+func failedCallback(wm *kafkaClient.WorkerManager) kafkaClient.FailedDecision {
 	kafkaClient.Info("main", "Failed callback")
 
 	return kafkaClient.DoNotCommitOffsetAndStop
 }
 
-func FailedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResult) kafkaClient.FailedDecision {
+func failedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResult) kafkaClient.FailedDecision {
 	kafkaClient.Info("main", "Failed attempt")
 
 	return kafkaClient.CommitOffsetAndContinue

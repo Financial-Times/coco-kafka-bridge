@@ -8,7 +8,7 @@ func TestExtractJSON(t *testing.T) {
 
 	var tests = []struct {
 		kafkaMsg            string
-		expectedJsonContent string
+		expectedJSONContent string
 	}{
 		{
 			`
@@ -28,8 +28,8 @@ func TestExtractJSON(t *testing.T) {
 
 	for _, test := range tests {
 		actualJSONContent, err := extractJSON(test.kafkaMsg)
-		if err != nil || test.expectedJsonContent != actualJSONContent {
-			t.Errorf("\nExpected: %s\nActual: %s", test.expectedJsonContent, actualJSONContent)
+		if err != nil || test.expectedJSONContent != actualJSONContent {
+			t.Errorf("\nExpected: %s\nActual: %s", test.expectedJSONContent, actualJSONContent)
 		}
 	}
 }
