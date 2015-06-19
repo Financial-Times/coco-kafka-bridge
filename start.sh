@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
-./kafka-bridge kafka-bridge.properties
+go build
+./coco-kafka-bridge kafka-bridge.properties
