@@ -230,7 +230,7 @@ func getStrategy(consumerID, httpEndpoint string) func(*kafkaClient.Worker, *kaf
 
 			req.Header.Add("Host", "cms-notifier")                  //this has no effect, as it gets overridden with the URL host by the http client
 			req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
-			req.Header.Add("X-Request-Id", "tid_kafka_bridge_"+uniuri.NewLen(8))
+			req.Header.Add("X-Request-Id", "tid_kafka_bridge_" + uniuri.NewLen(8))
 
 			resp, err := client.Do(req)
 			if err != nil {

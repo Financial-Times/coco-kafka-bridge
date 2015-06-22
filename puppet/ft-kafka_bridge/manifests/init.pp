@@ -37,7 +37,6 @@ class kafka_bridge {
       File[$config_file],
       Class["${module_name}::supervisord"]
     ],
-    before      => Class["${module_name}::monitoring"],
     refreshonly => true
   }
 }
