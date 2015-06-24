@@ -10,7 +10,7 @@ class kafka_bridge ($ssh_host = 'localhost') {
   class { 'autossh': }
   class { "${module_name}::supervisord": }
 
-  autossh::ps_autossh::tunnel { 'tunnel to aws co-co cloud':
+  autossh::tunnel { 'tunnel to aws co-co cloud':
     ensure      => "present",
     ssh_host    => "$ssh_host",
     ssh_user    => "core",
