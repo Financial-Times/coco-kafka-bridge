@@ -1,4 +1,4 @@
-class kafka_bridge {
+class kafka_bridge ($ssh_host = 'localhost') {
 
   $binary_name = "kafka-bridge"
   $install_dir = "/usr/local/$binary_name"
@@ -7,7 +7,18 @@ class kafka_bridge {
   $config_file = "/etc/$binary_name.properties"
 
   class { 'common_pp_up': }
+  class { 'ps_autossh': }
   class { "${module_name}::supervisord": }
+
+  ps_autossh::tunnel { 'tunnel to aws co-co cloud':
+    ensure      => "present",
+    ssh_host    => "$ssh_host",
+    ssh_user    => "core",
+    ssh_key     => "/root/.ssh/id_rsa",
+    target_host => "127.0.0.1",
+    target_port => "8080",
+    local_port  => "8080"
+  }
 
   file {
     $install_dir:
