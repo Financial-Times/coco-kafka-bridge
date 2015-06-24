@@ -1,10 +1,12 @@
-class kafka_bridge ($ssh_host = 'localhost') {
+class kafka_bridge {
 
   $binary_name = "kafka-bridge"
   $install_dir = "/usr/local/$binary_name"
   $binary_file = "$install_dir/$binary_name"
   $log_dir = "/var/log/apps"
   $config_file = "/etc/$binary_name.properties"
+
+  $ssh_host = hiera('ssh_host', 'localhost')
 
   class { 'common_pp_up': }
   class { 'autossh': }
