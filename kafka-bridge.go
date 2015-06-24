@@ -173,9 +173,9 @@ func main() {
 	fmt.Println("Successfully shut down all consumers")
 }
 
-func startNewConsumer(bridgeConfig bridge, topic string) *kafkaClient.Consumer {
-	consumerConfig := bridgeConfig.consumerConfig
-	consumerConfig.Strategy = getStrategy(consumerConfig.Consumerid, bridgeConfig.httpEndpoint)
+func startNewConsumer(bridge bridge, topic string) *kafkaClient.Consumer {
+	consumerConfig := bridge.consumerConfig
+	consumerConfig.Strategy = getStrategy(consumerConfig.Consumerid, bridge.httpEndpoint)
 	consumerConfig.WorkerFailureCallback = failedCallback
 	consumerConfig.WorkerFailedAttemptCallback = failedAttemptCallback
 	consumer := kafkaClient.NewConsumer(consumerConfig)
@@ -208,7 +208,7 @@ func getStrategy(consumerID, httpEndpoint string) func(*kafkaClient.Worker, *kaf
 			}
 
 			req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
-			req.Header.Add("X-Request-Id", "tid_kafka_bridge_"+uniuri.NewLen(8))
+			req.Header.Add("X-Request-Id", "tid_kafka_bridge_" + uniuri.NewLen(8))
 			req.Host = "cms-notifier"
 			resp, err := client.Do(req)
 			if err != nil {
