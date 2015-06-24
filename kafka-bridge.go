@@ -42,7 +42,7 @@ type bridge struct {
 	httpEndpoint   string
 }
 
-func resolveConfig(conf string) (*bridge, string, int, string, time.Duration) {
+func resolveConfig(conf string) (*bridge, string, int) {
 	rawConfig, err := kafkaClient.LoadConfiguration(conf)
 	if err != nil {
 		panic("Failed to load configuration file")
@@ -85,7 +85,6 @@ func resolveConfig(conf string) (*bridge, string, int, string, time.Duration) {
 
 	offsetsCommitMaxRetries, _ := strconv.Atoi(rawConfig["offsets_commit_max_retries"])
 
-	flushInterval, _ := time.ParseDuration(rawConfig["flush_interval"])
 	deploymentTimeout, _ := time.ParseDuration(rawConfig["deployment_timeout"])
 
 	zkConfig := kafkaClient.NewZookeeperConfig()
@@ -128,7 +127,7 @@ func resolveConfig(conf string) (*bridge, string, int, string, time.Duration) {
 	bridgeConfig.consumerConfig = consumerConfig
 	bridgeConfig.httpEndpoint = httpEndpoint
 
-	return bridgeConfig, rawConfig["topic"], numConsumers, rawConfig["graphite_connect"], flushInterval
+	return bridgeConfig, rawConfig["topic"], numConsumers
 }
 
 func setLogLevel(logLevel string) {
@@ -158,10 +157,7 @@ func main() {
 	}
 	conf := os.Args[1]
 
-	config, topic, numConsumers, graphiteConnect, graphiteFlushInterval := resolveConfig(conf)
-	if graphiteConnect != "" {
-		startMetrics(graphiteConnect, graphiteFlushInterval)
-	}
+	config, topic, numConsumers:= resolveConfig(conf)
 
 	ctrlc := make(chan os.Signal, 1)
 	signal.Notify(ctrlc, os.Interrupt)
@@ -178,21 +174,6 @@ func main() {
 		<-consumer.Close()
 	}
 	fmt.Println("Successfully shut down all consumers")
-}
-
-func startMetrics(graphiteConnect string, graphiteFlushInterval time.Duration) {
-	addr, err := net.ResolveTCPAddr("tcp", graphiteConnect)
-	if err != nil {
-		panic(err)
-	}
-	go metrics.GraphiteWithConfig(metrics.GraphiteConfig{
-		Addr:          addr,
-		Registry:      metrics.DefaultRegistry,
-		FlushInterval: graphiteFlushInterval,
-		DurationUnit:  time.Second,
-		Prefix:        "metrics",
-		Percentiles:   []float64{0.5, 0.75, 0.95, 0.99, 0.999},
-	})
 }
 
 func startNewConsumer(bridgeConfig bridge, topic string) *kafkaClient.Consumer {
