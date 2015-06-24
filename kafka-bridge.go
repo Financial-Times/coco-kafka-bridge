@@ -262,7 +262,7 @@ func extractJSON(msg string) (jsonContent string, err error) {
 	endIndex := strings.LastIndex(msg, "}")
 
 	if (startIndex == -1 || endIndex == -1 ) {
-		return _, errors.New("Unparseable message.")
+		return jsonContent, errors.New("Unparseable message.")
 	}
 
 	jsonContent = msg[startIndex : endIndex+1]
