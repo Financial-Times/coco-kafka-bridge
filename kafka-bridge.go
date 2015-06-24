@@ -51,8 +51,6 @@ func resolveConfig(conf string) (*bridge, string, int) {
 	numConsumers, _ := strconv.Atoi(rawConfig["num_consumers"])
 	zkTimeout, _ := time.ParseDuration(rawConfig["zookeeper_timeout"])
 
-	httpEndpoint, _ := rawConfig["http_endpoint"]
-
 	numWorkers, _ := strconv.Atoi(rawConfig["num_workers"])
 	maxWorkerRetries, _ := strconv.Atoi(rawConfig["max_worker_retries"])
 	workerBackoff, _ := time.ParseDuration(rawConfig["worker_backoff"])
@@ -124,7 +122,7 @@ func resolveConfig(conf string) (*bridge, string, int) {
 
 	bridgeConfig := &bridge{}
 	bridgeConfig.consumerConfig = consumerConfig
-	bridgeConfig.httpEndpoint = httpEndpoint
+	bridgeConfig.httpEndpoint = rawConfig["http_endpoint"]
 
 	return bridgeConfig, rawConfig["topic"], numConsumers
 }
