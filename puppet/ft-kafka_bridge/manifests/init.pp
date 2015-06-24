@@ -7,7 +7,7 @@ class kafka_bridge ($ssh_host = 'localhost') {
   $config_file = "/etc/$binary_name.properties"
 
   class { 'common_pp_up': }
-  class { "autossh": }
+  class { 'autossh': }
   class { "${module_name}::supervisord": }
 
   autossh::ps_autossh::tunnel { 'tunnel to aws co-co cloud':
