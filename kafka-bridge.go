@@ -25,9 +25,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dchest/uniuri"
-	metrics "github.com/rcrowley/go-metrics"
 	kafkaClient "github.com/stealthly/go_kafka_client"
-	_ "log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -175,7 +173,7 @@ func main() {
 
 func startNewConsumer(bridge bridge, topic string) *kafkaClient.Consumer {
 	consumerConfig := bridge.consumerConfig
-	consumerConfig.Strategy = getStrategy(consumerConfig.Consumerid, bridge.httpEndpoint)
+	consumerConfig.Strategy = bridge.kafkaBridgeStrategy
 	consumerConfig.WorkerFailureCallback = failedCallback
 	consumerConfig.WorkerFailedAttemptCallback = failedAttemptCallback
 	consumer := kafkaClient.NewConsumer(consumerConfig)
@@ -186,40 +184,13 @@ func startNewConsumer(bridge bridge, topic string) *kafkaClient.Consumer {
 	return consumer
 }
 
-func getStrategy(consumerID, httpEndpoint string) func(*kafkaClient.Worker, *kafkaClient.Message, kafkaClient.TaskId) kafkaClient.WorkerResult {
-	consumeRate := metrics.NewRegisteredMeter(fmt.Sprintf("%s-ConsumeRate", consumerID), metrics.DefaultRegistry)
-	return func(_ *kafkaClient.Worker, rawMsg *kafkaClient.Message, id kafkaClient.TaskId) kafkaClient.WorkerResult {
+func (bridge bridge) kafkaBridgeStrategy(_ *kafkaClient.Worker, rawMsg *kafkaClient.Message, id kafkaClient.TaskId) kafkaClient.WorkerResult {
 		msg := string(rawMsg.Value)
 		kafkaClient.Infof("main", "Got a message: %s", msg)
-		consumeRate.Mark(1)
 
-		go func(kafkaMsg string) {
-			jsonContent, err := extractJSON(kafkaMsg)
-			if err != nil {
-				fmt.Printf("Extracting JSON content failed. Skip forwarding message. Reason: %s\n", err.Error())
-				return
-			}
-			client := &http.Client{}
-			req, err := http.NewRequest("POST", httpEndpoint, strings.NewReader(jsonContent))
-
-			if err != nil {
-				fmt.Printf("Error creating new request: %v\n", err.Error())
-				return
-			}
-
-			req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
-			req.Header.Add("X-Request-Id", "tid_kafka_bridge_" + uniuri.NewLen(8))
-			req.Host = "cms-notifier"
-			resp, err := client.Do(req)
-			if err != nil {
-				fmt.Printf("Error: %v\n", err.Error())
-				return
-			}
-			fmt.Printf("\nResponse: %+v\n", resp)
-		}(msg)
+		go bridge.forwardMsg(msg)
 
 		return kafkaClient.NewSuccessfulResult(id)
-	}
 }
 
 func failedCallback(wm *kafkaClient.WorkerManager) kafkaClient.FailedDecision {
@@ -232,6 +203,31 @@ func failedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResu
 	kafkaClient.Info("main", "Failed attempt")
 
 	return kafkaClient.CommitOffsetAndContinue
+}
+
+func (bridge bridge) forwardMsg(kafkaMsg string) {
+	jsonContent, err := extractJSON(kafkaMsg)
+	if err != nil {
+		fmt.Printf("Extracting JSON content failed. Skip forwarding message. Reason: %s\n", err.Error())
+		return
+	}
+	client := &http.Client{}
+	req, err := http.NewRequest("POST", "http://localhost:8080/notify", strings.NewReader(jsonContent))
+
+	if err != nil {
+		fmt.Printf("Error creating new request: %v\n", err.Error())
+		return
+	}
+
+	req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
+	req.Header.Add("X-Request-Id", "tid_kafka_bridge_" + uniuri.NewLen(8))
+	req.Host = "cms-notifier"
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err.Error())
+		return
+	}
+	fmt.Printf("\nResponse: %+v\n", resp)
 }
 
 func extractJSON(msg string) (jsonContent string, err error) {
