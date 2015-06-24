@@ -193,18 +193,6 @@ func (bridge bridge) kafkaBridgeStrategy(_ *kafkaClient.Worker, rawMsg *kafkaCli
 		return kafkaClient.NewSuccessfulResult(id)
 }
 
-func failedCallback(wm *kafkaClient.WorkerManager) kafkaClient.FailedDecision {
-	kafkaClient.Info("main", "Failed callback")
-
-	return kafkaClient.DoNotCommitOffsetAndStop
-}
-
-func failedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResult) kafkaClient.FailedDecision {
-	kafkaClient.Info("main", "Failed attempt")
-
-	return kafkaClient.CommitOffsetAndContinue
-}
-
 func (bridge bridge) forwardMsg(kafkaMsg string) {
 	jsonContent, err := extractJSON(kafkaMsg)
 	if err != nil {
@@ -247,3 +235,17 @@ func extractJSON(msg string) (jsonContent string, err error) {
 
 	return jsonContent, err
 }
+
+
+func failedCallback(wm *kafkaClient.WorkerManager) kafkaClient.FailedDecision {
+	kafkaClient.Info("main", "Failed callback")
+
+	return kafkaClient.DoNotCommitOffsetAndStop
+}
+
+func failedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResult) kafkaClient.FailedDecision {
+	kafkaClient.Info("main", "Failed attempt")
+
+	return kafkaClient.CommitOffsetAndContinue
+}
+
