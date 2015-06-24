@@ -34,6 +34,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"errors"
 )
 
 type bridgeConfig struct {
@@ -259,6 +260,10 @@ func failedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResu
 func extractJSON(msg string) (jsonContent string, err error) {
 	startIndex := strings.Index(msg, "{")
 	endIndex := strings.LastIndex(msg, "}")
+
+	if (startIndex == -1 || endIndex == -1 ) {
+		return _, errors.New("Unparseable message.")
+	}
 
 	jsonContent = msg[startIndex : endIndex+1]
 
