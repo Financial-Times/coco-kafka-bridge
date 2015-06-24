@@ -185,12 +185,12 @@ func startNewConsumer(bridge bridge, topic string) *kafkaClient.Consumer {
 }
 
 func (bridge bridge) kafkaBridgeStrategy(_ *kafkaClient.Worker, rawMsg *kafkaClient.Message, id kafkaClient.TaskId) kafkaClient.WorkerResult {
-		msg := string(rawMsg.Value)
-		kafkaClient.Infof("main", "Got a message: %s", msg)
+	msg := string(rawMsg.Value)
+	kafkaClient.Infof("main", "Got a message: %s", msg)
 
-		go bridge.forwardMsg(msg)
+	go bridge.forwardMsg(msg)
 
-		return kafkaClient.NewSuccessfulResult(id)
+	return kafkaClient.NewSuccessfulResult(id)
 }
 
 func (bridge bridge) forwardMsg(kafkaMsg string) {
@@ -208,7 +208,7 @@ func (bridge bridge) forwardMsg(kafkaMsg string) {
 	}
 
 	req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
-	req.Header.Add("X-Request-Id", "tid_kafka_bridge_" + uniuri.NewLen(8))
+	req.Header.Add("X-Request-Id", "tid_kafka_bridge_"+uniuri.NewLen(8))
 	req.Host = "cms-notifier"
 	resp, err := client.Do(req)
 	if err != nil {
@@ -236,7 +236,6 @@ func extractJSON(msg string) (jsonContent string, err error) {
 	return jsonContent, err
 }
 
-
 func failedCallback(wm *kafkaClient.WorkerManager) kafkaClient.FailedDecision {
 	kafkaClient.Info("main", "Failed callback")
 
@@ -248,4 +247,3 @@ func failedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResu
 
 	return kafkaClient.CommitOffsetAndContinue
 }
-
