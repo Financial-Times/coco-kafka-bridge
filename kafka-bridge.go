@@ -22,19 +22,18 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/dchest/uniuri"
 	metrics "github.com/rcrowley/go-metrics"
 	kafkaClient "github.com/stealthly/go_kafka_client"
 	_ "log"
-	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
 	"strings"
 	"time"
-	"errors"
 )
 
 type bridge struct {
@@ -157,7 +156,7 @@ func main() {
 	}
 	conf := os.Args[1]
 
-	config, topic, numConsumers:= resolveConfig(conf)
+	config, topic, numConsumers := resolveConfig(conf)
 
 	ctrlc := make(chan os.Signal, 1)
 	signal.Notify(ctrlc, os.Interrupt)
@@ -211,7 +210,7 @@ func getStrategy(consumerID, httpEndpoint string) func(*kafkaClient.Worker, *kaf
 			}
 
 			req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
-			req.Header.Add("X-Request-Id", "tid_kafka_bridge_" + uniuri.NewLen(8))
+			req.Header.Add("X-Request-Id", "tid_kafka_bridge_"+uniuri.NewLen(8))
 			req.Host = "cms-notifier"
 			resp, err := client.Do(req)
 			if err != nil {
@@ -241,7 +240,7 @@ func extractJSON(msg string) (jsonContent string, err error) {
 	startIndex := strings.Index(msg, "{")
 	endIndex := strings.LastIndex(msg, "}")
 
-	if (startIndex == -1 || endIndex == -1 ) {
+	if startIndex == -1 || endIndex == -1 {
 		return jsonContent, errors.New("Unparseable message.")
 	}
 
