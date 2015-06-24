@@ -37,12 +37,12 @@ import (
 	"errors"
 )
 
-type bridgeConfig struct {
+type bridge struct {
 	consumerConfig *kafkaClient.ConsumerConfig
 	httpEndpoint   string
 }
 
-func resolveConfig(conf string) (*bridgeConfig, string, int, string, time.Duration) {
+func resolveConfig(conf string) (*bridge, string, int, string, time.Duration) {
 	rawConfig, err := kafkaClient.LoadConfiguration(conf)
 	if err != nil {
 		panic("Failed to load configuration file")
@@ -124,7 +124,7 @@ func resolveConfig(conf string) (*bridgeConfig, string, int, string, time.Durati
 	consumerConfig.DeploymentTimeout = deploymentTimeout
 	consumerConfig.OffsetCommitInterval = 10 * time.Second
 
-	bridgeConfig := &bridgeConfig{}
+	bridgeConfig := &bridge{}
 	bridgeConfig.consumerConfig = consumerConfig
 	bridgeConfig.httpEndpoint = httpEndpoint
 
@@ -195,7 +195,7 @@ func startMetrics(graphiteConnect string, graphiteFlushInterval time.Duration) {
 	})
 }
 
-func startNewConsumer(bridgeConfig bridgeConfig, topic string) *kafkaClient.Consumer {
+func startNewConsumer(bridgeConfig bridge, topic string) *kafkaClient.Consumer {
 	consumerConfig := bridgeConfig.consumerConfig
 	consumerConfig.Strategy = getStrategy(consumerConfig.Consumerid, bridgeConfig.httpEndpoint)
 	consumerConfig.WorkerFailureCallback = failedCallback
