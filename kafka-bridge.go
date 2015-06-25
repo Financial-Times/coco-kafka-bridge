@@ -24,6 +24,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"git.svc.ft.com/scm/gl/fthealth.git"
 	"github.com/dchest/uniuri"
 	kafkaClient "github.com/stealthly/go_kafka_client"
 	"net/http"
@@ -164,6 +165,12 @@ func main() {
 		time.Sleep(10 * time.Second)
 	}
 
+        http.HandleFunc("__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-prod@ucs", config.forwardHealthcheck(), config.consumeHealthcheck()))
+       	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		fmt.Printf("Couldn't set up HTTP listener: %+v\n", err)
+	}
+
 	<-ctrlc
 	fmt.Println("Shutdown triggered, closing all alive consumers")
 	for _, consumer := range consumers {
@@ -219,6 +226,14 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) {
 	fmt.Printf("\nResponse: %+v\n", resp)
 }
 
+func (bridge BridgeApp) forwardHealthcheck() fthealth.Check {
+    return fthealth.Check{}
+}
+
+func (bridge BridgeApp) consumeHealthcheck() fthealth.Check {
+    return fthealth.Check{} 
+}
+
 func extractJSON(msg string) (jsonContent string, err error) {
 	startIndex := strings.Index(msg, "{")
 	endIndex := strings.LastIndex(msg, "}")
@@ -248,3 +263,4 @@ func failedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResu
 
 	return kafkaClient.CommitOffsetAndContinue
 }
+
