@@ -239,18 +239,18 @@ func main() {
 	}
 	conf := os.Args[1]
 
-	config, topic, numConsumers := resolveConfig(conf)
+	bridgeApp, topic, numConsumers := resolveConfig(conf)
 
 	ctrlc := make(chan os.Signal, 1)
 	signal.Notify(ctrlc, os.Interrupt)
 
 	consumers := make([]*kafkaClient.Consumer, numConsumers)
 	for i := 0; i < numConsumers; i++ {
-		consumers[i] = startNewConsumer(*config, topic)
+		consumers[i] = startNewConsumer(*bridgeApp, topic)
 		time.Sleep(10 * time.Second)
 	}
 
-	http.HandleFunc("__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-prod@ucs", config.forwardHealthcheck(), config.consumeHealthcheck()))
+	http.HandleFunc("__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-prod@ucs", bridgeApp.forwardHealthcheck(), bridgeApp.consumeHealthcheck()))
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		fmt.Printf("Couldn't set up HTTP listener: %+v\n", err)
