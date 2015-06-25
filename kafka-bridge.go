@@ -41,8 +41,8 @@ type BridgeApp struct {
 	httpEndpoint   string
 }
 
-func resolveConfig(conf string) (*BridgeApp, string, int) {
-	rawConfig, err := kafkaClient.LoadConfiguration(conf)
+func resolveConfig(confPath string) (*BridgeApp, string, int) {
+	rawConfig, err := kafkaClient.LoadConfiguration(confPath)
 	if err != nil {
 		panic("Failed to load configuration file")
 	}
@@ -148,7 +148,7 @@ func setLogLevel(logLevel string) {
 	kafkaClient.Logger = kafkaClient.NewDefaultLogger(level)
 }
 
-func startNewConsumer(bridge BridgeApp, topic string) *kafkaClient.Consumer {
+func (bridge BridgeApp) startNewConsumer(topic string) *kafkaClient.Consumer {
 	consumerConfig := bridge.consumerConfig
 	consumerConfig.Strategy = bridge.kafkaBridgeStrategy
 	consumerConfig.WorkerFailureCallback = failedCallback
@@ -246,15 +246,17 @@ func main() {
 
 	consumers := make([]*kafkaClient.Consumer, numConsumers)
 	for i := 0; i < numConsumers; i++ {
-		consumers[i] = startNewConsumer(*bridgeApp, topic)
+		consumers[i] = bridgeApp.startNewConsumer(topic)
 		time.Sleep(10 * time.Second)
 	}
 
-	http.HandleFunc("__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-prod@ucs", bridgeApp.forwardHealthcheck(), bridgeApp.consumeHealthcheck()))
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		fmt.Printf("Couldn't set up HTTP listener: %+v\n", err)
-	}
+	go func() {
+		http.HandleFunc("__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-prod@ucs", bridgeApp.forwardHealthcheck(), bridgeApp.consumeHealthcheck()))
+		err := http.ListenAndServe(":8081", nil)
+		if err != nil {
+			fmt.Printf("Couldn't set up HTTP listener: %+v\n", err)
+		}
+	}()
 
 	<-ctrlc
 	fmt.Println("Shutdown triggered, closing all alive consumers")
