@@ -165,8 +165,8 @@ func main() {
 		time.Sleep(10 * time.Second)
 	}
 
-        http.HandleFunc("__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-prod@ucs", config.forwardHealthcheck(), config.consumeHealthcheck()))
-       	err := http.ListenAndServe(":8080", nil)
+	http.HandleFunc("__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-prod@ucs", config.forwardHealthcheck(), config.consumeHealthcheck()))
+	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		fmt.Printf("Couldn't set up HTTP listener: %+v\n", err)
 	}
@@ -227,11 +227,11 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) {
 }
 
 func (bridge BridgeApp) forwardHealthcheck() fthealth.Check {
-    return fthealth.Check{}
+	return fthealth.Check{}
 }
 
 func (bridge BridgeApp) consumeHealthcheck() fthealth.Check {
-    return fthealth.Check{} 
+	return fthealth.Check{}
 }
 
 func extractJSON(msg string) (jsonContent string, err error) {
@@ -263,4 +263,3 @@ func failedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResu
 
 	return kafkaClient.CommitOffsetAndContinue
 }
-
