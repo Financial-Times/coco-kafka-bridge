@@ -148,37 +148,6 @@ func setLogLevel(logLevel string) {
 	kafkaClient.Logger = kafkaClient.NewDefaultLogger(level)
 }
 
-func main() {
-	if len(os.Args) < 2 {
-		panic("Conf file path must be provided")
-	}
-	conf := os.Args[1]
-
-	config, topic, numConsumers := resolveConfig(conf)
-
-	ctrlc := make(chan os.Signal, 1)
-	signal.Notify(ctrlc, os.Interrupt)
-
-	consumers := make([]*kafkaClient.Consumer, numConsumers)
-	for i := 0; i < numConsumers; i++ {
-		consumers[i] = startNewConsumer(*config, topic)
-		time.Sleep(10 * time.Second)
-	}
-
-	http.HandleFunc("__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-prod@ucs", config.forwardHealthcheck(), config.consumeHealthcheck()))
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		fmt.Printf("Couldn't set up HTTP listener: %+v\n", err)
-	}
-
-	<-ctrlc
-	fmt.Println("Shutdown triggered, closing all alive consumers")
-	for _, consumer := range consumers {
-		<-consumer.Close()
-	}
-	fmt.Println("Successfully shut down all consumers")
-}
-
 func startNewConsumer(bridge BridgeApp, topic string) *kafkaClient.Consumer {
 	consumerConfig := bridge.consumerConfig
 	consumerConfig.Strategy = bridge.kafkaBridgeStrategy
@@ -226,14 +195,6 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) {
 	fmt.Printf("\nResponse: %+v\n", resp)
 }
 
-func (bridge BridgeApp) forwardHealthcheck() fthealth.Check {
-	return fthealth.Check{}
-}
-
-func (bridge BridgeApp) consumeHealthcheck() fthealth.Check {
-	return fthealth.Check{}
-}
-
 func extractJSON(msg string) (jsonContent string, err error) {
 	startIndex := strings.Index(msg, "{")
 	endIndex := strings.LastIndex(msg, "}")
@@ -262,4 +223,43 @@ func failedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResu
 	kafkaClient.Info("main", "Failed attempt")
 
 	return kafkaClient.CommitOffsetAndContinue
+}
+
+func (bridge BridgeApp) forwardHealthcheck() fthealth.Check {
+	return fthealth.Check{}
+}
+
+func (bridge BridgeApp) consumeHealthcheck() fthealth.Check {
+	return fthealth.Check{}
+}
+
+func main() {
+	if len(os.Args) < 2 {
+		panic("Conf file path must be provided")
+	}
+	conf := os.Args[1]
+
+	config, topic, numConsumers := resolveConfig(conf)
+
+	ctrlc := make(chan os.Signal, 1)
+	signal.Notify(ctrlc, os.Interrupt)
+
+	consumers := make([]*kafkaClient.Consumer, numConsumers)
+	for i := 0; i < numConsumers; i++ {
+		consumers[i] = startNewConsumer(*config, topic)
+		time.Sleep(10 * time.Second)
+	}
+
+	http.HandleFunc("__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-prod@ucs", config.forwardHealthcheck(), config.consumeHealthcheck()))
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		fmt.Printf("Couldn't set up HTTP listener: %+v\n", err)
+	}
+
+	<-ctrlc
+	fmt.Println("Shutdown triggered, closing all alive consumers")
+	for _, consumer := range consumers {
+		<-consumer.Close()
+	}
+	fmt.Println("Successfully shut down all consumers")
 }
