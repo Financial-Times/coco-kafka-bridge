@@ -35,12 +35,12 @@ import (
 )
 
 // Struct containing bridge properties
-type BridgeConfig struct {
+type BridgeApp struct {
 	consumerConfig *kafkaClient.ConsumerConfig
 	httpEndpoint   string
 }
 
-func resolveConfig(conf string) (*BridgeConfig, string, int) {
+func resolveConfig(conf string) (*BridgeApp, string, int) {
 	rawConfig, err := kafkaClient.LoadConfiguration(conf)
 	if err != nil {
 		panic("Failed to load configuration file")
@@ -119,7 +119,7 @@ func resolveConfig(conf string) (*BridgeConfig, string, int) {
 	consumerConfig.DeploymentTimeout = deploymentTimeout
 	consumerConfig.OffsetCommitInterval = 10 * time.Second
 
-	bridgeConfig := &BridgeConfig{}
+	bridgeConfig := &BridgeApp{}
 	bridgeConfig.consumerConfig = consumerConfig
 	bridgeConfig.httpEndpoint = rawConfig["http_endpoint"]
 
@@ -172,7 +172,7 @@ func main() {
 	fmt.Println("Successfully shut down all consumers")
 }
 
-func startNewConsumer(bridge BridgeConfig, topic string) *kafkaClient.Consumer {
+func startNewConsumer(bridge BridgeApp, topic string) *kafkaClient.Consumer {
 	consumerConfig := bridge.consumerConfig
 	consumerConfig.Strategy = bridge.kafkaBridgeStrategy
 	consumerConfig.WorkerFailureCallback = failedCallback
@@ -185,7 +185,7 @@ func startNewConsumer(bridge BridgeConfig, topic string) *kafkaClient.Consumer {
 	return consumer
 }
 
-func (bridge BridgeConfig) kafkaBridgeStrategy(_ *kafkaClient.Worker, rawMsg *kafkaClient.Message, id kafkaClient.TaskId) kafkaClient.WorkerResult {
+func (bridge BridgeApp) kafkaBridgeStrategy(_ *kafkaClient.Worker, rawMsg *kafkaClient.Message, id kafkaClient.TaskId) kafkaClient.WorkerResult {
 	msg := string(rawMsg.Value)
 	kafkaClient.Infof("main", "Got a message: %s", msg)
 
@@ -194,7 +194,7 @@ func (bridge BridgeConfig) kafkaBridgeStrategy(_ *kafkaClient.Worker, rawMsg *ka
 	return kafkaClient.NewSuccessfulResult(id)
 }
 
-func (bridge BridgeConfig) forwardMsg(kafkaMsg string) {
+func (bridge BridgeApp) forwardMsg(kafkaMsg string) {
 	jsonContent, err := extractJSON(kafkaMsg)
 	if err != nil {
 		fmt.Printf("Extracting JSON content failed. Skip forwarding message. Reason: %s\n", err.Error())
