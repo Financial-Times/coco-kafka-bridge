@@ -170,18 +170,18 @@ func (bridge BridgeApp) kafkaBridgeStrategy(_ *kafkaClient.Worker, rawMsg *kafka
 	return kafkaClient.NewSuccessfulResult(id)
 }
 
-func (bridge BridgeApp) forwardMsg(kafkaMsg string) {
+func (bridge BridgeApp) forwardMsg(kafkaMsg string) error{
 	jsonContent, err := extractJSON(kafkaMsg)
 	if err != nil {
 		fmt.Printf("Extracting JSON content failed. Skip forwarding message. Reason: %s\n", err.Error())
-		return
+		return err
 	}
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", "http://localhost:8080/notify", strings.NewReader(jsonContent))
 
 	if err != nil {
 		fmt.Printf("Error creating new request: %v\n", err.Error())
-		return
+		return err
 	}
 
 	req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
@@ -190,9 +190,13 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err.Error())
-		return
+		return err
 	}
 	fmt.Printf("\nResponse: %+v\n", resp)
+	if (resp.StatusCode != http.StatusOK) {
+		return errors.New("Forwarding message is not successful")
+	}
+	return nil
 }
 
 func extractJSON(msg string) (jsonContent string, err error) {
@@ -226,11 +230,33 @@ func failedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResu
 }
 
 func (bridge BridgeApp) forwardHealthcheck() fthealth.Check {
-	return fthealth.Check{}
+	return fthealth.Check{
+		BusinessImpact:   "Forwarding messages to coco cluster won't work. Containerised stack is NOT in ACTIVE state.",
+		Name:             "Forward to aws co-co cluster",
+		PanicGuide:       "none",
+		Severity:         1,
+		TechnicalSummary: "Forwarding messages is broken. Check networking, aws cluster reachability and/pr coco cms-notifier state.",
+		Checker:          bridge.checkForwardable,
+	}
+}
+
+func (bridge BridgeApp) checkForwardable() error {
+	return bridge.forwardMsg("{}")
 }
 
 func (bridge BridgeApp) consumeHealthcheck() fthealth.Check {
-	return fthealth.Check{}
+	return fthealth.Check{
+		BusinessImpact:   "Consuming messages from kafka won't work. Containerised stack is NOT in ACTIVE state.",
+		Name:             "Consume from kafka",
+		PanicGuide:       "none",
+		Severity:         1,
+		TechnicalSummary: "Consuming messages is broken. Check kafka/zookeeper is reachable.",
+		Checker:          bridge.checkConsumable,
+	}
+}
+
+func (bridge BridgeApp) checkConsumable() error {
+	return nil
 }
 
 func main() {
