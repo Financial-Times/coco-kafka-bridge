@@ -170,7 +170,7 @@ func (bridge BridgeApp) kafkaBridgeStrategy(_ *kafkaClient.Worker, rawMsg *kafka
 	return kafkaClient.NewSuccessfulResult(id)
 }
 
-func (bridge BridgeApp) forwardMsg(kafkaMsg string) error{
+func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 	jsonContent, err := extractJSON(kafkaMsg)
 	if err != nil {
 		fmt.Printf("Extracting JSON content failed. Skip forwarding message. Reason: %s\n", err.Error())
@@ -193,7 +193,7 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error{
 		return err
 	}
 	fmt.Printf("\nResponse: %+v\n", resp)
-	if (resp.StatusCode != http.StatusOK) {
+	if resp.StatusCode != http.StatusOK {
 		return errors.New("Forwarding message is not successful")
 	}
 	return nil
@@ -285,7 +285,7 @@ func main() {
 		}
 	}()
 
-	<- ctrlc
+	<-ctrlc
 	fmt.Println("Shutdown triggered, closing all alive consumers")
 	for _, consumer := range consumers {
 		<-consumer.Close()
