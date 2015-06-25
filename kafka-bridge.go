@@ -281,10 +281,11 @@ func main() {
 		err := http.ListenAndServe(":8080", nil)
 		if err != nil {
 			fmt.Printf("Couldn't set up HTTP listener: %+v\n", err)
+			close(ctrlc)
 		}
 	}()
 
-	<-ctrlc
+	<- ctrlc
 	fmt.Println("Shutdown triggered, closing all alive consumers")
 	for _, consumer := range consumers {
 		<-consumer.Close()
