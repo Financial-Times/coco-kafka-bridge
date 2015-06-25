@@ -231,7 +231,7 @@ func failedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResu
 
 func (bridge BridgeApp) forwardHealthcheck() fthealth.Check {
 	return fthealth.Check{
-		BusinessImpact:   "Forwarding messages to coco cluster won't work. Containerised stack is NOT in ACTIVE state.",
+		BusinessImpact:   "Forwarding messages to coco cluster won't work. Publishing in the containerised stack won't work.",
 		Name:             "Forward to aws co-co cluster",
 		PanicGuide:       "none",
 		Severity:         1,
@@ -246,7 +246,7 @@ func (bridge BridgeApp) checkForwardable() error {
 
 func (bridge BridgeApp) consumeHealthcheck() fthealth.Check {
 	return fthealth.Check{
-		BusinessImpact:   "Consuming messages from kafka won't work. Containerised stack is NOT in ACTIVE state.",
+		BusinessImpact:   "Consuming messages from kafka won't work. Publishing in the containerised stack won't work.",
 		Name:             "Consume from kafka",
 		PanicGuide:       "none",
 		Severity:         1,
