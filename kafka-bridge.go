@@ -24,7 +24,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"git.svc.ft.com/scm/gl/fthealth.git"
+	fthealth "github.com/Financial-Times/go-fthealth"
 	"github.com/dchest/uniuri"
 	kafkaClient "github.com/stealthly/go_kafka_client"
 	"net/http"
