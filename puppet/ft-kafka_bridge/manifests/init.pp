@@ -6,8 +6,6 @@ class kafka_bridge {
   $log_dir = "/var/log/apps"
   $config_file = "/etc/$binary_name.properties"
 
-  $ssh_host = hiera('ssh_host', 'localhost')
-
   class { 'common_pp_up': }
   class { 'autossh': }
   class { "${module_name}::supervisord": }
