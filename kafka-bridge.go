@@ -260,6 +260,7 @@ func (bridge BridgeApp) consumeHealthcheck() fthealth.Check {
 }
 
 func (bridge BridgeApp) checkConsumable() error {
+	//TODO
 	return nil
 }
 
