@@ -12,18 +12,6 @@ class kafka_bridge {
   class { 'autossh': }
   class { "${module_name}::supervisord": }
 
-  autossh::tunnel { 'tunnel to aws co-co cloud':
-    ensure        => "present",
-    ssh_host      => "$ssh_host",
-    ssh_user      => "core",
-    ssh_key       => "/root/.ssh/id_rsa",
-    target_host   => "127.0.0.1",
-    target_port   => "8080",
-    local_port    => "8081",
-    monitor_port  => "20000",
-    ssh_options   => "-Nn"
-  }
-
   file {
     $install_dir:
       mode    => "0664",

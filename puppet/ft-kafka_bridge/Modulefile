@@ -10,4 +10,3 @@ project_page 'UNKNOWN'
 ## Add dependencies, if any:
 dependency 'ft/common_pp_up', '>=0.0.1'
 dependency 'ft/satellitesubscribe', '0.0.x'
-dependency 'proudsourcing/autossh', '>=0.0.0'
