@@ -177,7 +177,7 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 		return err
 	}
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", "http://localhost:8080/notify", strings.NewReader(jsonContent))
+	req, err := http.NewRequest("POST", bridge.httpEndpoint, strings.NewReader(jsonContent))
 
 	if err != nil {
 		fmt.Printf("Error creating new request: %v\n", err.Error())
