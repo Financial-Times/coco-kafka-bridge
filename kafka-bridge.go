@@ -24,6 +24,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"git.svc.ft.com/scm/gl/fthealth.git"
 	"github.com/dchest/uniuri"
 	kafkaClient "github.com/stealthly/go_kafka_client"
 	"net/http"
@@ -35,13 +36,13 @@ import (
 )
 
 // Struct containing bridge properties
-type BridgeConfig struct {
+type BridgeApp struct {
 	consumerConfig *kafkaClient.ConsumerConfig
 	httpEndpoint   string
 }
 
-func resolveConfig(conf string) (*BridgeConfig, string, int) {
-	rawConfig, err := kafkaClient.LoadConfiguration(conf)
+func resolveConfig(confPath string) (*BridgeApp, string, int) {
+	rawConfig, err := kafkaClient.LoadConfiguration(confPath)
 	if err != nil {
 		panic("Failed to load configuration file")
 	}
@@ -119,7 +120,7 @@ func resolveConfig(conf string) (*BridgeConfig, string, int) {
 	consumerConfig.DeploymentTimeout = deploymentTimeout
 	consumerConfig.OffsetCommitInterval = 10 * time.Second
 
-	bridgeConfig := &BridgeConfig{}
+	bridgeConfig := &BridgeApp{}
 	bridgeConfig.consumerConfig = consumerConfig
 	bridgeConfig.httpEndpoint = rawConfig["http_endpoint"]
 
@@ -147,32 +148,7 @@ func setLogLevel(logLevel string) {
 	kafkaClient.Logger = kafkaClient.NewDefaultLogger(level)
 }
 
-func main() {
-	if len(os.Args) < 2 {
-		panic("Conf file path must be provided")
-	}
-	conf := os.Args[1]
-
-	config, topic, numConsumers := resolveConfig(conf)
-
-	ctrlc := make(chan os.Signal, 1)
-	signal.Notify(ctrlc, os.Interrupt)
-
-	consumers := make([]*kafkaClient.Consumer, numConsumers)
-	for i := 0; i < numConsumers; i++ {
-		consumers[i] = startNewConsumer(*config, topic)
-		time.Sleep(10 * time.Second)
-	}
-
-	<-ctrlc
-	fmt.Println("Shutdown triggered, closing all alive consumers")
-	for _, consumer := range consumers {
-		<-consumer.Close()
-	}
-	fmt.Println("Successfully shut down all consumers")
-}
-
-func startNewConsumer(bridge BridgeConfig, topic string) *kafkaClient.Consumer {
+func (bridge BridgeApp) startNewConsumer(topic string) *kafkaClient.Consumer {
 	consumerConfig := bridge.consumerConfig
 	consumerConfig.Strategy = bridge.kafkaBridgeStrategy
 	consumerConfig.WorkerFailureCallback = failedCallback
@@ -185,7 +161,7 @@ func startNewConsumer(bridge BridgeConfig, topic string) *kafkaClient.Consumer {
 	return consumer
 }
 
-func (bridge BridgeConfig) kafkaBridgeStrategy(_ *kafkaClient.Worker, rawMsg *kafkaClient.Message, id kafkaClient.TaskId) kafkaClient.WorkerResult {
+func (bridge BridgeApp) kafkaBridgeStrategy(_ *kafkaClient.Worker, rawMsg *kafkaClient.Message, id kafkaClient.TaskId) kafkaClient.WorkerResult {
 	msg := string(rawMsg.Value)
 	kafkaClient.Infof("main", "Got a message: %s", msg)
 
@@ -194,18 +170,18 @@ func (bridge BridgeConfig) kafkaBridgeStrategy(_ *kafkaClient.Worker, rawMsg *ka
 	return kafkaClient.NewSuccessfulResult(id)
 }
 
-func (bridge BridgeConfig) forwardMsg(kafkaMsg string) {
+func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 	jsonContent, err := extractJSON(kafkaMsg)
 	if err != nil {
 		fmt.Printf("Extracting JSON content failed. Skip forwarding message. Reason: %s\n", err.Error())
-		return
+		return err
 	}
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", "http://localhost:8080/notify", strings.NewReader(jsonContent))
+	req, err := http.NewRequest("POST", bridge.httpEndpoint, strings.NewReader(jsonContent))
 
 	if err != nil {
 		fmt.Printf("Error creating new request: %v\n", err.Error())
-		return
+		return err
 	}
 
 	req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
@@ -214,9 +190,13 @@ func (bridge BridgeConfig) forwardMsg(kafkaMsg string) {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err.Error())
-		return
+		return err
 	}
 	fmt.Printf("\nResponse: %+v\n", resp)
+	if resp.StatusCode != http.StatusOK {
+            return errors.New("Forwarding message is not successful. Status: " + string(resp.StatusCode))
+	}
+	return nil
 }
 
 func extractJSON(msg string) (jsonContent string, err error) {
@@ -247,4 +227,68 @@ func failedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResu
 	kafkaClient.Info("main", "Failed attempt")
 
 	return kafkaClient.CommitOffsetAndContinue
+}
+
+func (bridge BridgeApp) forwardHealthcheck() fthealth.Check {
+	return fthealth.Check{
+		BusinessImpact:   "Forwarding messages to coco cluster won't work. Publishing in the containerised stack won't work.",
+		Name:             "Forward to aws co-co cluster",
+		PanicGuide:       "none",
+		Severity:         1,
+		TechnicalSummary: "Forwarding messages is broken. Check networking, aws cluster reachability and/pr coco cms-notifier state.",
+		Checker:          bridge.checkForwardable,
+	}
+}
+
+func (bridge BridgeApp) checkForwardable() error {
+	return bridge.forwardMsg("{}")
+}
+
+func (bridge BridgeApp) consumeHealthcheck() fthealth.Check {
+	return fthealth.Check{
+		BusinessImpact:   "Consuming messages from kafka won't work. Publishing in the containerised stack won't work.",
+		Name:             "Consume from kafka",
+		PanicGuide:       "none",
+		Severity:         1,
+		TechnicalSummary: "Consuming messages is broken. Check kafka/zookeeper is reachable.",
+		Checker:          bridge.checkConsumable,
+	}
+}
+
+func (bridge BridgeApp) checkConsumable() error {
+	return nil
+}
+
+func main() {
+	if len(os.Args) < 2 {
+		panic("Conf file path must be provided")
+	}
+	conf := os.Args[1]
+
+	bridgeApp, topic, numConsumers := resolveConfig(conf)
+
+	ctrlc := make(chan os.Signal, 1)
+	signal.Notify(ctrlc, os.Interrupt)
+
+	consumers := make([]*kafkaClient.Consumer, numConsumers)
+	for i := 0; i < numConsumers; i++ {
+		consumers[i] = bridgeApp.startNewConsumer(topic)
+		time.Sleep(10 * time.Second)
+	}
+
+	go func() {
+		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-prod@ucs", bridgeApp.forwardHealthcheck(), bridgeApp.consumeHealthcheck()))
+		err := http.ListenAndServe(":8080", nil)
+		if err != nil {
+			fmt.Printf("Couldn't set up HTTP listener: %+v\n", err)
+			close(ctrlc)
+		}
+	}()
+
+	<-ctrlc
+	fmt.Println("Shutdown triggered, closing all alive consumers")
+	for _, consumer := range consumers {
+		<-consumer.Close()
+	}
+	fmt.Println("Successfully shut down all consumers")
 }
