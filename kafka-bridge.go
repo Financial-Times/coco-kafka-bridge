@@ -122,7 +122,7 @@ func resolveConfig(confPath string) (*BridgeApp, string, int) {
 
 	bridgeConfig := &BridgeApp{}
 	bridgeConfig.consumerConfig = consumerConfig
-	bridgeConfig.httpEndpoint = rawConfig["http_endpoint"]
+	bridgeConfig.httpEndpoint = buildHttpEndpoint(rawConfig["http_host"])
 
 	return bridgeConfig, rawConfig["topic"], numConsumers
 }
@@ -146,6 +146,10 @@ func setLogLevel(logLevel string) {
 		level = kafkaClient.InfoLevel
 	}
 	kafkaClient.Logger = kafkaClient.NewDefaultLogger(level)
+}
+
+func buildHttpEndpoint(host string) string{
+	return "http://" + strings.Trim(host,"/") + "/notify"
 }
 
 func (bridge BridgeApp) startNewConsumer(topic string) *kafkaClient.Consumer {
@@ -235,7 +239,7 @@ func (bridge BridgeApp) forwardHealthcheck() fthealth.Check {
 		Name:             "Forward to aws co-co cluster",
 		PanicGuide:       "none",
 		Severity:         1,
-		TechnicalSummary: "Forwarding messages is broken. Check networking, aws cluster reachability and/pr coco cms-notifier state.",
+		TechnicalSummary: "Forwarding messages is broken. Check networking, aws cluster reachability and/or coco cms-notifier state.",
 		Checker:          bridge.checkForwardable,
 	}
 }
