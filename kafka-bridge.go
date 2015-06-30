@@ -194,7 +194,7 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 	}
 	fmt.Printf("\nResponse: %+v\n", resp)
 	if resp.StatusCode != http.StatusOK {
-		return errors.New("Forwarding message is not successful")
+            return errors.New("Forwarding message is not successful. Status: " + string(resp.StatusCode))
 	}
 	return nil
 }
