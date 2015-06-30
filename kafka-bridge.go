@@ -239,7 +239,7 @@ func (bridge BridgeApp) forwardHealthcheck() fthealth.Check {
 		Name:             "Forward to aws co-co cluster",
 		PanicGuide:       "none",
 		Severity:         1,
-		TechnicalSummary: "Forwarding messages is broken. Check networking, aws cluster reachability and/pr coco cms-notifier state.",
+		TechnicalSummary: "Forwarding messages is broken. Check networking, aws cluster reachability and/or coco cms-notifier state.",
 		Checker:          bridge.checkForwardable,
 	}
 }
