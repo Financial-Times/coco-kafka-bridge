@@ -33,3 +33,25 @@ func TestExtractJSON(t *testing.T) {
 		}
 	}
 }
+
+func TestBuildHTTPEndpoint(t *testing.T) {
+	var tests = []struct {
+		host, expectedHttpEndpoint string
+	} {
+		{
+			"123-cluster-elb-456.eu-west-1.elb.amazonaws.com",
+			"http://123-cluster-elb-456.eu-west-1.elb.amazonaws.com/notify",
+		},
+		{
+			"/123-cluster-elb-456.eu-west-1.elb.amazonaws.com/",
+			"http://123-cluster-elb-456.eu-west-1.elb.amazonaws.com/notify",
+		},
+	}
+
+	for _, test := range tests {
+		actualHTTPEndpoint := buildHttpEndpoint(test.host)
+		if test.expectedHttpEndpoint != actualHTTPEndpoint {
+			t.Errorf("\nExpected: %s\nActual: %s", test.expectedHttpEndpoint, actualHTTPEndpoint)
+		}
+	}
+}

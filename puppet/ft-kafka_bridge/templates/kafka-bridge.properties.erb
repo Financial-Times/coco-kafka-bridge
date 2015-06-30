@@ -10,7 +10,7 @@ zookeeper_connect=<%=scope.function_hiera('zookeepers',nil)%>
 zookeeper_timeout=10s
 
 #HTTP endpoint
-http_endpoint=<%=scope.function_hiera('http_endpoint',nil)%>
+http_host=<%=scope.function_hiera('http_host',nil)%>
 
 #workers settings
 num_workers=1

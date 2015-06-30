@@ -122,7 +122,7 @@ func resolveConfig(confPath string) (*BridgeApp, string, int) {
 
 	bridgeConfig := &BridgeApp{}
 	bridgeConfig.consumerConfig = consumerConfig
-	bridgeConfig.httpEndpoint = rawConfig["http_endpoint"]
+	bridgeConfig.httpEndpoint = buildHttpEndpoint(rawConfig["http_host"])
 
 	return bridgeConfig, rawConfig["topic"], numConsumers
 }
@@ -146,6 +146,10 @@ func setLogLevel(logLevel string) {
 		level = kafkaClient.InfoLevel
 	}
 	kafkaClient.Logger = kafkaClient.NewDefaultLogger(level)
+}
+
+func buildHttpEndpoint(host string) string{
+	return "http://" + strings.Trim(host,"/") + "/notify"
 }
 
 func (bridge BridgeApp) startNewConsumer(topic string) *kafkaClient.Consumer {
