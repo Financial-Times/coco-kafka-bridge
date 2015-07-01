@@ -7,6 +7,7 @@ class kafka_bridge {
   $config_file = "/etc/$binary_name.properties"
 
   class { 'common_pp_up': }
+  class { "${module_name}::monitoring": }
   class { "${module_name}::supervisord": }
 
   file {
