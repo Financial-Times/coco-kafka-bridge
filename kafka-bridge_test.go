@@ -121,6 +121,7 @@ func TestExtractOriginSystem(t *testing.T) {
 	var tests = []struct {
 		msg                  string
 		expectedSystemOrigin string
+		expectedErrorMsg	 string
 	}{
 		{
 			`
@@ -132,6 +133,7 @@ func TestExtractOriginSystem(t *testing.T) {
 			X-Request-Id: t9happe59y
 			`,
 			"methode-web-pub",
+			"",
 		},
 		{
 			`
@@ -142,6 +144,7 @@ func TestExtractOriginSystem(t *testing.T) {
 			X-Request-Id: t9happe59y
 			`,
 			"",
+			"Origin system id is not set",
 		},
 		{
 			`
@@ -153,12 +156,16 @@ func TestExtractOriginSystem(t *testing.T) {
 			X-Request-Id: t9happe59y
 			`,
 			"",
+			"Origin system id is not set",
 		},
 	}
 
 	for _, test := range tests {
-		actualSystemOrigin := extractOriginSystem(test.msg)
-		if test.expectedSystemOrigin != actualSystemOrigin {
+		actualSystemOrigin, err := extractOriginSystem(test.msg)
+		if err != nil && !strings.Contains(err.Error(), test.expectedErrorMsg) {
+			t.Errorf("\nExpected: %s\nActual: %s", test.expectedErrorMsg, err.Error())
+		}
+		if err == nil && test.expectedSystemOrigin != actualSystemOrigin {
 			t.Errorf("\nExpected: %s\nActual: %s", test.expectedSystemOrigin, actualSystemOrigin)
 		}
 	}

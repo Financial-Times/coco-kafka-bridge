@@ -189,10 +189,9 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 		return err
 	}
 
-	originSystem := extractOriginSystem(kafkaMsg)
-	if originSystem == "" {
-		err = errors.New("Origin system is not set. Skip forwarding message.")
-		fmt.Printf("%s", err.Error())
+	originSystem, err := extractOriginSystem(kafkaMsg)
+	if err != nil {
+		fmt.Printf("Error parsing origin system id. Skip forwarding message. Reason: %s", err.Error())
 		return err
 	}
 	tid, err := extractTID(kafkaMsg)
@@ -248,11 +247,15 @@ func extractTID(msg string) (tid string, err error) {
 	return tid, nil
 }
 
-func extractOriginSystem(msg string) string {
+func extractOriginSystem(msg string) (string, error) {
 	origSysHeaderRegexp := regexp.MustCompile(`Origin-System-Id:\s[a-zA-Z0-9:/.-]*`)
-	systemHeader := origSysHeaderRegexp.FindString(msg)
-	origSys := regexp.MustCompile(`[a-zA-Z-]*$`)
-	return origSys.FindString(systemHeader)
+	origSysHeader := origSysHeaderRegexp.FindString(msg)
+	systemIDRegexp := regexp.MustCompile(`[a-zA-Z-]*$`)
+	systemID := systemIDRegexp.FindString(origSysHeader)
+    if (systemID == "") {
+        return "", errors.New("Origin system id is not set.")
+    }
+	return systemID, nil
 }
 
 func failedCallback(wm *kafkaClient.WorkerManager) kafkaClient.FailedDecision {
