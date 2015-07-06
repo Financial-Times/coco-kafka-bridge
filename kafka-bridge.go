@@ -252,9 +252,9 @@ func extractOriginSystem(msg string) (string, error) {
 	origSysHeader := origSysHeaderRegexp.FindString(msg)
 	systemIDRegexp := regexp.MustCompile(`[a-zA-Z-]*$`)
 	systemID := systemIDRegexp.FindString(origSysHeader)
-    if (systemID == "") {
-        return "", errors.New("Origin system id is not set.")
-    }
+	if systemID == "" {
+		return "", errors.New("Origin system id is not set.")
+	}
 	return systemID, nil
 }
 

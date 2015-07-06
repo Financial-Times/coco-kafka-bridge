@@ -121,7 +121,7 @@ func TestExtractOriginSystem(t *testing.T) {
 	var tests = []struct {
 		msg                  string
 		expectedSystemOrigin string
-		expectedErrorMsg	 string
+		expectedErrorMsg     string
 	}{
 		{
 			`
