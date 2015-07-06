@@ -30,10 +30,10 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
-	"regexp"
 )
 
 // BridgeApp wraps the config and represents the API for the bridge
@@ -190,7 +190,7 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 	}
 
 	originSystem := extractOriginSystem(kafkaMsg)
-	if (originSystem == "") {
+	if originSystem == "" {
 		err = errors.New("Origin system is not set. Skip forwarding message.")
 		fmt.Printf("%s", err.Error())
 		return err

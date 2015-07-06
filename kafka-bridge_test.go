@@ -119,9 +119,9 @@ func TestExtractTID(t *testing.T) {
 
 func TestExtractOriginSystem(t *testing.T) {
 	var tests = []struct {
-		msg string
+		msg                  string
 		expectedSystemOrigin string
-	} {
+	}{
 		{
 			`
 			Message-Id: fc429b46-2500-4fe7-88bb-fd507fbaf00c
@@ -158,9 +158,8 @@ func TestExtractOriginSystem(t *testing.T) {
 
 	for _, test := range tests {
 		actualSystemOrigin := extractOriginSystem(test.msg)
-		if test.expectedSystemOrigin != actualSystemOrigin  {
+		if test.expectedSystemOrigin != actualSystemOrigin {
 			t.Errorf("\nExpected: %s\nActual: %s", test.expectedSystemOrigin, actualSystemOrigin)
 		}
 	}
 }
-
