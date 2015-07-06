@@ -148,8 +148,8 @@ func setLogLevel(logLevel string) {
 	kafkaClient.Logger = kafkaClient.NewDefaultLogger(level)
 }
 
-func buildHttpEndpoint(host string) string{
-	return "http://" + strings.Trim(host,"/") + "/notify"
+func buildHttpEndpoint(host string) string {
+	return "http://" + strings.Trim(host, "/") + "/notify"
 }
 
 func (bridge BridgeApp) startNewConsumer(topic string) *kafkaClient.Consumer {
@@ -206,7 +206,7 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 	}
 	fmt.Printf("\nResponse: %+v\n", resp)
 	if resp.StatusCode != http.StatusOK {
-            return errors.New("Forwarding message is not successful. Status: " + string(resp.StatusCode))
+		return errors.New("Forwarding message is not successful. Status: " + string(resp.StatusCode))
 	}
 	return nil
 }
@@ -237,7 +237,7 @@ func extractTID(msg string) (tid string, err error) {
 		return tid, errors.New("Transaction id is not in expected format.")
 	}
 	startIndex := strings.Index(msg, "X-Request-Id: tid_") + len("X-Request-Id: ")
-	tid = msg[startIndex : startIndex + len("tid_") + 10]
+	tid = msg[startIndex : startIndex+len("tid_")+10]
 	return tid, nil
 }
 

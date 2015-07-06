@@ -1,8 +1,8 @@
 package main
 
 import (
-	"testing"
 	"strings"
+	"testing"
 )
 
 func TestExtractJSON(t *testing.T) {
@@ -38,7 +38,7 @@ func TestExtractJSON(t *testing.T) {
 func TestBuildHTTPEndpoint(t *testing.T) {
 	var tests = []struct {
 		host, expectedHttpEndpoint string
-	} {
+	}{
 		{
 			"123-cluster-elb-456.eu-west-1.elb.amazonaws.com",
 			"http://123-cluster-elb-456.eu-west-1.elb.amazonaws.com/notify",
@@ -59,10 +59,10 @@ func TestBuildHTTPEndpoint(t *testing.T) {
 
 func TestExtractTID(t *testing.T) {
 	var tests = []struct {
-		msg string
+		msg                   string
 		expectedTransactionId string
-		expectedErrorMsg string
-	} {
+		expectedErrorMsg      string
+	}{
 		{
 			`
 			Message-Id: fc429b46-2500-4fe7-88bb-fd507fbaf00c
@@ -104,7 +104,6 @@ func TestExtractTID(t *testing.T) {
 			"",
 			"Transaction id is not in expected format.",
 		},
-
 	}
 
 	for _, test := range tests {
