@@ -35,7 +35,7 @@ import (
 	"time"
 )
 
-// Struct containing bridge properties
+// BridgeApp wraps the config and represents the API for the bridge
 type BridgeApp struct {
 	consumerConfig *kafkaClient.ConsumerConfig
 	httpEndpoint   string
@@ -122,7 +122,7 @@ func resolveConfig(confPath string) (*BridgeApp, string, int) {
 
 	bridgeConfig := &BridgeApp{}
 	bridgeConfig.consumerConfig = consumerConfig
-	bridgeConfig.httpEndpoint = buildHttpEndpoint(rawConfig["http_host"])
+	bridgeConfig.httpEndpoint = buildHTTPEndpoint(rawConfig["http_host"])
 
 	return bridgeConfig, rawConfig["topic"], numConsumers
 }
@@ -148,7 +148,7 @@ func setLogLevel(logLevel string) {
 	kafkaClient.Logger = kafkaClient.NewDefaultLogger(level)
 }
 
-func buildHttpEndpoint(host string) string {
+func buildHTTPEndpoint(host string) string {
 	return "http://" + strings.Trim(host, "/") + "/notify"
 }
 

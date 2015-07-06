@@ -37,7 +37,7 @@ func TestExtractJSON(t *testing.T) {
 
 func TestBuildHTTPEndpoint(t *testing.T) {
 	var tests = []struct {
-		host, expectedHttpEndpoint string
+		host, expectedHTTPEndpoint string
 	}{
 		{
 			"123-cluster-elb-456.eu-west-1.elb.amazonaws.com",
@@ -50,9 +50,9 @@ func TestBuildHTTPEndpoint(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actualHTTPEndpoint := buildHttpEndpoint(test.host)
-		if test.expectedHttpEndpoint != actualHTTPEndpoint {
-			t.Errorf("\nExpected: %s\nActual: %s", test.expectedHttpEndpoint, actualHTTPEndpoint)
+		actualHTTPEndpoint := buildHTTPEndpoint(test.host)
+		if test.expectedHTTPEndpoint != actualHTTPEndpoint {
+			t.Errorf("\nExpected: %s\nActual: %s", test.expectedHTTPEndpoint, actualHTTPEndpoint)
 		}
 	}
 }
@@ -60,7 +60,7 @@ func TestBuildHTTPEndpoint(t *testing.T) {
 func TestExtractTID(t *testing.T) {
 	var tests = []struct {
 		msg                   string
-		expectedTransactionId string
+		expectedTransactionID string
 		expectedErrorMsg      string
 	}{
 		{
@@ -107,12 +107,12 @@ func TestExtractTID(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actualTransactionId, err := extractTID(test.msg)
+		actualTransactionID, err := extractTID(test.msg)
 		if err != nil && !strings.Contains(err.Error(), test.expectedErrorMsg) {
 			t.Errorf("\nExpected: %s\nActual: %s", test.expectedErrorMsg, err.Error())
 		}
-		if err == nil && test.expectedTransactionId != actualTransactionId {
-			t.Errorf("\nExpected: %s\nActual: %s", test.expectedTransactionId, actualTransactionId)
+		if err == nil && test.expectedTransactionID != actualTransactionID {
+			t.Errorf("\nExpected: %s\nActual: %s", test.expectedTransactionID, actualTransactionID)
 		}
 	}
 }
