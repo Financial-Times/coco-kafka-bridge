@@ -116,3 +116,51 @@ func TestExtractTID(t *testing.T) {
 		}
 	}
 }
+
+func TestExtractOriginSystem(t *testing.T) {
+	var tests = []struct {
+		msg string
+		expectedSystemOrigin string
+	} {
+		{
+			`
+			Message-Id: fc429b46-2500-4fe7-88bb-fd507fbaf00c
+			Message-Timestamp: 2015-07-06T07:03:09.362Z
+			Message-Type: cms-content-published
+			Origin-System-Id: http://cmdb.ft.com/systems/methode-web-pub
+			Content-Type: application/json
+			X-Request-Id: t9happe59y
+			`,
+			"methode-web-pub",
+		},
+		{
+			`
+			Message-Id: fc429b46-2500-4fe7-88bb-fd507fbaf00c
+			Message-Timestamp: 2015-07-06T07:03:09.362Z
+			Message-Type: cms-content-published
+			Content-Type: application/json
+			X-Request-Id: t9happe59y
+			`,
+			"",
+		},
+		{
+			`
+			Message-Id: fc429b46-2500-4fe7-88bb-fd507fbaf00c
+			Message-Timestamp: 2015-07-06T07:03:09.362Z
+			Message-Type: cms-content-published
+			Origin-System-Id:
+			Content-Type: application/json
+			X-Request-Id: t9happe59y
+			`,
+			"",
+		},
+	}
+
+	for _, test := range tests {
+		actualSystemOrigin := extractOriginSystem(test.msg)
+		if test.expectedSystemOrigin != actualSystemOrigin  {
+			t.Errorf("\nExpected: %s\nActual: %s", test.expectedSystemOrigin, actualSystemOrigin)
+		}
+	}
+}
+
