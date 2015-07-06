@@ -188,8 +188,16 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 		return err
 	}
 
+	tid, err := extractTID(kafkaMsg)
+
+	if err != nil {
+		fmt.Printf("Error parsing transaction id: %v\n", err.Error())
+		tid = "tid_" + uniuri.NewLen(10) + "_kafka_bridge"
+		fmt.Printf("Generating tid: " + tid)
+	}
+
 	req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
-	req.Header.Add("X-Request-Id", "tid_kafka_bridge_"+uniuri.NewLen(8))
+	req.Header.Add("X-Request-Id", tid)
 	req.Host = "cms-notifier"
 	resp, err := client.Do(req)
 	if err != nil {
@@ -219,6 +227,18 @@ func extractJSON(msg string) (jsonContent string, err error) {
 	}
 
 	return jsonContent, err
+}
+
+func extractTID(msg string) (tid string, err error) {
+	if !strings.Contains(msg, "X-Request-Id") {
+		return tid, errors.New("X-Request-Id header could not be found.")
+	}
+	if !strings.Contains(msg, "X-Request-Id: tid_") {
+		return tid, errors.New("Transaction id is not in expected format.")
+	}
+	startIndex := strings.Index(msg, "X-Request-Id: tid_") + len("X-Request-Id: ")
+	tid = msg[startIndex : startIndex + len("tid_") + 10]
+	return tid, nil
 }
 
 func failedCallback(wm *kafkaClient.WorkerManager) kafkaClient.FailedDecision {
