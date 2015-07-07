@@ -247,10 +247,11 @@ func extractTID(msg string) (tid string, err error) {
 	return tid, nil
 }
 
+var origSysHeaderRegexp = regexp.MustCompile(`Origin-System-Id:\s[a-zA-Z0-9:/.-]*`)
+var systemIDRegexp = regexp.MustCompile(`[a-zA-Z-]*$`)
+
 func extractOriginSystem(msg string) (string, error) {
-	origSysHeaderRegexp := regexp.MustCompile(`Origin-System-Id:\s[a-zA-Z0-9:/.-]*`)
 	origSysHeader := origSysHeaderRegexp.FindString(msg)
-	systemIDRegexp := regexp.MustCompile(`[a-zA-Z-]*$`)
 	systemID := systemIDRegexp.FindString(origSysHeader)
 	if systemID == "" {
 		return "", errors.New("Origin system id is not set.")
