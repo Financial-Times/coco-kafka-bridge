@@ -30,6 +30,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -188,6 +189,11 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 		return err
 	}
 
+	originSystem, err := extractOriginSystem(kafkaMsg)
+	if err != nil {
+		fmt.Printf("Error parsing origin system id. Skip forwarding message. Reason: %s", err.Error())
+		return err
+	}
 	tid, err := extractTID(kafkaMsg)
 
 	if err != nil {
@@ -196,7 +202,7 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 		fmt.Printf("Generating tid: " + tid)
 	}
 
-	req.Header.Add("X-Origin-System-Id", "methode-web-pub") //TODO: parse this from msg
+	req.Header.Add("X-Origin-System-Id", originSystem)
 	req.Header.Add("X-Request-Id", tid)
 	req.Host = "cms-notifier"
 	resp, err := client.Do(req)
@@ -239,6 +245,18 @@ func extractTID(msg string) (tid string, err error) {
 	startIndex := strings.Index(msg, "X-Request-Id: tid_") + len("X-Request-Id: ")
 	tid = msg[startIndex : startIndex+len("tid_")+10]
 	return tid, nil
+}
+
+var origSysHeaderRegexp = regexp.MustCompile(`Origin-System-Id:\s[a-zA-Z0-9:/.-]*`)
+var systemIDRegexp = regexp.MustCompile(`[a-zA-Z-]*$`)
+
+func extractOriginSystem(msg string) (string, error) {
+	origSysHeader := origSysHeaderRegexp.FindString(msg)
+	systemID := systemIDRegexp.FindString(origSysHeader)
+	if systemID == "" {
+		return "", errors.New("Origin system id is not set.")
+	}
+	return systemID, nil
 }
 
 func failedCallback(wm *kafkaClient.WorkerManager) kafkaClient.FailedDecision {

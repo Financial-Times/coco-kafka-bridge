@@ -116,3 +116,57 @@ func TestExtractTID(t *testing.T) {
 		}
 	}
 }
+
+func TestExtractOriginSystem(t *testing.T) {
+	var tests = []struct {
+		msg                  string
+		expectedSystemOrigin string
+		expectedErrorMsg     string
+	}{
+		{
+			`
+			Message-Id: fc429b46-2500-4fe7-88bb-fd507fbaf00c
+			Message-Timestamp: 2015-07-06T07:03:09.362Z
+			Message-Type: cms-content-published
+			Origin-System-Id: http://cmdb.ft.com/systems/methode-web-pub
+			Content-Type: application/json
+			X-Request-Id: t9happe59y
+			`,
+			"methode-web-pub",
+			"",
+		},
+		{
+			`
+			Message-Id: fc429b46-2500-4fe7-88bb-fd507fbaf00c
+			Message-Timestamp: 2015-07-06T07:03:09.362Z
+			Message-Type: cms-content-published
+			Content-Type: application/json
+			X-Request-Id: t9happe59y
+			`,
+			"",
+			"Origin system id is not set",
+		},
+		{
+			`
+			Message-Id: fc429b46-2500-4fe7-88bb-fd507fbaf00c
+			Message-Timestamp: 2015-07-06T07:03:09.362Z
+			Message-Type: cms-content-published
+			Origin-System-Id:
+			Content-Type: application/json
+			X-Request-Id: t9happe59y
+			`,
+			"",
+			"Origin system id is not set",
+		},
+	}
+
+	for _, test := range tests {
+		actualSystemOrigin, err := extractOriginSystem(test.msg)
+		if err != nil && !strings.Contains(err.Error(), test.expectedErrorMsg) {
+			t.Errorf("\nExpected: %s\nActual: %s", test.expectedErrorMsg, err.Error())
+		}
+		if err == nil && test.expectedSystemOrigin != actualSystemOrigin {
+			t.Errorf("\nExpected: %s\nActual: %s", test.expectedSystemOrigin, actualSystemOrigin)
+		}
+	}
+}
