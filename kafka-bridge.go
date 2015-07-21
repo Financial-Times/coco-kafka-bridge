@@ -188,7 +188,7 @@ func main() {
 	}
 
 	go func() {
-		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-prod@ucs", bridgeApp.ForwardHealthcheck()))
+		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws", bridgeApp.ForwardHealthcheck()))
 		err := http.ListenAndServe(":8080", nil)
 		if err != nil {
 			log.Printf("Couldn't set up HTTP listener: %+v", err)
