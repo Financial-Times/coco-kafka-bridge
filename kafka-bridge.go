@@ -31,7 +31,6 @@ import (
 	"os"
 	"os/signal"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -39,127 +38,27 @@ import (
 // BridgeApp wraps the config and represents the API for the bridge
 type BridgeApp struct {
 	consumerConfig *kafkaClient.ConsumerConfig
-	httpEndpoint   string
+	httpHost       string
+	topic          string
 }
 
-func resolveConfig(confPath string) (*BridgeApp, string, int) {
-	rawConfig, err := kafkaClient.LoadConfiguration(confPath)
-	if err != nil {
-		panic("Failed to load configuration file")
+func newBridgeApp(confPath string) (*BridgeApp, int) {
+	consumerConfig, host, topic, numConsumers := ResolveConfig(confPath)
+	bridgeApp := &BridgeApp{
+		consumerConfig: consumerConfig,
+		httpHost:       strings.Trim(host, "/"),
+		topic:          topic,
 	}
-	logLevel := rawConfig["log_level"]
-	setLogLevel(logLevel)
-	numConsumers, _ := strconv.Atoi(rawConfig["num_consumers"])
-	zkTimeout, _ := time.ParseDuration(rawConfig["zookeeper_timeout"])
-
-	numWorkers, _ := strconv.Atoi(rawConfig["num_workers"])
-	maxWorkerRetries, _ := strconv.Atoi(rawConfig["max_worker_retries"])
-	workerBackoff, _ := time.ParseDuration(rawConfig["worker_backoff"])
-	workerRetryThreshold, _ := strconv.Atoi(rawConfig["worker_retry_threshold"])
-	workerConsideredFailedTimeWindow, _ := time.ParseDuration(rawConfig["worker_considered_failed_time_window"])
-	workerTaskTimeout, _ := time.ParseDuration(rawConfig["worker_task_timeout"])
-	workerManagersStopTimeout, _ := time.ParseDuration(rawConfig["worker_managers_stop_timeout"])
-
-	rebalanceBarrierTimeout, _ := time.ParseDuration(rawConfig["rebalance_barrier_timeout"])
-	rebalanceMaxRetries, _ := strconv.Atoi(rawConfig["rebalance_max_retries"])
-	rebalanceBackoff, _ := time.ParseDuration(rawConfig["rebalance_backoff"])
-	partitionAssignmentStrategy, _ := rawConfig["partition_assignment_strategy"]
-	excludeInternalTopics, _ := strconv.ParseBool(rawConfig["exclude_internal_topics"])
-
-	numConsumerFetchers, _ := strconv.Atoi(rawConfig["num_consumer_fetchers"])
-	fetchBatchSize, _ := strconv.Atoi(rawConfig["fetch_batch_size"])
-	fetchMessageMaxBytes, _ := strconv.Atoi(rawConfig["fetch_message_max_bytes"])
-	fetchMinBytes, _ := strconv.Atoi(rawConfig["fetch_min_bytes"])
-	fetchBatchTimeout, _ := time.ParseDuration(rawConfig["fetch_batch_timeout"])
-	requeueAskNextBackoff, _ := time.ParseDuration(rawConfig["requeue_ask_next_backoff"])
-	fetchWaitMaxMs, _ := strconv.Atoi(rawConfig["fetch_wait_max_ms"])
-	socketTimeout, _ := time.ParseDuration(rawConfig["socket_timeout"])
-	queuedMaxMessages, _ := strconv.Atoi(rawConfig["queued_max_messages"])
-	refreshLeaderBackoff, _ := time.ParseDuration(rawConfig["refresh_leader_backoff"])
-	fetchMetadataRetries, _ := strconv.Atoi(rawConfig["fetch_metadata_retries"])
-	fetchMetadataBackoff, _ := time.ParseDuration(rawConfig["fetch_metadata_backoff"])
-
-	time.ParseDuration(rawConfig["fetch_metadata_backoff"])
-
-	offsetsCommitMaxRetries, _ := strconv.Atoi(rawConfig["offsets_commit_max_retries"])
-
-	deploymentTimeout, _ := time.ParseDuration(rawConfig["deployment_timeout"])
-
-	zkConfig := kafkaClient.NewZookeeperConfig()
-	zkConfig.ZookeeperConnect = strings.Split(rawConfig["zookeeper_connect"], ",")
-	zkConfig.ZookeeperTimeout = zkTimeout
-
-	consumerConfig := kafkaClient.DefaultConsumerConfig()
-	consumerConfig.Groupid = rawConfig["group_id"]
-	consumerConfig.NumWorkers = numWorkers
-	consumerConfig.MaxWorkerRetries = maxWorkerRetries
-	consumerConfig.WorkerBackoff = workerBackoff
-	consumerConfig.WorkerRetryThreshold = int32(workerRetryThreshold)
-	consumerConfig.WorkerThresholdTimeWindow = workerConsideredFailedTimeWindow
-	consumerConfig.WorkerTaskTimeout = workerTaskTimeout
-	consumerConfig.WorkerManagersStopTimeout = workerManagersStopTimeout
-	consumerConfig.BarrierTimeout = rebalanceBarrierTimeout
-	consumerConfig.RebalanceMaxRetries = int32(rebalanceMaxRetries)
-	consumerConfig.RebalanceBackoff = rebalanceBackoff
-	consumerConfig.PartitionAssignmentStrategy = partitionAssignmentStrategy
-	consumerConfig.ExcludeInternalTopics = excludeInternalTopics
-	consumerConfig.NumConsumerFetchers = numConsumerFetchers
-	consumerConfig.FetchBatchSize = fetchBatchSize
-	consumerConfig.FetchMessageMaxBytes = int32(fetchMessageMaxBytes)
-	consumerConfig.FetchMinBytes = int32(fetchMinBytes)
-	consumerConfig.FetchBatchTimeout = fetchBatchTimeout
-	consumerConfig.FetchTopicMetadataRetries = fetchMetadataRetries
-	consumerConfig.FetchTopicMetadataBackoff = fetchMetadataBackoff
-	consumerConfig.RequeueAskNextBackoff = requeueAskNextBackoff
-	consumerConfig.FetchWaitMaxMs = int32(fetchWaitMaxMs)
-	consumerConfig.SocketTimeout = socketTimeout
-	consumerConfig.QueuedMaxMessages = int32(queuedMaxMessages)
-	consumerConfig.RefreshLeaderBackoff = refreshLeaderBackoff
-	consumerConfig.Coordinator = kafkaClient.NewZookeeperCoordinator(zkConfig)
-	consumerConfig.AutoOffsetReset = rawConfig["auto_offset_reset"]
-	consumerConfig.OffsetsCommitMaxRetries = offsetsCommitMaxRetries
-	consumerConfig.DeploymentTimeout = deploymentTimeout
-	consumerConfig.OffsetCommitInterval = 10 * time.Second
-
-	bridgeConfig := &BridgeApp{}
-	bridgeConfig.consumerConfig = consumerConfig
-	bridgeConfig.httpEndpoint = buildHTTPEndpoint(rawConfig["http_host"])
-
-	return bridgeConfig, rawConfig["topic"], numConsumers
+	return bridgeApp, numConsumers
 }
 
-func setLogLevel(logLevel string) {
-	var level kafkaClient.LogLevel
-	switch strings.ToLower(logLevel) {
-	case "trace":
-		level = kafkaClient.TraceLevel
-	case "debug":
-		level = kafkaClient.DebugLevel
-	case "info":
-		level = kafkaClient.InfoLevel
-	case "warn":
-		level = kafkaClient.WarnLevel
-	case "error":
-		level = kafkaClient.ErrorLevel
-	case "critical":
-		level = kafkaClient.CriticalLevel
-	default:
-		level = kafkaClient.InfoLevel
-	}
-	kafkaClient.Logger = kafkaClient.NewDefaultLogger(level)
-}
-
-func buildHTTPEndpoint(host string) string {
-	return "http://" + strings.Trim(host, "/") + "/notify"
-}
-
-func (bridge BridgeApp) startNewConsumer(topic string) *kafkaClient.Consumer {
+func (bridge BridgeApp) startNewConsumer() *kafkaClient.Consumer {
 	consumerConfig := bridge.consumerConfig
 	consumerConfig.Strategy = bridge.kafkaBridgeStrategy
 	consumerConfig.WorkerFailureCallback = failedCallback
 	consumerConfig.WorkerFailedAttemptCallback = failedAttemptCallback
 	consumer := kafkaClient.NewConsumer(consumerConfig)
-	topics := map[string]int{topic: consumerConfig.NumConsumerFetchers}
+	topics := map[string]int{bridge.topic: consumerConfig.NumConsumerFetchers}
 	go func() {
 		consumer.StartStatic(topics)
 	}()
@@ -182,7 +81,7 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 		return err
 	}
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", bridge.httpEndpoint, strings.NewReader(jsonContent))
+	req, err := http.NewRequest("POST", "http://"+bridge.httpHost+"/notify", strings.NewReader(jsonContent))
 
 	if err != nil {
 		fmt.Printf("Error creating new request: %v\n", err.Error())
@@ -283,7 +182,18 @@ func (bridge BridgeApp) forwardHealthcheck() fthealth.Check {
 }
 
 func (bridge BridgeApp) checkForwardable() error {
-	return bridge.forwardMsg("{}")
+	resp, err := http.Get("http://" + bridge.httpHost + "/health/cms-notifier-1/__health")
+	if err != nil {
+		fmt.Printf("Error executing GET request: %v\n", err.Error())
+		return err
+	}
+	fmt.Printf("\nResponse: %+v\n", resp)
+	if resp.StatusCode != http.StatusOK {
+		errMsg := fmt.Sprintf("Request to cms-notifer /__health endpoint failed. Status: %d.", resp.StatusCode)
+		return errors.New(errMsg)
+	}
+
+	return nil
 }
 
 func (bridge BridgeApp) consumeHealthcheck() fthealth.Check {
@@ -308,14 +218,14 @@ func main() {
 	}
 	conf := os.Args[1]
 
-	bridgeApp, topic, numConsumers := resolveConfig(conf)
+	bridgeApp, numConsumers := newBridgeApp(conf)
 
 	ctrlc := make(chan os.Signal, 1)
 	signal.Notify(ctrlc, os.Interrupt)
 
 	consumers := make([]*kafkaClient.Consumer, numConsumers)
 	for i := 0; i < numConsumers; i++ {
-		consumers[i] = bridgeApp.startNewConsumer(topic)
+		consumers[i] = bridgeApp.startNewConsumer()
 		time.Sleep(10 * time.Second)
 	}
 
