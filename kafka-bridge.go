@@ -289,18 +289,9 @@ func (bridge BridgeApp) forwardHealthcheck() fthealth.Check {
 }
 
 func (bridge BridgeApp) checkForwardable() error {
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", bridge.httpHealthCheckEndpoint, nil)
-
+	resp, err := http.Get(bridge.httpHealthCheckEndpoint)
 	if err != nil {
-		fmt.Printf("Error creating new request: %v\n", err.Error())
-		return err
-	}
-	req.Host = "cms-notifier"
-
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Printf("Error: %v\n", err.Error())
+		fmt.Printf("Error processing GET request: %v\n", err.Error())
 		return err
 	}
 	fmt.Printf("\nResponse: %+v\n", resp)
