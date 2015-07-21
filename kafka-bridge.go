@@ -152,7 +152,7 @@ func setLogLevel(logLevel string) {
 }
 
 func buildHTTPHealthCheckEndpoint(host string) string {
-	return "http://" + strings.Trim(host, "/") + "/__health"
+	return "http://" + strings.Trim(host, "/") + "/health/cms-notifier-1/__health"
 }
 
 func buildHTTPEndpoint(host string) string {
