@@ -35,28 +35,6 @@ func TestExtractJSON(t *testing.T) {
 	}
 }
 
-func TestBuildHTTPEndpoint(t *testing.T) {
-	var tests = []struct {
-		host, expectedHTTPEndpoint string
-	}{
-		{
-			"123-cluster-elb-456.eu-west-1.elb.amazonaws.com",
-			"http://123-cluster-elb-456.eu-west-1.elb.amazonaws.com/notify",
-		},
-		{
-			"/123-cluster-elb-456.eu-west-1.elb.amazonaws.com/",
-			"http://123-cluster-elb-456.eu-west-1.elb.amazonaws.com/notify",
-		},
-	}
-
-	for _, test := range tests {
-		actualHTTPEndpoint := buildHTTPEndpoint(test.host)
-		if test.expectedHTTPEndpoint != actualHTTPEndpoint {
-			t.Errorf("\nExpected: %s\nActual: %s", test.expectedHTTPEndpoint, actualHTTPEndpoint)
-		}
-	}
-}
-
 func TestExtractTID(t *testing.T) {
 	var tests = []struct {
 		msg                   string
