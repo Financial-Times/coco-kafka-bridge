@@ -291,12 +291,13 @@ func (bridge BridgeApp) forwardHealthcheck() fthealth.Check {
 func (bridge BridgeApp) checkForwardable() error {
 	resp, err := http.Get(bridge.httpHealthCheckEndpoint)
 	if err != nil {
-		fmt.Printf("Error processing GET request: %v\n", err.Error())
+		fmt.Printf("Error executing GET request: %v\n", err.Error())
 		return err
 	}
 	fmt.Printf("\nResponse: %+v\n", resp)
 	if resp.StatusCode != http.StatusOK {
-		return errors.New("Request to cms-notifer /__health endpoint failed.")
+		errMsg := fmt.Sprintf("Request to cms-notifer /__health endpoint failed. Status: %d.", resp.StatusCode)
+		return errors.New(errMsg)
 	}
 
 	return nil
