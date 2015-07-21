@@ -78,14 +78,14 @@ func (bridge BridgeApp) kafkaBridgeStrategy(_ *kafkaClient.Worker, rawMsg *kafka
 func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 	jsonContent, err := extractJSON(kafkaMsg)
 	if err != nil {
-		log.Printf("Extracting JSON content failed. Skip forwarding message. Reason: %s\n", err.Error())
+		log.Printf("Extracting JSON content failed. Skip forwarding message. Reason: %s", err.Error())
 		return err
 	}
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", "http://"+bridge.httpHost+"/notify", strings.NewReader(jsonContent))
 
 	if err != nil {
-		log.Printf("Error creating new request: %v\n", err.Error())
+		log.Printf("Error creating new request: %v", err.Error())
 		return err
 	}
 
@@ -97,7 +97,7 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 	tid, err := extractTID(kafkaMsg)
 
 	if err != nil {
-		log.Printf("Error parsing transaction id: %v\n", err.Error())
+		log.Printf("Error parsing transaction id: %v", err.Error())
 		tid = "tid_" + uniuri.NewLen(10) + "_kafka_bridge"
 		log.Printf("Generating tid: " + tid)
 	}
@@ -107,11 +107,11 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 	req.Host = "cms-notifier"
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Printf("Error: %v\n", err.Error())
+		log.Printf("Error: %v", err.Error())
 		return err
 	}
 	defer resp.Body.Close()
-	log.Printf("\nResponse: %+v\n", resp)
+	log.Printf("Response: %+v", resp)
 	if resp.StatusCode != http.StatusOK {
 		return errors.New("Forwarding message is not successful. Status: " + string(resp.StatusCode))
 	}
@@ -130,7 +130,7 @@ func extractJSON(msg string) (jsonContent string, err error) {
 
 	var temp map[string]interface{}
 	if err = json.Unmarshal([]byte(jsonContent), &temp); err != nil {
-		log.Printf("Error: Not valid JSON: %s\n", err.Error())
+		log.Printf("Error: Not valid JSON: %s", err.Error())
 	}
 
 	return jsonContent, err
@@ -186,11 +186,11 @@ func (bridge BridgeApp) forwardHealthcheck() fthealth.Check {
 func (bridge BridgeApp) checkForwardable() error {
 	resp, err := http.Get("http://" + bridge.httpHost + "/health/cms-notifier-1/__health")
 	if err != nil {
-		log.Printf("Error executing GET request: %v\n", err.Error())
+		log.Printf("Error executing GET request: %v", err.Error())
 		return err
 	}
 	defer resp.Body.Close()
-	log.Printf("\nResponse: %+v\n", resp)
+	log.Printf("Response: %+v", resp)
 	if resp.StatusCode != http.StatusOK {
 		errMsg := fmt.Sprintf("Request to cms-notifer /__health endpoint failed. Status: %d.", resp.StatusCode)
 		return errors.New(errMsg)
@@ -236,7 +236,7 @@ func main() {
 		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-prod@ucs", bridgeApp.forwardHealthcheck(), bridgeApp.consumeHealthcheck()))
 		err := http.ListenAndServe(":8080", nil)
 		if err != nil {
-			log.Printf("Couldn't set up HTTP listener: %+v\n", err)
+			log.Printf("Couldn't set up HTTP listener: %+v", err)
 			close(ctrlc)
 		}
 	}()
