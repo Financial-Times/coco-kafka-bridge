@@ -38,16 +38,18 @@ import (
 // BridgeApp wraps the config and represents the API for the bridge
 type BridgeApp struct {
 	consumerConfig *kafkaClient.ConsumerConfig
-	httpHost       string
 	topic          string
+	httpClient     *http.Client
+	httpHost       string
 }
 
 func newBridgeApp(confPath string) (*BridgeApp, int) {
 	consumerConfig, host, topic, numConsumers := ResolveConfig(confPath)
 	bridgeApp := &BridgeApp{
 		consumerConfig: consumerConfig,
-		httpHost:       strings.Trim(host, "/"),
 		topic:          topic,
+		httpClient:     &http.Client{},
+		httpHost:       strings.Trim(host, "/"),
 	}
 	return bridgeApp, numConsumers
 }
@@ -80,7 +82,6 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 		log.Printf("Extracting JSON content failed. Skip forwarding message. Reason: %s", err.Error())
 		return err
 	}
-	client := &http.Client{}
 	req, err := http.NewRequest("POST", "http://"+bridge.httpHost+"/notify", strings.NewReader(jsonContent))
 
 	if err != nil {
@@ -104,7 +105,7 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 	req.Header.Add("X-Origin-System-Id", originSystem)
 	req.Header.Add("X-Request-Id", tid)
 	req.Host = "cms-notifier"
-	resp, err := client.Do(req)
+	resp, err := bridge.httpClient.Do(req)
 	if err != nil {
 		log.Printf("Error: %v", err.Error())
 		return err
