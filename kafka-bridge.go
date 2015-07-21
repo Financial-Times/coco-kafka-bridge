@@ -69,7 +69,6 @@ func (bridge BridgeApp) startNewConsumer() *kafkaClient.Consumer {
 
 func (bridge BridgeApp) kafkaBridgeStrategy(_ *kafkaClient.Worker, rawMsg *kafkaClient.Message, id kafkaClient.TaskId) kafkaClient.WorkerResult {
 	msg := string(rawMsg.Value)
-	kafkaClient.Infof("main", "Got a message: %s", msg)
 
 	go bridge.forwardMsg(msg)
 
@@ -111,7 +110,6 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 		return err
 	}
 	defer resp.Body.Close()
-	log.Printf("Response: %+v", resp)
 	if resp.StatusCode != http.StatusOK {
 		return errors.New("Forwarding message is not successful. Status: " + string(resp.StatusCode))
 	}
