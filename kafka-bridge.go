@@ -23,7 +23,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	fthealth "github.com/Financial-Times/go-fthealth"
 	"github.com/dchest/uniuri"
 	kafkaClient "github.com/stealthly/go_kafka_client"
@@ -172,49 +171,6 @@ func failedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResu
 	return kafkaClient.CommitOffsetAndContinue
 }
 
-func (bridge BridgeApp) forwardHealthcheck() fthealth.Check {
-	return fthealth.Check{
-		BusinessImpact:   "Forwarding messages to coco cluster won't work. Publishing in the containerised stack won't work.",
-		Name:             "Forward to aws co-co cluster",
-		PanicGuide:       "none",
-		Severity:         1,
-		TechnicalSummary: "Forwarding messages is broken. Check networking, aws cluster reachability and/or coco cms-notifier state.",
-		Checker:          bridge.checkForwardable,
-	}
-}
-
-func (bridge BridgeApp) checkForwardable() error {
-	resp, err := http.Get("http://" + bridge.httpHost + "/health/cms-notifier-1/__health")
-	if err != nil {
-		log.Printf("Error executing GET request: %v", err.Error())
-		return err
-	}
-	defer resp.Body.Close()
-	log.Printf("Response: %+v", resp)
-	if resp.StatusCode != http.StatusOK {
-		errMsg := fmt.Sprintf("Request to cms-notifer /__health endpoint failed. Status: %d.", resp.StatusCode)
-		return errors.New(errMsg)
-	}
-
-	return nil
-}
-
-func (bridge BridgeApp) consumeHealthcheck() fthealth.Check {
-	return fthealth.Check{
-		BusinessImpact:   "Consuming messages from kafka won't work. Publishing in the containerised stack won't work.",
-		Name:             "Consume from kafka",
-		PanicGuide:       "none",
-		Severity:         1,
-		TechnicalSummary: "Consuming messages is broken. Check kafka/zookeeper is reachable.",
-		Checker:          bridge.checkConsumable,
-	}
-}
-
-func (bridge BridgeApp) checkConsumable() error {
-	//TODO
-	return nil
-}
-
 func main() {
 	if len(os.Args) < 2 {
 		panic("Conf file path must be provided")
@@ -233,7 +189,7 @@ func main() {
 	}
 
 	go func() {
-		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-prod@ucs", bridgeApp.forwardHealthcheck(), bridgeApp.consumeHealthcheck()))
+		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-prod@ucs", bridgeApp.ForwardHealthcheck(), bridgeApp.ConsumeHealthcheck()))
 		err := http.ListenAndServe(":8080", nil)
 		if err != nil {
 			log.Printf("Couldn't set up HTTP listener: %+v", err)
