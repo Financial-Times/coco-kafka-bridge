@@ -38,8 +38,9 @@ import (
 
 // BridgeApp wraps the config and represents the API for the bridge
 type BridgeApp struct {
-	consumerConfig *kafkaClient.ConsumerConfig
-	httpEndpoint   string
+	consumerConfig          *kafkaClient.ConsumerConfig
+	httpEndpoint            string
+	httpHealthCheckEndpoint string
 }
 
 func resolveConfig(confPath string) (*BridgeApp, string, int) {
@@ -124,6 +125,7 @@ func resolveConfig(confPath string) (*BridgeApp, string, int) {
 	bridgeConfig := &BridgeApp{}
 	bridgeConfig.consumerConfig = consumerConfig
 	bridgeConfig.httpEndpoint = buildHTTPEndpoint(rawConfig["http_host"])
+	bridgeConfig.httpHealthCheckEndpoint = buildHTTPHealthCheckEndpoint(rawConfig["http,host"])
 
 	return bridgeConfig, rawConfig["topic"], numConsumers
 }
@@ -147,6 +149,10 @@ func setLogLevel(logLevel string) {
 		level = kafkaClient.InfoLevel
 	}
 	kafkaClient.Logger = kafkaClient.NewDefaultLogger(level)
+}
+
+func buildHTTPHealthCheckEndpoint(host string) string {
+	return "http://" + strings.Trim(host, "/") + "/__health"
 }
 
 func buildHTTPEndpoint(host string) string {
@@ -283,7 +289,26 @@ func (bridge BridgeApp) forwardHealthcheck() fthealth.Check {
 }
 
 func (bridge BridgeApp) checkForwardable() error {
-	return bridge.forwardMsg("{}")
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", bridge.httpHealthCheckEndpoint, nil)
+
+	if err != nil {
+		fmt.Printf("Error creating new request: %v\n", err.Error())
+		return err
+	}
+	req.Host = "cms-notifier"
+
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err.Error())
+		return err
+	}
+	fmt.Printf("\nResponse: %+v\n", resp)
+	if resp.StatusCode != http.StatusOK {
+		return errors.New("Request to cms-notifer /__health endpoint failed.")
+	}
+
+	return nil
 }
 
 func (bridge BridgeApp) consumeHealthcheck() fthealth.Check {
