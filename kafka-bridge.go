@@ -94,11 +94,12 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 		return err
 	}
 	tid, err := extractTID(kafkaMsg)
-
 	if err != nil {
 		log.Printf("Error parsing transaction id: %v", err.Error())
 		tid = "tid_" + uniuri.NewLen(10) + "_kafka_bridge"
 		log.Printf("Generating tid: " + tid)
+	} else {
+		log.Printf("Forwarding msg with tid: %s", tid)
 	}
 
 	req.Header.Add("X-Origin-System-Id", originSystem)
@@ -106,12 +107,14 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 	req.Host = "cms-notifier"
 	resp, err := bridge.httpClient.Do(req)
 	if err != nil {
-		log.Printf("Error: %v", err.Error())
+		log.Printf("Error executing POST request to the ELB: %v", err.Error())
 		return err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return errors.New("Forwarding message is not successful. Status: " + string(resp.StatusCode))
+		errMsg := "Error: Forwarding message is not successful. Status: " + string(resp.StatusCode)
+		log.Printf(errMsg)
+		return errors.New(errMsg)
 	}
 	return nil
 }
