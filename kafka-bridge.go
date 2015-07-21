@@ -110,6 +110,7 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 		log.Printf("Error: %v\n", err.Error())
 		return err
 	}
+	defer resp.Body.Close()
 	log.Printf("\nResponse: %+v\n", resp)
 	if resp.StatusCode != http.StatusOK {
 		return errors.New("Forwarding message is not successful. Status: " + string(resp.StatusCode))
@@ -188,6 +189,7 @@ func (bridge BridgeApp) checkForwardable() error {
 		log.Printf("Error executing GET request: %v\n", err.Error())
 		return err
 	}
+	defer resp.Body.Close()
 	log.Printf("\nResponse: %+v\n", resp)
 	if resp.StatusCode != http.StatusOK {
 		errMsg := fmt.Sprintf("Request to cms-notifer /__health endpoint failed. Status: %d.", resp.StatusCode)
