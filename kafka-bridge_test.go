@@ -80,7 +80,7 @@ func TestExtractTID(t *testing.T) {
 			{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}
 			`,
 			"",
-			"Transaction id is not in expected format.",
+			"Transaction ID is in unknown format",
 		},
 	}
 

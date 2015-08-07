@@ -23,6 +23,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	fthealth "github.com/Financial-Times/go-fthealth"
 	"github.com/dchest/uniuri"
 	kafkaClient "github.com/stealthly/go_kafka_client"
@@ -95,7 +96,7 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 	}
 	tid, err := extractTID(kafkaMsg)
 	if err != nil {
-		log.Printf("Error parsing transaction id: %v", err.Error())
+		log.Printf("Couldn't extract transaction id: %s", err.Error())
 		tid = "tid_" + uniuri.NewLen(10) + "_kafka_bridge"
 		log.Printf("Generating tid: " + tid)
 	} else {
@@ -137,16 +138,21 @@ func extractJSON(msg string) (jsonContent string, err error) {
 	return jsonContent, err
 }
 
-func extractTID(msg string) (tid string, err error) {
-	if !strings.Contains(msg, "X-Request-Id") {
-		return tid, errors.New("X-Request-Id header could not be found.")
+func extractTID(msg string) (string, error) {
+	header := regexp.MustCompile("X-Request-Id:.*").FindString(msg)
+	if header == "" {
+		return "", errors.New("X-Request-Id header could not be found.")
 	}
-	if !strings.Contains(msg, "X-Request-Id: tid_") {
-		return tid, errors.New("Transaction id is not in expected format.")
+	tid := findTID(header)
+	if tid == "" {
+		return "", fmt.Errorf("Transaction ID is in unknown format: %s.", header)
 	}
-	startIndex := strings.Index(msg, "X-Request-Id: tid_") + len("X-Request-Id: ")
-	tid = msg[startIndex : startIndex+len("tid_")+10]
 	return tid, nil
+}
+
+func findTID(header string) string {
+	tidRegexp := regexp.MustCompile("(tid|SYN-REQ-MON)[a-zA-Z0-9_]*$")
+	return tidRegexp.FindString(header)
 }
 
 var origSysHeaderRegexp = regexp.MustCompile(`Origin-System-Id:\s[a-zA-Z0-9:/.-]*`)
