@@ -95,6 +95,27 @@ func TestExtractTID(t *testing.T) {
 	}
 }
 
+func TestExtractTID_TIDRegexp(t *testing.T) {
+	var tests = []struct {
+		header string
+		tid    string
+	}{
+		{"X-Request-Id:tid_ABCDe12345", "tid_ABCDe12345"},
+		{"X-Request-Id: tid_ABCDe12345", "tid_ABCDe12345"},
+		{"X-Request-Id: SYN-REQ-MON_ABCDe12345", "SYN-REQ-MON_ABCDe12345"},
+		{"X-Request-Id:  SYN-REQ-MON_ABCDe12345", "SYN-REQ-MON_ABCDe12345"},
+		{"X-Request-Id: ABCDE12345", ""},
+		{"X-Request-Id: tid_ABCDe1234%", ""},
+	}
+
+	for _, test := range tests {
+		actualTID := tidRegexp.FindString(test.header)
+		if actualTID != test.tid {
+			t.Errorf("\nHeader: %s\nExpectedTID: %s\nActualTID: %s\n", test.header, test.tid, actualTID)
+		}
+	}
+}
+
 func TestExtractOriginSystem(t *testing.T) {
 	var tests = []struct {
 		msg                  string
@@ -145,26 +166,6 @@ func TestExtractOriginSystem(t *testing.T) {
 		}
 		if err == nil && test.expectedSystemOrigin != actualSystemOrigin {
 			t.Errorf("\nExpected: %s\nActual: %s", test.expectedSystemOrigin, actualSystemOrigin)
-		}
-	}
-}
-
-func TestFindTID(t *testing.T) {
-	var tests = []struct {
-		header string
-		tid    string
-	}{
-		{"X-Request-Id:tid_ABCDe12345", "tid_ABCDe12345"},
-		{"X-Request-Id: tid_ABCDe12345", "tid_ABCDe12345"},
-		{"X-Request-Id: SYN-REQ-MON_ABCDe12345", "SYN-REQ-MON_ABCDe12345"},
-		{"X-Request-ID:  SYN-REQ-MON_ABCDe12345", "SYN-REQ-MON_ABCDe12345"},
-		{"X-Request-ID: ABCDE12345", ""},
-	}
-
-	for _, test := range tests {
-		actualTID := findTID(test.header)
-		if actualTID != test.tid {
-			t.Errorf("\nHeader:%s ExpectedTID: %s\nActualTID: %s", test.header, test.tid, actualTID)
 		}
 	}
 }
