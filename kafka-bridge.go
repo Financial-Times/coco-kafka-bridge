@@ -138,21 +138,19 @@ func extractJSON(msg string) (jsonContent string, err error) {
 	return jsonContent, err
 }
 
+var tidHeaderRegexp = regexp.MustCompile("X-Request-Id:.*")
+var tidRegexp = regexp.MustCompile("(tid|SYN-REQ-MON)[a-zA-Z0-9_]*$")
+
 func extractTID(msg string) (string, error) {
-	header := regexp.MustCompile("X-Request-Id:.*").FindString(msg)
+	header := tidHeaderRegexp.FindString(msg)
 	if header == "" {
 		return "", errors.New("X-Request-Id header could not be found.")
 	}
-	tid := findTID(header)
+	tid := tidRegexp.FindString(header)
 	if tid == "" {
 		return "", fmt.Errorf("Transaction ID is in unknown format: %s.", header)
 	}
 	return tid, nil
-}
-
-func findTID(header string) string {
-	tidRegexp := regexp.MustCompile("(tid|SYN-REQ-MON)[a-zA-Z0-9_]*$")
-	return tidRegexp.FindString(header)
 }
 
 var origSysHeaderRegexp = regexp.MustCompile(`Origin-System-Id:\s[a-zA-Z0-9:/.-]*`)
