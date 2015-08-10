@@ -148,3 +148,23 @@ func TestExtractOriginSystem(t *testing.T) {
 		}
 	}
 }
+
+func TestFindTID(t *testing.T) {
+	var tests = []struct {
+		header string
+		tid    string
+	}{
+		{"X-Request-Id:tid_ABCDe12345", "tid_ABCDe12345"},
+		{"X-Request-Id: tid_ABCDe12345", "tid_ABCDe12345"},
+		{"X-Request-Id: SYN-REQ-MON_ABCDe12345", "SYN-REQ-MON_ABCDe12345"},
+		{"X-Request-ID:  SYN-REQ-MON_ABCDe12345", "SYN-REQ-MON_ABCDe12345"},
+		{"X-Request-ID: ABCDE12345", ""},
+	}
+
+	for _, test := range tests {
+		actualTID := findTID(test.header)
+		if actualTID != test.tid {
+			t.Errorf("\nHeader:%s ExpectedTID: %s\nActualTID: %s", test.header, test.tid, actualTID)
+		}
+	}
+}
