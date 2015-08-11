@@ -110,8 +110,11 @@ func TestExtractTID_TIDRegexp(t *testing.T) {
 	}{
 		{"X-Request-Id:tid_ABCDe12345", "tid_ABCDe12345"},
 		{"X-Request-Id: tid_ABCDe12345", "tid_ABCDe12345"},
-		{"X-Request-Id: SYN-REQ-MON_ABCDe12345", "SYN-REQ-MON_ABCDe12345"},
-		{"X-Request-Id:  SYN-REQ-MON_ABCDe12345", "SYN-REQ-MON_ABCDe12345"},
+		{"X-Request-Id: SYNTHETIC-REQ-MON_ABCDe12345", "SYNTHETIC-REQ-MON_ABCDe12345"},
+		{"X-Request-Id:  SYNTHETIC-REQ-MON_ABCDe12345", "SYNTHETIC-REQ-MON_ABCDe12345"},
+		{"X-Request-Id: SYNTHETIC-REQ-MON-abcdefgh-1234-pqrs-5678-stuvwxyz", "SYNTHETIC-REQ-MON-abcdefgh-1234-pqrs-5678-stuvwxyz"},
+		{"X-Request-Id: SYNTHETIC-REQ-MONabcdefgh-1234-pqrs-5678-stuvwxyz", "SYNTHETIC-REQ-MONabcdefgh-1234-pqrs-5678-stuvwxyz"},
+		{"X-Request-Id: SYN-REQ-MON_ABCDe12345", ""},
 		{"X-Request-Id: ABCDE12345", ""},
 		{"X-Request-Id: tid_ABCDe1234%", ""},
 	}

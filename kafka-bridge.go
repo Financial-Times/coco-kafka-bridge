@@ -143,7 +143,7 @@ func extractJSON(msg string) (msgHeader, jsonContent string, err error) {
 }
 
 var tidHeaderRegexp = regexp.MustCompile("X-Request-Id:.*")
-var tidRegexp = regexp.MustCompile("(tid|SYN-REQ-MON)[a-zA-Z0-9_]*$")
+var tidRegexp = regexp.MustCompile("(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$")
 
 func extractTID(msg string) (string, error) {
 	header := tidHeaderRegexp.FindString(msg)
