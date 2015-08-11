@@ -80,7 +80,7 @@ func TestExtractTID(t *testing.T) {
 			{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}
 			`,
 			"",
-			"Transaction id is not in expected format.",
+			"Transaction ID is in unknown format",
 		},
 	}
 
@@ -91,6 +91,27 @@ func TestExtractTID(t *testing.T) {
 		}
 		if err == nil && test.expectedTransactionID != actualTransactionID {
 			t.Errorf("\nExpected: %s\nActual: %s", test.expectedTransactionID, actualTransactionID)
+		}
+	}
+}
+
+func TestExtractTID_TIDRegexp(t *testing.T) {
+	var tests = []struct {
+		header string
+		tid    string
+	}{
+		{"X-Request-Id:tid_ABCDe12345", "tid_ABCDe12345"},
+		{"X-Request-Id: tid_ABCDe12345", "tid_ABCDe12345"},
+		{"X-Request-Id: SYN-REQ-MON_ABCDe12345", "SYN-REQ-MON_ABCDe12345"},
+		{"X-Request-Id:  SYN-REQ-MON_ABCDe12345", "SYN-REQ-MON_ABCDe12345"},
+		{"X-Request-Id: ABCDE12345", ""},
+		{"X-Request-Id: tid_ABCDe1234%", ""},
+	}
+
+	for _, test := range tests {
+		actualTID := tidRegexp.FindString(test.header)
+		if actualTID != test.tid {
+			t.Errorf("\nHeader: %s\nExpectedTID: %s\nActualTID: %s\n", test.header, test.tid, actualTID)
 		}
 	}
 }
