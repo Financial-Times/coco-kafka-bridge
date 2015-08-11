@@ -118,6 +118,7 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 		log.Printf(errMsg)
 		return errors.New(errMsg)
 	}
+	log.Printf("tid=%s message forwarded", tid)
 	return nil
 }
 
