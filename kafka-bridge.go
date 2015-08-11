@@ -76,11 +76,13 @@ func (bridge BridgeApp) kafkaBridgeStrategy(_ *kafkaClient.Worker, rawMsg *kafka
 }
 
 func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
-	jsonContent, err := extractJSON(kafkaMsg)
+	msgHeader, jsonContent, err := extractJSON(kafkaMsg)
 	if err != nil {
 		log.Printf("Extracting JSON content failed. Skip forwarding message. Reason: %s", err.Error())
 		return err
 	}
+
+	log.Printf("New message:\n---\n%s\n---", msgHeader)
 	req, err := http.NewRequest("POST", "http://"+bridge.httpHost+"/notify", strings.NewReader(jsonContent))
 
 	if err != nil {
@@ -88,12 +90,12 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 		return err
 	}
 
-	originSystem, err := extractOriginSystem(kafkaMsg)
+	originSystem, err := extractOriginSystem(msgHeader)
 	if err != nil {
 		log.Printf("Error parsing origin system id. Skip forwarding message. Reason: %s", err.Error())
 		return err
 	}
-	tid, err := extractTID(kafkaMsg)
+	tid, err := extractTID(msgHeader)
 	if err != nil {
 		log.Printf("Error parsing transaction id: %v", err.Error())
 		tid = "tid_" + uniuri.NewLen(10) + "_kafka_bridge"
@@ -119,14 +121,15 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 	return nil
 }
 
-func extractJSON(msg string) (jsonContent string, err error) {
+func extractJSON(msg string) (msgHeader, jsonContent string, err error) {
 	startIndex := strings.Index(msg, "{")
 	endIndex := strings.LastIndex(msg, "}")
 
 	if startIndex == -1 || endIndex == -1 {
-		return jsonContent, errors.New("Unparseable message.")
+		return msgHeader, jsonContent, errors.New("Unparseable message.")
 	}
 
+	msgHeader = strings.TrimSpace(msg[:startIndex])
 	jsonContent = msg[startIndex : endIndex+1]
 
 	var temp map[string]interface{}
@@ -134,7 +137,7 @@ func extractJSON(msg string) (jsonContent string, err error) {
 		log.Printf("Error: Not valid JSON: %s", err.Error())
 	}
 
-	return jsonContent, err
+	return msgHeader, jsonContent, err
 }
 
 func extractTID(msg string) (tid string, err error) {
