@@ -115,7 +115,7 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		errMsg := "Error: Forwarding message is not successful. Status: " + string(resp.StatusCode)
+		errMsg := fmt.Sprintf("Error: Forwarding message with tid: %s is not successful. Status: %d", tid, resp.StatusCode)
 		log.Printf(errMsg)
 		return errors.New(errMsg)
 	}
