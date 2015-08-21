@@ -1,6 +1,6 @@
 #Consumer identity
 client_id=go-consumer
-group_id=bridge
+group_id=<%=scope.function_hiera('group_id',nil)%>
 num_consumers=1
 topic=NativeCmsPublicationEvents
 log_level=info
