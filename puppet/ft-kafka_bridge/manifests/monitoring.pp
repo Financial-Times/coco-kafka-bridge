@@ -3,7 +3,7 @@ class kafka_bridge::monitoring {
   $port = "8080"
   $cmd_check_http_json = "/usr/lib64/nagios/plugins/check_http_json.py --host $hostname:$port --path /__health --key_equals \"\$ARG1\$\""
   $nrpe_cmd_check_http_json = '/usr/lib64/nagios/plugins/check_nrpe -H $HOSTNAME$ -c check_http_json -a "$ARG1$"'
-  $action_url = 'No runbook yet.'
+  $action_url = 'https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book'
   $config_file = '/etc/nrpe.d/check_http_json.cfg'
 
   package {
