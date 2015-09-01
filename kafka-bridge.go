@@ -103,7 +103,6 @@ func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 	}
 
 	ctxlogger := TxCombinedLogger{logger, tid}
-	ctxlogger.info(fmt.Sprintf("Forwarding msg.", tid))
 
 	req.Header.Add("X-Origin-System-Id", originSystem)
 	req.Header.Add("X-Request-Id", tid)
