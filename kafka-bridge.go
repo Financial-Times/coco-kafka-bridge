@@ -27,7 +27,6 @@ import (
 	fthealth "github.com/Financial-Times/go-fthealth"
 	"github.com/dchest/uniuri"
 	kafkaClient "github.com/stealthly/go_kafka_client"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -79,47 +78,47 @@ func (bridge BridgeApp) kafkaBridgeStrategy(_ *kafkaClient.Worker, rawMsg *kafka
 func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
 	msgHeader, jsonContent, err := extractJSON(kafkaMsg)
 	if err != nil {
-		log.Printf("Extracting JSON content failed. Skip forwarding message. Reason: %s", err.Error())
+		logger.error(fmt.Sprintf("Extracting JSON content failed. Skip forwarding message. Reason: %s", err.Error()))
 		return err
 	}
 
-	log.Printf("New message:\n---\n%s\n---", msgHeader)
+	logger.info(fmt.Sprintf("New message:\n---\n%s\n---", msgHeader))
 	req, err := http.NewRequest("POST", "http://"+bridge.httpHost+"/notify", strings.NewReader(jsonContent))
 
 	if err != nil {
-		log.Printf("Error creating new request: %v", err.Error())
+		logger.error(fmt.Sprintf("Error creating new request: %v", err.Error()))
 		return err
 	}
 
 	originSystem, err := extractOriginSystem(msgHeader)
 	if err != nil {
-		log.Printf("Error parsing origin system id. Skip forwarding message. Reason: %s", err.Error())
+		logger.error(fmt.Sprintf("Error parsing origin system id. Skip forwarding message. Reason: %s", err.Error()))
 		return err
 	}
 	tid, err := extractTID(msgHeader)
 	if err != nil {
-		log.Printf("Couldn't extract transaction id: %s", err.Error())
+		logger.warn(fmt.Sprintf("Couldn't extract transaction id: %s", err.Error()))
 		tid = "tid_" + uniuri.NewLen(10) + "_kafka_bridge"
-		log.Printf("Generating tid: " + tid)
-	} else {
-		log.Printf("Forwarding msg with tid: %s", tid)
+		logger.info("Generating tid: " + tid)
 	}
+
+	ctxlogger := TxCombinedLogger{logger, tid}
 
 	req.Header.Add("X-Origin-System-Id", originSystem)
 	req.Header.Add("X-Request-Id", tid)
 	req.Host = "cms-notifier"
 	resp, err := bridge.httpClient.Do(req)
 	if err != nil {
-		log.Printf("Error executing POST request to the ELB: %v", err.Error())
+		ctxlogger.error(fmt.Sprintf("Error executing POST request to the ELB: %v", err.Error()))
 		return err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		errMsg := fmt.Sprintf("Error: Forwarding message with tid: %s is not successful. Status: %d", tid, resp.StatusCode)
-		log.Printf(errMsg)
+		errMsg := fmt.Sprintf("Forwarding message with tid: %s is not successful. Status: %d", tid, resp.StatusCode)
+		ctxlogger.error(errMsg)
 		return errors.New(errMsg)
 	}
-	log.Printf("tid=%s message forwarded", tid)
+	ctxlogger.info("Message forwarded")
 	return nil
 }
 
@@ -135,9 +134,7 @@ func extractJSON(msg string) (msgHeader, jsonContent string, err error) {
 	jsonContent = msg[startIndex : endIndex+1]
 
 	var temp map[string]interface{}
-	if err = json.Unmarshal([]byte(jsonContent), &temp); err != nil {
-		log.Printf("Error: Not valid JSON: %s", err.Error())
-	}
+	err = json.Unmarshal([]byte(jsonContent), &temp)
 
 	return msgHeader, jsonContent, err
 }
@@ -182,6 +179,8 @@ func failedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResu
 }
 
 func main() {
+	initLoggers()
+	logger.info("Starting Kafka Bridge")
 	if len(os.Args) < 2 {
 		panic("Conf file path must be provided")
 	}
@@ -202,15 +201,15 @@ func main() {
 		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws", bridgeApp.ForwardHealthcheck()))
 		err := http.ListenAndServe(":8080", nil)
 		if err != nil {
-			log.Printf("Couldn't set up HTTP listener: %+v", err)
+			logger.error(fmt.Sprintf("Couldn't set up HTTP listener: %+v", err))
 			close(ctrlc)
 		}
 	}()
 
 	<-ctrlc
-	log.Println("Shutdown triggered, closing all alive consumers")
+	logger.info("Shutdown triggered, closing all alive consumers")
 	for _, consumer := range consumers {
 		<-consumer.Close()
 	}
-	log.Println("Successfully shut down all consumers")
+	logger.info("Successfully shut down all consumers")
 }

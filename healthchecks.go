@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	fthealth "github.com/Financial-Times/go-fthealth"
-	"log"
 	"net/http"
 )
 
@@ -22,13 +21,13 @@ func (bridge BridgeApp) ForwardHealthcheck() fthealth.Check {
 func (bridge BridgeApp) checkForwardable() error {
 	resp, err := bridge.httpClient.Get("http://" + bridge.httpHost + "/health/cms-notifier-1/__health")
 	if err != nil {
-		log.Printf("Error executing GET request: %v", err.Error())
+		logger.warn(fmt.Sprintf("Healthcheck: Error executing GET request: %v", err.Error()))
 		return err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		errMsg := fmt.Sprintf("Request to cms-notifer /__health endpoint failed. Status: %d.", resp.StatusCode)
-		log.Printf(errMsg)
+		errMsg := fmt.Sprintf("Healthcheck: Request to cms-notifer /__health endpoint failed. Status: %d.", resp.StatusCode)
+		logger.warn(errMsg)
 		return errors.New(errMsg)
 	}
 
