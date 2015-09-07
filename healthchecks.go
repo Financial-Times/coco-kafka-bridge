@@ -19,7 +19,13 @@ func (bridge BridgeApp) ForwardHealthcheck() fthealth.Check {
 }
 
 func (bridge BridgeApp) checkForwardable() error {
-	resp, err := bridge.httpClient.Get("http://" + bridge.httpHost + "/health/cms-notifier-1/__health")
+	req, err := http.NewRequest("GET", "http://"+bridge.httpHost+"/__health", nil)
+	if err != nil {
+		logger.warn(fmt.Sprintf("Healthcheck: Error creating GET request: %v", err.Error()))
+		return err
+	}
+	req.Host = "cms-notifier"
+	resp, err := bridge.httpClient.Do(req)
 	if err != nil {
 		logger.warn(fmt.Sprintf("Healthcheck: Error executing GET request: %v", err.Error()))
 		return err
