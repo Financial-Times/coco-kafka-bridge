@@ -21,15 +21,13 @@
 package main
 
 import (
-	"encoding/json"
+	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
+	fthealth "github.com/Financial-Times/go-fthealth"
 	"errors"
 	"fmt"
-	fthealth "github.com/Financial-Times/go-fthealth"
 	"github.com/dchest/uniuri"
-	kafkaClient "github.com/stealthly/go_kafka_client"
 	"net/http"
 	"os"
-	"os/signal"
 	"regexp"
 	"strings"
 	"time"
@@ -37,145 +35,110 @@ import (
 
 // BridgeApp wraps the config and represents the API for the bridge
 type BridgeApp struct {
-	consumerConfig *kafkaClient.ConsumerConfig
-	topic          string
+	consumerConfig *queueConsumer.QueueConfig
 	httpClient     *http.Client
 	httpHost       string
+	httpEndpoint   string
+	hostHeader     string
 }
 
+const tidValidRegexp = "(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$"
+const systemIDValidRegexp = `[a-zA-Z-]*$`
+
 func newBridgeApp(confPath string) (*BridgeApp, int) {
-	consumerConfig, host, topic, numConsumers := ResolveConfig(confPath)
+	consumerConfig, host, endpoint, header, numConsumers := ResolveConfig(confPath)
 	bridgeApp := &BridgeApp{
-		consumerConfig: consumerConfig,
-		topic:          topic,
+		consumerConfig: &consumerConfig,
 		httpClient:     &http.Client{},
-		httpHost:       strings.Trim(host, "/"),
+		httpHost:       host,
+		httpEndpoint:   endpoint,
+		hostHeader:     header,
 	}
 	return bridgeApp, numConsumers
 }
 
-func (bridge BridgeApp) startNewConsumer() *kafkaClient.Consumer {
+func (bridge BridgeApp) startNewConsumer() queueConsumer.MessageIterator {
 	consumerConfig := bridge.consumerConfig
-	consumerConfig.Strategy = bridge.kafkaBridgeStrategy
-	consumerConfig.WorkerFailureCallback = failedCallback
-	consumerConfig.WorkerFailedAttemptCallback = failedAttemptCallback
-	consumer := kafkaClient.NewConsumer(consumerConfig)
-	topics := map[string]int{bridge.topic: consumerConfig.NumConsumerFetchers}
-	go func() {
-		consumer.StartStatic(topics)
-	}()
+	consumer := queueConsumer.NewIterator(*consumerConfig)
 	return consumer
 }
 
-func (bridge BridgeApp) kafkaBridgeStrategy(_ *kafkaClient.Worker, rawMsg *kafkaClient.Message, id kafkaClient.TaskId) kafkaClient.WorkerResult {
-	msg := string(rawMsg.Value)
-
-	go bridge.forwardMsg(msg)
-
-	return kafkaClient.NewSuccessfulResult(id)
+func (bridge BridgeApp) consumeMessages(iterator queueConsumer.MessageIterator) {
+	for {
+		msgs, err := iterator.NextMessages()
+		if err != nil {
+			logger.warn(fmt.Sprintf("Could not read messages: %s", err.Error()))
+			continue
+		}
+		for _, m := range msgs {
+			go bridge.forwardMsg(m)
+		}
+	}
 }
 
-func (bridge BridgeApp) forwardMsg(kafkaMsg string) error {
-	msgHeader, jsonContent, err := extractJSON(kafkaMsg)
-	if err != nil {
-		logger.error(fmt.Sprintf("Extracting JSON content failed. Skip forwarding message. Reason: %s", err.Error()))
-		return err
-	}
+func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) error {
 
-	logger.info(fmt.Sprintf("New message:\n---\n%s\n---", msgHeader))
-	req, err := http.NewRequest("POST", "http://"+bridge.httpHost+"/notify", strings.NewReader(jsonContent))
-
-	if err != nil {
-		logger.error(fmt.Sprintf("Error creating new request: %v", err.Error()))
-		return err
-	}
-
-	originSystem, err := extractOriginSystem(msgHeader)
+	originSystem, err := extractOriginSystem(msg.Headers)
 	if err != nil {
 		logger.error(fmt.Sprintf("Error parsing origin system id. Skip forwarding message. Reason: %s", err.Error()))
 		return err
 	}
-	tid, err := extractTID(msgHeader)
+
+	tid, err := extractTID(msg.Headers)
 	if err != nil {
 		logger.warn(fmt.Sprintf("Couldn't extract transaction id: %s", err.Error()))
 		tid = "tid_" + uniuri.NewLen(10) + "_kafka_bridge"
 		logger.info("Generating tid: " + tid)
 	}
 
-	ctxlogger := TxCombinedLogger{logger, tid}
-
+	req, err := http.NewRequest("POST", "http://" + bridge.httpHost + "/" + bridge.httpEndpoint, strings.NewReader(msg.Body))
+	if err != nil {
+		logger.error(fmt.Sprintf("Error creating new request: %v", err.Error()))
+		return err
+	}
 	req.Header.Add("X-Origin-System-Id", originSystem)
 	req.Header.Add("X-Request-Id", tid)
-	req.Host = "cms-notifier"
+	req.Host = bridge.hostHeader
+
+	ctxlogger := TxCombinedLogger{logger, tid}
 	resp, err := bridge.httpClient.Do(req)
 	if err != nil {
 		ctxlogger.error(fmt.Sprintf("Error executing POST request to the ELB: %v", err.Error()))
 		return err
 	}
 	defer resp.Body.Close()
+
 	if resp.StatusCode != http.StatusOK {
 		errMsg := fmt.Sprintf("Forwarding message with tid: %s is not successful. Status: %d", tid, resp.StatusCode)
 		ctxlogger.error(errMsg)
 		return errors.New(errMsg)
 	}
+
 	ctxlogger.info("Message forwarded")
 	return nil
 }
 
-func extractJSON(msg string) (msgHeader, jsonContent string, err error) {
-	startIndex := strings.Index(msg, "{")
-	endIndex := strings.LastIndex(msg, "}")
-
-	if startIndex == -1 || endIndex == -1 {
-		return msgHeader, jsonContent, errors.New("Unparseable message.")
-	}
-
-	msgHeader = strings.TrimSpace(msg[:startIndex])
-	jsonContent = msg[startIndex : endIndex+1]
-
-	var temp map[string]interface{}
-	err = json.Unmarshal([]byte(jsonContent), &temp)
-
-	return msgHeader, jsonContent, err
-}
-
-var tidHeaderRegexp = regexp.MustCompile("X-Request-Id:.*")
-var tidRegexp = regexp.MustCompile("(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$")
-
-func extractTID(msg string) (string, error) {
-	header := tidHeaderRegexp.FindString(msg)
-	if header == "" {
-		return "", errors.New("X-Request-Id header could not be found.")
-	}
-	tid := tidRegexp.FindString(header)
-	if tid == "" {
-		return "", fmt.Errorf("Transaction ID is in unknown format: %s.", header)
-	}
-	return tid, nil
-}
-
-var origSysHeaderRegexp = regexp.MustCompile(`Origin-System-Id:\s[a-zA-Z0-9:/.-]*`)
-var systemIDRegexp = regexp.MustCompile(`[a-zA-Z-]*$`)
-
-func extractOriginSystem(msg string) (string, error) {
-	origSysHeader := origSysHeaderRegexp.FindString(msg)
-	systemID := systemIDRegexp.FindString(origSysHeader)
+func extractOriginSystem(headers map[string]string) (string, error) {
+	origSysHeader := headers["Origin-System-Id"]
+	validRegexp := regexp.MustCompile(systemIDValidRegexp);
+	systemID := validRegexp.FindString(origSysHeader)
 	if systemID == "" {
 		return "", errors.New("Origin system id is not set.")
 	}
 	return systemID, nil
 }
 
-func failedCallback(wm *kafkaClient.WorkerManager) kafkaClient.FailedDecision {
-	kafkaClient.Info("main", "Failed callback")
-
-	return kafkaClient.DoNotCommitOffsetAndStop
-}
-
-func failedAttemptCallback(task *kafkaClient.Task, result kafkaClient.WorkerResult) kafkaClient.FailedDecision {
-	kafkaClient.Info("main", "Failed attempt")
-
-	return kafkaClient.CommitOffsetAndContinue
+func extractTID(headers map[string]string) (string, error) {
+	header := headers["X-Request-Id"]
+	if header == "" {
+		return "", errors.New("X-Request-Id header could not be found.")
+	}
+	validRegexp := regexp.MustCompile(tidValidRegexp);
+	tid := validRegexp.FindString(header)
+	if tid == "" {
+		return "", fmt.Errorf("Transaction ID is in unknown format: %s.", header)
+	}
+	return tid, nil
 }
 
 func main() {
@@ -185,31 +148,19 @@ func main() {
 		panic("Conf file path must be provided")
 	}
 	conf := os.Args[1]
-
 	bridgeApp, numConsumers := newBridgeApp(conf)
 
-	ctrlc := make(chan os.Signal, 1)
-	signal.Notify(ctrlc, os.Interrupt)
+	consumers := make([]queueConsumer.MessageIterator, numConsumers)
 
-	consumers := make([]*kafkaClient.Consumer, numConsumers)
-	for i := 0; i < numConsumers; i++ {
+	go func() {for i := 0; i < numConsumers; i++ {
 		consumers[i] = bridgeApp.startNewConsumer()
+		bridgeApp.consumeMessages(consumers[i])
 		time.Sleep(10 * time.Second)
-	}
+	}}()
 
-	go func() {
-		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws", bridgeApp.ForwardHealthcheck()))
-		err := http.ListenAndServe(":8080", nil)
-		if err != nil {
-			logger.error(fmt.Sprintf("Couldn't set up HTTP listener: %+v", err))
-			close(ctrlc)
-		}
-	}()
-
-	<-ctrlc
-	logger.info("Shutdown triggered, closing all alive consumers")
-	for _, consumer := range consumers {
-		<-consumer.Close()
+	http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-rest-proxy@aws", bridgeApp.ForwardHealthcheck(), bridgeApp.ConsumeHealthcheck()))
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		logger.error(fmt.Sprintf("Couldn't set up HTTP listener: %+v", err))
 	}
-	logger.info("Successfully shut down all consumers")
 }

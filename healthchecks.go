@@ -1,9 +1,9 @@
 package main
 
 import (
+	fthealth "github.com/Financial-Times/go-fthealth"
 	"errors"
 	"fmt"
-	fthealth "github.com/Financial-Times/go-fthealth"
 	"net/http"
 )
 
@@ -19,6 +19,7 @@ func (bridge BridgeApp) ForwardHealthcheck() fthealth.Check {
 }
 
 func (bridge BridgeApp) checkForwardable() error {
+	//TODO not really a nice way to check just one of the cms notifier nodes...
 	resp, err := bridge.httpClient.Get("http://" + bridge.httpHost + "/health/cms-notifier-1/__health")
 	if err != nil {
 		logger.warn(fmt.Sprintf("Healthcheck: Error executing GET request: %v", err.Error()))
