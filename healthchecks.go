@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"io/ioutil"
+	"strings"
 )
 
 func (bridge BridgeApp) ForwardHealthcheck() fthealth.Check {
@@ -19,12 +21,19 @@ func (bridge BridgeApp) ForwardHealthcheck() fthealth.Check {
 }
 
 func (bridge BridgeApp) checkForwardable() error {
-	//TODO not really a nice way to check just one of the cms notifier nodes...
-	resp, err := bridge.httpClient.Get("http://" + bridge.httpHost + "/health/cms-notifier-1/__health")
+	req, err := http.NewRequest("GET", "http://" + bridge.httpHost + "/__health", nil)
 	if err != nil {
-		logger.warn(fmt.Sprintf("Healthcheck: Error executing GET request: %v", err.Error()))
+		logger.error(fmt.Sprintf("Error creating new cms-notifier healthcheck request: %v", err.Error()))
 		return err
 	}
+	req.Host = bridge.hostHeader
+
+	resp, err := bridge.httpClient.Do(req)
+	if err != nil {
+		logger.warn(fmt.Sprintf("Healthcheck: Error executing cms-notifier GET request: %v", err.Error()))
+		return err
+	}
+
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		errMsg := fmt.Sprintf("Healthcheck: Request to cms-notifer /__health endpoint failed. Status: %d.", resp.StatusCode)
@@ -37,16 +46,53 @@ func (bridge BridgeApp) checkForwardable() error {
 
 func (bridge BridgeApp) ConsumeHealthcheck() fthealth.Check {
 	return fthealth.Check{
-		BusinessImpact:   "Consuming messages from kafka won't work. Publishing in the containerised stack won't work.",
-		Name:             "Consume from kafka",
+		BusinessImpact:   "Consuming messages through kafka-proxy won't work. Publishing in the containerised stack won't work.",
+		Name:             "Consume from UCS kafka through the proxy",
 		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",
 		Severity:         1,
-		TechnicalSummary: "Consuming messages is broken. Check kafka/zookeeper is reachable.",
+		TechnicalSummary: "Consuming messages is broken. Check is kafka-proxy is reachable.",
 		Checker:          bridge.checkConsumable,
 	}
 }
 
 func (bridge BridgeApp) checkConsumable() error {
-	//TODO
-	return nil
+	//check if proxy is running and topic is present
+	req, err := http.NewRequest("GET", bridge.consumerConfig.Addr + "/topics", nil)
+	if err != nil {
+		logger.error(fmt.Sprintf("Error creating new kafka-proxy healthcheck request: %v", err.Error()))
+		return err
+	}
+
+	if bridge.consumerAuthorization != "" {
+		req.Header.Add("Authorization", bridge.consumerAuthorization)
+	}
+
+	resp, err := bridge.httpClient.Do(req)
+	if err != nil {
+		logger.error(fmt.Sprintf("Healthcheck: Error executing kafka-proxy GET request: %v", err.Error()))
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		errMsg := fmt.Sprintf("Connecting to kafka proxy was not successful. Status: %d", resp.StatusCode)
+		return errors.New(errMsg)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	return checkIfTopicIsPresent(body, bridge.consumerConfig.Topic)
+
+}
+
+func checkIfTopicIsPresent(body []byte, searchedTopic string) error {
+	strBody := string(body[1:len(body) - 1])
+	strClearedBody := strings.Replace(strBody, "\"", "", -1)
+
+	for _, topic := range strings.Split(strClearedBody, ",") {
+		if topic == searchedTopic {
+			return nil
+		}
+	}
+
+	return errors.New("Connection could be established to kafka-proxy, but topic was not found")
 }

@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func ResolveConfig(confPath string) (queueConsumer.QueueConfig, string, string, string, int) {
+func ResolveConfig(confPath string) (queueConsumer.QueueConfig, string, string, string, string, int) {
 
 	rawConfig := make(map[string]string)
 	err := cfg.Load(confPath, rawConfig)
@@ -22,6 +22,6 @@ func ResolveConfig(confPath string) (queueConsumer.QueueConfig, string, string, 
 
 	numConsumers, _ := strconv.Atoi(rawConfig["num_consumers"])
 
-	return consumerConfig, rawConfig["http_host"], rawConfig["http_endpoint"], rawConfig["host_header"], numConsumers
+	return consumerConfig, rawConfig["authorization"], rawConfig["http_host"], rawConfig["http_endpoint"], rawConfig["host_header"], numConsumers
 }
 
