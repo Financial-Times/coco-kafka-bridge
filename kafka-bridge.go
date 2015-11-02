@@ -146,6 +146,6 @@ func main() {
 	http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-rest-proxy@aws", bridgeApp.ForwardHealthcheck(), bridgeApp.ConsumeHealthcheck()))
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
-		logger.error(fmt.Sprintf("Couldn't set up HTTP listener: %+v", err))
+		logger.error(fmt.Sprintf("Couldn't set up HTTP listener for healthcheck: %+v", err))
 	}
 }
