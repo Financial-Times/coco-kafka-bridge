@@ -26,8 +26,8 @@ type BridgeApp struct {
 const tidValidRegexp = "(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$"
 const systemIDValidRegexp = `[a-zA-Z-]*$`
 
-func newBridgeApp(confPath string, authorizationKeyPath string) (*BridgeApp, int) {
-	consumerConfig, host, endpoint, header, numConsumers := ResolveConfig(confPath, authorizationKeyPath)
+func newBridgeApp(confPath string) (*BridgeApp, int) {
+	consumerConfig, host, endpoint, header, numConsumers := ResolveConfig(confPath)
 	bridgeApp := &BridgeApp{
 		consumerConfig: &consumerConfig,
 		httpClient:     &http.Client{},
@@ -130,13 +130,7 @@ func main() {
 	}
 	confPath := os.Args[1]
 
-	authorizationKeyPath := "";
-	if len(os.Args) == 2 {
-		logger.warn("Authorization path has not been provided, header will not be set")
-	} else {
-		authorizationKeyPath = os.Args[2]
-	}
-	bridgeApp, numConsumers := newBridgeApp(confPath, authorizationKeyPath)
+	bridgeApp, numConsumers := newBridgeApp(confPath)
 
 	consumers := make([]queueConsumer.MessageIterator, numConsumers)
 
