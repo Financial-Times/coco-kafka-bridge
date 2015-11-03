@@ -26,11 +26,10 @@ type BridgeApp struct {
 const tidValidRegexp = "(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$"
 const systemIDValidRegexp = `[a-zA-Z-]*$`
 
-func newBridgeApp(confPath string) (*BridgeApp, int) {
-	consumerConfig, authorization, host, endpoint, header, numConsumers := ResolveConfig(confPath)
+func newBridgeApp(confPath string, authorizationKeyPath string) (*BridgeApp, int) {
+	consumerConfig, host, endpoint, header, numConsumers := ResolveConfig(confPath, authorizationKeyPath)
 	bridgeApp := &BridgeApp{
 		consumerConfig: &consumerConfig,
-		consumerAuthorization: authorization,
 		httpClient:     &http.Client{},
 		httpHost:       host,
 		httpEndpoint:   endpoint,
@@ -80,9 +79,6 @@ func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) error {
 	}
 	req.Header.Add("X-Origin-System-Id", originSystem)
 	req.Header.Add("X-Request-Id", tid)
-	if bridge.consumerAuthorization != "" {
-		req.Header.Add("Authorization", bridge.consumerAuthorization)
-	}
 	req.Host = bridge.hostHeader
 
 	ctxlogger := TxCombinedLogger{logger, tid}
@@ -132,8 +128,15 @@ func main() {
 	if len(os.Args) < 2 {
 		panic("Conf file path must be provided")
 	}
-	conf := os.Args[1]
-	bridgeApp, numConsumers := newBridgeApp(conf)
+	confPath := os.Args[1]
+
+	authorizationKeyPath := "";
+	if len(os.Args) == 2 {
+		logger.warn("Authorization path has not been provided, header will not be set")
+	} else {
+		authorizationKeyPath = os.Args[2]
+	}
+	bridgeApp, numConsumers := newBridgeApp(confPath, authorizationKeyPath)
 
 	consumers := make([]queueConsumer.MessageIterator, numConsumers)
 

@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 go build
-./coco-kafka-bridge kafka-bridge.properties
+./coco-kafka-bridge kafka-bridge.properties authorization.yml

@@ -51,20 +51,35 @@ func (bridge BridgeApp) ConsumeHealthcheck() fthealth.Check {
 		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",
 		Severity:         1,
 		TechnicalSummary: "Consuming messages is broken. Check is kafka-proxy is reachable.",
-		Checker:          bridge.checkConsumable,
+		Checker:          bridge.aggregateConsumableResults,
 	}
 }
 
-func (bridge BridgeApp) checkConsumable() error {
+func (bridge BridgeApp) aggregateConsumableResults() error {
+	addresses := bridge.consumerConfig.Addrs
+	errMsg := ""
+	for i := 0; i < len(addresses); i++ {
+		error := bridge.checkConsumable(addresses[i])
+		if error == nil {
+			return nil
+		} else {
+			errMsg = errMsg +fmt.Sprintf("For %s there is an error %v \n",addresses[i], error.Error())
+		}
+	}
+
+	return errors.New(errMsg)
+}
+
+func (bridge BridgeApp) checkConsumable(address string) error {
 	//check if proxy is running and topic is present
-	req, err := http.NewRequest("GET", bridge.consumerConfig.Addr + "/topics", nil)
+	req, err := http.NewRequest("GET", address + "/topics", nil)
 	if err != nil {
 		logger.error(fmt.Sprintf("Error creating new kafka-proxy healthcheck request: %v", err.Error()))
 		return err
 	}
 
 	if bridge.consumerAuthorization != "" {
-		req.Header.Add("Authorization", bridge.consumerAuthorization)
+		req.Header.Add("Authorization", bridge.consumerConfig.AuthorizationKey)
 	}
 
 	resp, err := bridge.httpClient.Do(req)
