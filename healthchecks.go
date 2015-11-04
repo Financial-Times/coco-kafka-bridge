@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"net/http"
 	"io/ioutil"
-	"strings"
+	"encoding/json"
 )
 
 func (bridge BridgeApp) ForwardHealthcheck() fthealth.Check {
 	return fthealth.Check{
-		BusinessImpact:   "Forwarding messages to coco cluster won't work. Publishing in the containerised stack won't work.",
-		Name:             "Forward to aws co-co cluster",
+		BusinessImpact:   "Forwarding messages to cms-notifier in coco won't work. Publishing in the containerised stack won't work.",
+		Name:             "Forward messages to cms-notifier",
 		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",
 		Severity:         1,
 		TechnicalSummary: "Forwarding messages is broken. Check networking, aws cluster reachability and/or coco cms-notifier state.",
@@ -63,7 +63,7 @@ func (bridge BridgeApp) aggregateConsumableResults() error {
 		if error == nil {
 			return nil
 		} else {
-			errMsg = errMsg +fmt.Sprintf("For %s there is an error %v \n",addresses[i], error.Error())
+			errMsg = errMsg + fmt.Sprintf("For %s there is an error %v \n", addresses[i], error.Error())
 		}
 	}
 
@@ -100,10 +100,14 @@ func (bridge BridgeApp) checkConsumable(address string) error {
 }
 
 func checkIfTopicIsPresent(body []byte, searchedTopic string) error {
-	strBody := string(body[1:len(body) - 1])
-	strClearedBody := strings.Replace(strBody, "\"", "", -1)
+	var topics []string
 
-	for _, topic := range strings.Split(strClearedBody, ",") {
+	err := json.Unmarshal(body, &topics)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Connection could be established to kafka-proxy, but a parsing error occured and topic could not be found. %v", err.Error()))
+	}
+
+	for _, topic := range topics {
 		if topic == searchedTopic {
 			return nil
 		}
