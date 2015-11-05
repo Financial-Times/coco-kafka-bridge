@@ -24,11 +24,12 @@ type BridgeApp struct {
 const tidValidRegexp = "(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$"
 const systemIDValidRegexp = `[a-zA-Z-]*$`
 
-func newBridgeApp(addrs string, groupId string, topic string, authorizationKey string, httpHost string, httpEndPoint string, hostHeader string) (*BridgeApp) {
+func newBridgeApp(addrs string, groupId string, topic string, offset string, authorizationKey string, httpHost string, httpEndPoint string, hostHeader string) (*BridgeApp) {
 	consumerConfig := queueConsumer.QueueConfig{}
 	consumerConfig.Addrs = strings.Split(addrs, ",")
 	consumerConfig.Group = groupId
 	consumerConfig.Topic = topic
+	consumerConfig.Offset = offset
 	consumerConfig.AuthorizationKey = authorizationKey
 
 	bridgeApp := &BridgeApp{
@@ -130,6 +131,7 @@ func initBridgeApp() (*BridgeApp) {
 	addrs := flag.String("queue_proxy_addr", "", "Comma separated kafka proxy hosts.")
 	group := flag.String("group_id", "", "Kafka qroup id.")
 	topic := flag.String("topic", "", "Kafka topic.")
+	offset := flag.String("offset", "", "Kafka read offset.")
 	authorizationKey := flag.String("authorization_key", "", "The authorization key required to UCS access.")
 
 	httpHost := flag.String("http_host", "", "The host the messages are forwarded to.")
@@ -137,8 +139,8 @@ func initBridgeApp() (*BridgeApp) {
 	hostHeader := flag.String("host_header", "cms-notifier", "The host header for the forwarder service.")
 
 	flag.Parse()
-	logger.info("httpHost:"+*httpHost)
-	return newBridgeApp(*addrs, *group, *topic, *authorizationKey, *httpHost, *httpEndpoint, *hostHeader)
+
+	return newBridgeApp(*addrs, *group, *topic, *offset, *authorizationKey, *httpHost, *httpEndpoint, *hostHeader)
 }
 
 func main() {
