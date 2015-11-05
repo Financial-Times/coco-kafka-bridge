@@ -7,35 +7,38 @@ import (
 	"fmt"
 	"github.com/dchest/uniuri"
 	"net/http"
-	"os"
 	"regexp"
 	"strings"
-	"time"
+	"flag"
 )
 
 // BridgeApp wraps the config and represents the API for the bridge
 type BridgeApp struct {
-	consumerConfig        *queueConsumer.QueueConfig
-	consumerAuthorization string
-	httpClient            *http.Client
-	httpHost              string
-	httpEndpoint          string
-	hostHeader            string
+	consumerConfig *queueConsumer.QueueConfig
+	httpClient     *http.Client
+	httpHost       string
+	httpEndpoint   string
+	hostHeader     string
 }
 
 const tidValidRegexp = "(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$"
 const systemIDValidRegexp = `[a-zA-Z-]*$`
 
-func newBridgeApp(confPath string) (*BridgeApp, int) {
-	consumerConfig, host, endpoint, header, numConsumers := ResolveConfig(confPath)
+func newBridgeApp(addrs string, groupId string, topic string, authorizationKey string, httpHost string, httpEndPoint string, hostHeader string) (*BridgeApp) {
+	consumerConfig := queueConsumer.QueueConfig{}
+	consumerConfig.Addrs = strings.Split(addrs, ",")
+	consumerConfig.Group = groupId
+	consumerConfig.Topic = topic
+	consumerConfig.AuthorizationKey = authorizationKey
+
 	bridgeApp := &BridgeApp{
 		consumerConfig: &consumerConfig,
 		httpClient:     &http.Client{},
-		httpHost:       host,
-		httpEndpoint:   endpoint,
-		hostHeader:     header,
+		httpHost:       httpHost,
+		httpEndpoint:   httpEndPoint,
+		hostHeader:     hostHeader,
 	}
-	return bridgeApp, numConsumers
+	return bridgeApp
 }
 
 func (bridge BridgeApp) startNewConsumer() queueConsumer.MessageIterator {
@@ -122,23 +125,31 @@ func extractTID(headers map[string]string) (string, error) {
 	return tid, nil
 }
 
+func initBridgeApp() (*BridgeApp) {
+
+	addrs := flag.String("queue_proxy_addr", "", "Comma separated kafka proxy hosts.")
+	group := flag.String("group_id", "", "Kafka qroup id.")
+	topic := flag.String("topic", "", "Kafka topic.")
+	authorizationKey := flag.String("authorization_key", "", "The authorization key required to UCS access.")
+
+	httpHost := flag.String("http_host", "", "The host the messages are forwarded to.")
+	httpEndpoint := flag.String("http_endpoint", "notify", "The endpoint the messages are forwarded to.")
+	hostHeader := flag.String("host_header", "cms-notifier", "The host header for the forwarder service.")
+
+	flag.Parse()
+	logger.info("httpHost:"+*httpHost)
+	return newBridgeApp(*addrs, *group, *topic, *authorizationKey, *httpHost, *httpEndpoint, *hostHeader)
+}
+
 func main() {
 	initLoggers()
 	logger.info("Starting Kafka Bridge")
-	if len(os.Args) < 2 {
-		panic("Conf file path must be provided")
-	}
-	confPath := os.Args[1]
 
-	bridgeApp, numConsumers := newBridgeApp(confPath)
-
-	consumers := make([]queueConsumer.MessageIterator, numConsumers)
-
-	go func() {for i := 0; i < numConsumers; i++ {
-		consumers[i] = bridgeApp.startNewConsumer()
-		bridgeApp.consumeMessages(consumers[i])
-		time.Sleep(10 * time.Second)
-	}}()
+	bridgeApp := initBridgeApp()
+	go func() {
+		consumer := bridgeApp.startNewConsumer()
+		bridgeApp.consumeMessages(consumer)
+	}()
 
 	http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: cms-notifier@aws, kafka-rest-proxy@aws", bridgeApp.ForwardHealthcheck(), bridgeApp.ConsumeHealthcheck()))
 	err := http.ListenAndServe(":8080", nil)

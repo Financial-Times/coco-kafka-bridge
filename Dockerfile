@@ -1,7 +1,6 @@
 FROM alpine
 
 ADD *.go /kafka-bridge/
-ADD kafka-bridge.properties /kafka-bridge/kafka-bridge.properties
 ADD start.sh /
 
 RUN apk add --update bash \
@@ -17,7 +16,6 @@ RUN apk add --update bash \
   && go test \
   && go build \
   && mv coco-kafka-bridge /coco-kafka-bridge \
-  && mv kafka-bridge.properties /kafka-bridge.properties  \
   && apk del go git bzr \
   && rm -rf $GOPATH /var/cache/apk/* 
 

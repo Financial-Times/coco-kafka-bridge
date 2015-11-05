@@ -78,7 +78,7 @@ func (bridge BridgeApp) checkConsumable(address string) error {
 		return err
 	}
 
-	if bridge.consumerAuthorization != "" {
+	if bridge.consumerConfig.AuthorizationKey != "" {
 		req.Header.Add("Authorization", bridge.consumerConfig.AuthorizationKey)
 	}
 
