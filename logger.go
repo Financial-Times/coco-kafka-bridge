@@ -25,8 +25,6 @@ func (l simpleCombinedLogger) info(msg string) {
     l.Info.Println(msg)
 }
 
-//l.Info.Println(fmt.Sprintf("transaction_id: %+v - %+v", txId, msg));
-
 func (l simpleCombinedLogger) warn(msg string) {
     l.Warning.Println(msg)
 }
