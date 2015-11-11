@@ -56,7 +56,7 @@ func (bridge BridgeApp) consumeMessages(iterator queueConsumer.MessageIterator) 
 			continue
 		}
 		for _, m := range msgs {
-			go bridge.forwardMsg(m)
+			bridge.forwardMsg(m)
 		}
 	}
 }
