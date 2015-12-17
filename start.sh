@@ -1,1 +1,1 @@
-./coco-kafka-bridge -queue_proxy_addr=$QUEUE_PROXY_ADDRS -group_id=$GROUP_ID -topic=NativeCmsPublicationEvents -offset=largest -authorization_key="$AUTHORIZATION_KEY" -http_host=$HTTP_HOST -http_endpoint=notify -host_header=cms-notifier
+./coco-kafka-bridge -queue_proxy_addr=$QUEUE_PROXY_ADDRS -group_id=$GROUP_ID -topic=NativeCmsPublicationEvents -offset=largest -authorization_key="$AUTHORIZATION_KEY" -http_host=$HTTP_HOST -http_endpoint=notify -host_header=cms-notifier -vulcan-auth="$VULCAN_AUTH"

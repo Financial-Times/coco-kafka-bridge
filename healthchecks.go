@@ -1,12 +1,12 @@
 package main
 
 import (
-	fthealth "github.com/Financial-Times/go-fthealth"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
+	fthealth "github.com/Financial-Times/go-fthealth"
 	"io/ioutil"
-	"encoding/json"
+	"net/http"
 )
 
 func (bridge BridgeApp) ForwardHealthcheck() fthealth.Check {
@@ -21,7 +21,7 @@ func (bridge BridgeApp) ForwardHealthcheck() fthealth.Check {
 }
 
 func (bridge BridgeApp) checkForwardable() error {
-	req, err := http.NewRequest("GET", "http://" + bridge.httpHost + "/__health", nil)
+	req, err := http.NewRequest("GET", "http://"+bridge.httpHost+"/__health", nil)
 	if err != nil {
 		logger.error(fmt.Sprintf("Error creating new cms-notifier healthcheck request: %v", err.Error()))
 		return err
@@ -72,7 +72,7 @@ func (bridge BridgeApp) aggregateConsumableResults() error {
 
 func (bridge BridgeApp) checkConsumable(address string) error {
 	//check if proxy is running and topic is present
-	req, err := http.NewRequest("GET", address + "/topics", nil)
+	req, err := http.NewRequest("GET", address+"/topics", nil)
 	if err != nil {
 		logger.error(fmt.Sprintf("Error creating new kafka-proxy healthcheck request: %v", err.Error()))
 		return err
