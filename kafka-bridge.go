@@ -1,15 +1,15 @@
 package main
 
 import (
-	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
-	fthealth "github.com/Financial-Times/go-fthealth"
 	"errors"
+	"flag"
 	"fmt"
+	fthealth "github.com/Financial-Times/go-fthealth"
+	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/dchest/uniuri"
 	"net/http"
 	"regexp"
 	"strings"
-	"flag"
 )
 
 // BridgeApp wraps the config and represents the API for the bridge
@@ -25,7 +25,7 @@ type BridgeApp struct {
 const tidValidRegexp = "(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$"
 const systemIDValidRegexp = `[a-zA-Z-]*$`
 
-func newBridgeApp(addrs string, groupId string, topic string, offset string, authorizationKey string, httpHost string, httpEndPoint string, hostHeader string, vulcanAuth string) (*BridgeApp) {
+func newBridgeApp(addrs string, groupId string, topic string, offset string, authorizationKey string, httpHost string, httpEndPoint string, hostHeader string, vulcanAuth string) *BridgeApp {
 	consumerConfig := queueConsumer.QueueConfig{}
 	consumerConfig.Addrs = strings.Split(addrs, ",")
 	consumerConfig.Group = groupId
@@ -78,7 +78,7 @@ func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) error {
 		logger.info("Generating tid: " + tid)
 	}
 
-	req, err := http.NewRequest("POST", "http://" + bridge.httpHost + "/" + bridge.httpEndpoint, strings.NewReader(msg.Body))
+	req, err := http.NewRequest("POST", "http://"+bridge.httpHost+"/"+bridge.httpEndpoint, strings.NewReader(msg.Body))
 	if err != nil {
 		logger.error(fmt.Sprintf("Error creating new request: %v", err.Error()))
 		return err
@@ -108,7 +108,7 @@ func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) error {
 
 func extractOriginSystem(headers map[string]string) (string, error) {
 	origSysHeader := headers["Origin-System-Id"]
-	validRegexp := regexp.MustCompile(systemIDValidRegexp);
+	validRegexp := regexp.MustCompile(systemIDValidRegexp)
 	systemID := validRegexp.FindString(origSysHeader)
 	if systemID == "" {
 		return "", errors.New("Origin system id is not set.")
@@ -121,7 +121,7 @@ func extractTID(headers map[string]string) (string, error) {
 	if header == "" {
 		return "", errors.New("X-Request-Id header could not be found.")
 	}
-	validRegexp := regexp.MustCompile(tidValidRegexp);
+	validRegexp := regexp.MustCompile(tidValidRegexp)
 	tid := validRegexp.FindString(header)
 	if tid == "" {
 		return "", fmt.Errorf("Transaction ID is in unknown format: %s.", header)
@@ -129,7 +129,7 @@ func extractTID(headers map[string]string) (string, error) {
 	return tid, nil
 }
 
-func initBridgeApp() (*BridgeApp) {
+func initBridgeApp() *BridgeApp {
 
 	addrs := flag.String("queue_proxy_addr", "", "Comma separated kafka proxy hosts.")
 	group := flag.String("group_id", "", "Kafka qroup id.")
