@@ -27,6 +27,7 @@ func (bridge BridgeApp) checkForwardable() error {
 		return err
 	}
 	req.Host = bridge.hostHeader
+	req.Header.Add("Authorization", bridge.vulcanAuth)
 
 	resp, err := bridge.httpClient.Do(req)
 	if err != nil {
