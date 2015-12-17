@@ -19,12 +19,13 @@ type BridgeApp struct {
 	httpHost       string
 	httpEndpoint   string
 	hostHeader     string
+	vulcanAuth     string
 }
 
 const tidValidRegexp = "(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$"
 const systemIDValidRegexp = `[a-zA-Z-]*$`
 
-func newBridgeApp(addrs string, groupId string, topic string, offset string, authorizationKey string, httpHost string, httpEndPoint string, hostHeader string) (*BridgeApp) {
+func newBridgeApp(addrs string, groupId string, topic string, offset string, authorizationKey string, httpHost string, httpEndPoint string, hostHeader string, vulcanAuth string) (*BridgeApp) {
 	consumerConfig := queueConsumer.QueueConfig{}
 	consumerConfig.Addrs = strings.Split(addrs, ",")
 	consumerConfig.Group = groupId
@@ -38,6 +39,7 @@ func newBridgeApp(addrs string, groupId string, topic string, offset string, aut
 		httpHost:       httpHost,
 		httpEndpoint:   httpEndPoint,
 		hostHeader:     hostHeader,
+		vulcanAuth:     vulcanAuth,
 	}
 	return bridgeApp
 }
@@ -83,6 +85,7 @@ func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) error {
 	}
 	req.Header.Add("X-Origin-System-Id", originSystem)
 	req.Header.Add("X-Request-Id", tid)
+	req.Header.Add("Authorization", bridge.vulcanAuth)
 	req.Host = bridge.hostHeader
 
 	ctxlogger := TxCombinedLogger{logger, tid}
@@ -138,9 +141,10 @@ func initBridgeApp() (*BridgeApp) {
 	httpEndpoint := flag.String("http_endpoint", "notify", "The endpoint the messages are forwarded to.")
 	hostHeader := flag.String("host_header", "cms-notifier", "The host header for the forwarder service.")
 
+	vulcanAuth := flag.String("vulcan-auth", "", "Authentication string by which you access cms-notifier via vulcand.")
 	flag.Parse()
 
-	return newBridgeApp(*addrs, *group, *topic, *offset, *authorizationKey, *httpHost, *httpEndpoint, *hostHeader)
+	return newBridgeApp(*addrs, *group, *topic, *offset, *authorizationKey, *httpHost, *httpEndpoint, *hostHeader, *vulcanAuth)
 }
 
 func main() {
