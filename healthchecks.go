@@ -9,41 +9,7 @@ import (
 	"net/http"
 )
 
-func (bridge BridgeApp) ForwardHealthcheck() fthealth.Check {
-	return fthealth.Check{
-		BusinessImpact:   "Forwarding messages to cms-notifier in coco won't work. Publishing in the containerised stack won't work.",
-		Name:             "Forward messages to cms-notifier",
-		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",
-		Severity:         1,
-		TechnicalSummary: "Forwarding messages is broken. Check networking, aws cluster reachability and/or coco cms-notifier state.",
-		Checker:          bridge.checkForwardable,
-	}
-}
-
-func (bridge BridgeApp) checkForwardable() error {
-	req, err := http.NewRequest("GET", "http://"+bridge.httpHost+"/__health", nil)
-	if err != nil {
-		logger.error(fmt.Sprintf("Error creating new cms-notifier healthcheck request: %v", err.Error()))
-		return err
-	}
-	req.Host = bridge.hostHeader
-	req.Header.Add("Authorization", bridge.vulcanAuth)
-
-	resp, err := bridge.httpClient.Do(req)
-	if err != nil {
-		logger.warn(fmt.Sprintf("Healthcheck: Error executing cms-notifier GET request: %v", err.Error()))
-		return err
-	}
-
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		errMsg := fmt.Sprintf("Healthcheck: Request to cms-notifer /__health endpoint failed. Status: %d.", resp.StatusCode)
-		logger.warn(errMsg)
-		return errors.New(errMsg)
-	}
-
-	return nil
-}
+var httpClient *http.Client = &http.Client{}
 
 func (bridge BridgeApp) ConsumeHealthcheck() fthealth.Check {
 	return fthealth.Check{
@@ -51,8 +17,30 @@ func (bridge BridgeApp) ConsumeHealthcheck() fthealth.Check {
 		Name:             "Consume from UCS kafka through the proxy",
 		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",
 		Severity:         1,
-		TechnicalSummary: "Consuming messages is broken. Check is kafka-proxy is reachable.",
+		TechnicalSummary: "Consuming messages is broken. Check if kafka-proxy in aws is reachable.",
 		Checker:          bridge.aggregateConsumableResults,
+	}
+}
+
+func (bridge BridgeApp) PROXYForwarderHealthcheck() fthealth.Check {
+	return fthealth.Check{
+		BusinessImpact:   "Forwarding messages to kafka-proxy in coco won't work. Publishing in the containerised stack won't work.",
+		Name:             "Forward messages to kafka-proxy.",
+		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",
+		Severity:         1,
+		TechnicalSummary: "Forwarding messages is broken. Check if kafka-proxy in coco is reachable.",
+		Checker:          bridge.checkForwardableProxy,
+	}
+}
+
+func (bridge BridgeApp) HTTPForwarderHealthcheck() fthealth.Check {
+	return fthealth.Check{
+		BusinessImpact:   "Forwarding messages to cms-notifier in coco won't work. Publishing in the containerised stack won't work.",
+		Name:             "Forward messages to cms-notifier",
+		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",
+		Severity:         1,
+		TechnicalSummary: "Forwarding messages is broken. Check networking, aws cluster reachability and/or coco cms-notifier state.",
+		Checker:          bridge.checkForwardableHTTP,
 	}
 }
 
@@ -72,32 +60,39 @@ func (bridge BridgeApp) aggregateConsumableResults() error {
 }
 
 func (bridge BridgeApp) checkConsumable(address string) error {
+	body, err := checkProxyConnection(address, bridge.consumerConfig.AuthorizationKey)
+	if err != nil {
+		logger.error(fmt.Sprintf("Healthcheck: Error reading request body: %v", err.Error()))
+		return err
+	}
+	return checkIfTopicIsPresent(body, bridge.consumerConfig.Topic)
+}
+
+func checkProxyConnection(address string, authorizationKey string) (body []byte, err error) {
 	//check if proxy is running and topic is present
 	req, err := http.NewRequest("GET", address+"/topics", nil)
 	if err != nil {
 		logger.error(fmt.Sprintf("Error creating new kafka-proxy healthcheck request: %v", err.Error()))
-		return err
+		return nil, err
 	}
 
-	if bridge.consumerConfig.AuthorizationKey != "" {
-		req.Header.Add("Authorization", bridge.consumerConfig.AuthorizationKey)
+	if authorizationKey != "" {
+		req.Header.Add("Authorization", authorizationKey)
 	}
 
-	resp, err := bridge.httpClient.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		logger.error(fmt.Sprintf("Healthcheck: Error executing kafka-proxy GET request: %v", err.Error()))
-		return err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		errMsg := fmt.Sprintf("Connecting to kafka proxy was not successful. Status: %d", resp.StatusCode)
-		return errors.New(errMsg)
+		return nil, errors.New(errMsg)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
-	return checkIfTopicIsPresent(body, bridge.consumerConfig.Topic)
-
+	return ioutil.ReadAll(resp.Body)
 }
 
 func checkIfTopicIsPresent(body []byte, searchedTopic string) error {
@@ -115,4 +110,34 @@ func checkIfTopicIsPresent(body []byte, searchedTopic string) error {
 	}
 
 	return errors.New("Connection could be established to kafka-proxy, but topic was not found")
+}
+
+func (bridge BridgeApp) checkForwardableHTTP() error {
+	req, err := http.NewRequest("GET", bridge.producerConfig.Addr+"/__health", nil)
+	if err != nil {
+		logger.error(fmt.Sprintf("Error creating new plainHttp producer healthcheck request: %v", err.Error()))
+		return err
+	}
+	req.Host = bridge.producerConfig.Queue
+	req.Header.Add("Authorization", bridge.producerConfig.Authorization)
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		logger.warn(fmt.Sprintf("Healthcheck: Error executing GET request: %v", err.Error()))
+		return err
+	}
+
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		errMsg := fmt.Sprintf("Healthcheck: Request to plainHTTP producer /__health endpoint failed. Status: %d.", resp.StatusCode)
+		logger.warn(errMsg)
+		return errors.New(errMsg)
+	}
+
+	return nil
+}
+
+func (bridge BridgeApp) checkForwardableProxy() error {
+	_, err := checkProxyConnection(bridge.producerConfig.Addr, bridge.producerConfig.Authorization)
+	return err
 }

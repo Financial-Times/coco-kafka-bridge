@@ -1,4 +1,4 @@
-###Kafka consumer listening to kafka-proxy and forwarding messages to an HTTP endpoint.
+###Kafka consumer listening to kafka-proxy and forwarding messages to another KAFKA-PROXY or a simple HTTP endpoint.
 
 Run: `./start.sh`
 
