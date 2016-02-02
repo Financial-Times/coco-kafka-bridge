@@ -73,16 +73,7 @@ func initBridgeApp() *BridgeApp {
 	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAuthorizationKey, *topic, *producerHost, *producerHostHeader, *producerVulcanAuth, *producerType)
 }
 
-func main() {
-	initLoggers()
-	logger.info("Starting Kafka Bridge")
-
-	bridgeApp := initBridgeApp()
-	go func() {
-		consumer := bridgeApp.startNewConsumer()
-		bridgeApp.consumeMessages(consumer)
-	}()
-
+func (bridgeApp *BridgeApp) enableHealthchecks() {
 	//create healthcheck service according to the producer type
 	if bridgeApp.producerType == PROXY {
 		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, kafka-rest-proxy@aws", bridgeApp.ConsumeHealthcheck(), bridgeApp.PROXYForwarderHealthcheck()))
@@ -94,4 +85,15 @@ func main() {
 	if err != nil {
 		logger.error(fmt.Sprintf("Couldn't set up HTTP listener for healthcheck: %+v", err))
 	}
+}
+
+func main() {
+	initLoggers()
+	logger.info("Starting Kafka Bridge")
+
+	bridgeApp := initBridgeApp()
+
+	go bridgeApp.enableHealthchecks()
+
+	bridgeApp.consumeMessages()
 }

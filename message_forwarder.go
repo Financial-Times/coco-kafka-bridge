@@ -14,7 +14,7 @@ const UUIDContextRegexp = "\"uuid\":\"[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-
 const UUIDValidRegexp = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
 const systemIDValidRegexp = `[a-zA-Z-]*$`
 
-func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) error {
+func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) {
 
 	tid, err := extractTID(msg.Headers)
 	if err != nil {
@@ -28,14 +28,12 @@ func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) error {
 	uuid, err := extractUUID(msg.Body)
 	if err != nil {
 		logger.error(fmt.Sprintf("Error parsing message for extracting uuid. Skip forwarding message. Reason: %s", err.Error()))
-		return err
 	}
 
 	producerInstance := *bridge.producerInstance
 	producerInstance.SendMessage(uuid, queueProducer.Message{Headers: msg.Headers, Body: msg.Body})
 
 	ctxlogger.info("Message forwarded")
-	return nil
 }
 
 func extractTID(headers map[string]string) (string, error) {

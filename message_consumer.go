@@ -1,27 +1,30 @@
 package main
 
 import (
-	"fmt"
 	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
+	"net/http"
+	"sync"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
-func (bridge BridgeApp) startNewConsumer() queueConsumer.MessageIterator {
+func (bridge BridgeApp) consumeMessages() {
 	consumerConfig := bridge.consumerConfig
-	consumer := queueConsumer.NewIterator(*consumerConfig)
-	return consumer
-}
 
-func (bridge BridgeApp) consumeMessages(iterator queueConsumer.MessageIterator) {
-	logger.info("waiting for messages")
-	for {
-		msgs, err := iterator.NextMessages()
-		if err != nil {
-			logger.warn(fmt.Sprintf("Could not read messages: %s", err.Error()))
-			continue
-		}
-		for _, m := range msgs {
-			logger.info("forwarding message")
-			bridge.forwardMsg(m)
-		}
-	}
+	consumer := queueConsumer.NewConsumer(*consumerConfig, bridge.forwardMsg, http.Client{})
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go func() {
+		consumer.Start()
+		wg.Done()
+	}()
+
+	ch := make(chan os.Signal)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+	<-ch
+	consumer.Stop()
+	wg.Wait()
 }
