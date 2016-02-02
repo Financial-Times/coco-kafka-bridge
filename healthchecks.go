@@ -4,15 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	fthealth "github.com/Financial-Times/go-fthealth"
+	ftHealth "github.com/Financial-Times/go-fthealth"
 	"io/ioutil"
 	"net/http"
 )
 
 var httpClient *http.Client = &http.Client{}
 
-func (bridge BridgeApp) ConsumeHealthcheck() fthealth.Check {
-	return fthealth.Check{
+func (bridge BridgeApp) ConsumeHealthcheck() ftHealth.Check {
+	return ftHealth.Check{
 		BusinessImpact:   "Consuming messages through kafka-proxy won't work. Publishing in the containerised stack won't work.",
 		Name:             "Consume from UCS kafka through the proxy",
 		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",
@@ -22,8 +22,8 @@ func (bridge BridgeApp) ConsumeHealthcheck() fthealth.Check {
 	}
 }
 
-func (bridge BridgeApp) PROXYForwarderHealthcheck() fthealth.Check {
-	return fthealth.Check{
+func (bridge BridgeApp) PROXYForwarderHealthcheck() ftHealth.Check {
+	return ftHealth.Check{
 		BusinessImpact:   "Forwarding messages to kafka-proxy in coco won't work. Publishing in the containerised stack won't work.",
 		Name:             "Forward messages to kafka-proxy.",
 		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",
@@ -33,8 +33,8 @@ func (bridge BridgeApp) PROXYForwarderHealthcheck() fthealth.Check {
 	}
 }
 
-func (bridge BridgeApp) HTTPForwarderHealthcheck() fthealth.Check {
-	return fthealth.Check{
+func (bridge BridgeApp) HTTPForwarderHealthcheck() ftHealth.Check {
+	return ftHealth.Check{
 		BusinessImpact:   "Forwarding messages to cms-notifier in coco won't work. Publishing in the containerised stack won't work.",
 		Name:             "Forward messages to cms-notifier",
 		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",

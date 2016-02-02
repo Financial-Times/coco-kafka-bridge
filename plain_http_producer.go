@@ -3,9 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
+	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
 	"net/http"
 	"strings"
-	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
 )
 
 type PlainHttpMessageProducer struct {
