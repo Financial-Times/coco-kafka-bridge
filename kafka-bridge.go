@@ -23,13 +23,14 @@ const (
 	PROXY      = "proxy"
 )
 
-func newBridgeApp(consumerAddrs string, consumerGroupId string, consumerOffset string, consumerAuthorizationKey string, topic string, producerHost string, producerHostHeader string, producerVulcanAuth string, producerType string) *BridgeApp {
+func newBridgeApp(consumerAddrs string, consumerGroupId string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerHost string, producerHostHeader string, producerVulcanAuth string, producerType string) *BridgeApp {
 	consumerConfig := queueConsumer.QueueConfig{}
 	consumerConfig.Addrs = strings.Split(consumerAddrs, ",")
 	consumerConfig.Group = consumerGroupId
 	consumerConfig.Topic = topic
 	consumerConfig.Offset = consumerOffset
 	consumerConfig.AuthorizationKey = consumerAuthorizationKey
+	consumerConfig.AutoCommitEnable = consumerAutoCommitEnable
 
 	producerConfig := queueProducer.MessageProducerConfig{}
 	producerConfig.Addr = producerHost
@@ -58,6 +59,7 @@ func initBridgeApp() *BridgeApp {
 	consumerAddrs := flag.String("consumer_proxy_addr", "", "Comma separated kafka proxy hosts for message consuming.")
 	consumerGroup := flag.String("consumer_group_id", "", "Kafka qroup id used for message consuming.")
 	consumerOffset := flag.String("consumer_offset", "", "Kafka read offset.")
+	consumerAutoCommitEnable := flag.Bool("consumer_autocommit_enable", false, "Enable autocommit for small messages.")
 	consumerAuthorizationKey := flag.String("consumer_authorization_key", "", "The authorization key required to UCS access.")
 
 	topic := flag.String("topic", "", "Kafka topic.")
@@ -70,7 +72,7 @@ func initBridgeApp() *BridgeApp {
 
 	flag.Parse()
 
-	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAuthorizationKey, *topic, *producerHost, *producerHostHeader, *producerVulcanAuth, *producerType)
+	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerHost, *producerHostHeader, *producerVulcanAuth, *producerType)
 }
 
 func (bridgeApp *BridgeApp) enableHealthchecks() {
