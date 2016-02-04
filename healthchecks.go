@@ -60,7 +60,7 @@ func (bridge BridgeApp) aggregateConsumableResults() error {
 }
 
 func (bridge BridgeApp) checkConsumable(address string) error {
-	body, err := checkProxyConnection(address, bridge.consumerConfig.AuthorizationKey)
+	body, err := checkProxyConnection(address, bridge.consumerConfig.AuthorizationKey,"")
 	if err != nil {
 		logger.error(fmt.Sprintf("Healthcheck: Error reading request body: %v", err.Error()))
 		return err
@@ -68,7 +68,7 @@ func (bridge BridgeApp) checkConsumable(address string) error {
 	return checkIfTopicIsPresent(body, bridge.consumerConfig.Topic)
 }
 
-func checkProxyConnection(address string, authorizationKey string) (body []byte, err error) {
+func checkProxyConnection(address string, authorizationKey string, hostHeader string) (body []byte, err error) {
 	//check if proxy is running and topic is present
 	req, err := http.NewRequest("GET", address+"/topics", nil)
 	if err != nil {
@@ -78,6 +78,10 @@ func checkProxyConnection(address string, authorizationKey string) (body []byte,
 
 	if authorizationKey != "" {
 		req.Header.Add("Authorization", authorizationKey)
+	}
+
+	if hostHeader != "" {
+		req.Host = hostHeader
 	}
 
 	resp, err := httpClient.Do(req)
@@ -138,6 +142,6 @@ func (bridge BridgeApp) checkForwardableHTTP() error {
 }
 
 func (bridge BridgeApp) checkForwardableProxy() error {
-	_, err := checkProxyConnection(bridge.producerConfig.Addr, bridge.producerConfig.Authorization)
+	_, err := checkProxyConnection(bridge.producerConfig.Addr, bridge.producerConfig.Authorization, bridge.producerConfig.Queue)
 	return err
 }
