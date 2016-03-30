@@ -60,7 +60,7 @@ func extractUUID(msg string) (string, error) {
 	uuid := validRegexp.FindString(uuidContext)
 
 	if uuid == "" {
-		return "", fmt.Errorf("UUID is not present.")
+		return "", fmt.Errorf("UUID is not present")
 	}
 	return uuid, nil
 }
