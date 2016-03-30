@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-var httpClient *http.Client = &http.Client{}
+var httpClient = &http.Client{}
 
 func (bridge BridgeApp) ConsumeHealthcheck() ftHealth.Check {
 	return ftHealth.Check{
