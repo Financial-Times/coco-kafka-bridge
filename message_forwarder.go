@@ -30,8 +30,7 @@ func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) {
 		logger.error(fmt.Sprintf("Error parsing message for extracting uuid. Skip forwarding message. Reason: %s", err.Error()))
 	}
 
-	producerInstance := *bridge.producerInstance
-	producerInstance.SendMessage(uuid, queueProducer.Message{Headers: msg.Headers, Body: msg.Body})
+	bridge.producerInstance.SendMessage(uuid, queueProducer.Message{Headers: msg.Headers, Body: msg.Body})
 
 	ctxlogger.info("Message forwarded")
 }
