@@ -23,7 +23,7 @@ func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) {
 		logger.info("Generating tid: " + tid)
 	}
 	msg.Headers["X-Request-Id"] = tid
-	ctxlogger := TxCombinedLogger{logger, tid}
+	ctxlogger := txCombinedLogger{logger, tid}
 
 	uuid, err := extractUUID(msg.Body)
 	if err != nil {

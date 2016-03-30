@@ -43,7 +43,7 @@ func (c *PlainHttpMessageProducer) SendMessage(uuid string, message queueProduce
 		req.Host = c.config.Queue
 	}
 
-	ctxlogger := TxCombinedLogger{logger, message.Headers["X-Request-Id"]}
+	ctxlogger := txCombinedLogger{logger, message.Headers["X-Request-Id"]}
 
 	resp, err := c.client.Do(req)
 	if err != nil {

@@ -54,28 +54,28 @@ func initLoggers() {
 	}
 }
 
-type TxCombinedLogger struct {
+type txCombinedLogger struct {
 	wrapped combinedLogger
 	txID    string
 }
 
-func (l TxCombinedLogger) info(msg string) {
+func (l txCombinedLogger) info(msg string) {
 	l.wrapped.info(fmt.Sprintf("transaction_id=%+v - %+v", l.txID, msg))
 }
 
-func (l TxCombinedLogger) warn(msg string) {
+func (l txCombinedLogger) warn(msg string) {
 	l.wrapped.warn(fmt.Sprintf("transaction_id=%+v - %+v", l.txID, msg))
 }
 
-func (l TxCombinedLogger) error(msg string) {
+func (l txCombinedLogger) error(msg string) {
 	l.wrapped.error(fmt.Sprintf("transaction_id=%+v - %+v", l.txID, msg))
 }
 
-func (l TxCombinedLogger) access(msg string) {
+func (l txCombinedLogger) access(msg string) {
 	l.wrapped.access(fmt.Sprintf("transaction_id=%+v - %+v", l.txID, msg))
 }
 
-func (l TxCombinedLogger) Write(p []byte) (int, error) {
+func (l txCombinedLogger) Write(p []byte) (int, error) {
 	msg := string(p)
 	l.access(msg)
 	return len(msg), nil
