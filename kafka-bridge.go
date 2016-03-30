@@ -23,10 +23,10 @@ const (
 	proxy     = "proxy"
 )
 
-func newBridgeApp(consumerAddrs string, consumerGroupId string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerHost string, producerHostHeader string, producerVulcanAuth string, producerType string) *BridgeApp {
+func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerHost string, producerHostHeader string, producerVulcanAuth string, producerType string) *BridgeApp {
 	consumerConfig := queueConsumer.QueueConfig{}
 	consumerConfig.Addrs = strings.Split(consumerAddrs, ",")
-	consumerConfig.Group = consumerGroupId
+	consumerConfig.Group = consumerGroupID
 	consumerConfig.Topic = topic
 	consumerConfig.Offset = consumerOffset
 	consumerConfig.AuthorizationKey = consumerAuthorizationKey
