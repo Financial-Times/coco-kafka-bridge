@@ -42,7 +42,7 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 	if producerType == proxy {
 		producerInstance = queueProducer.NewMessageProducer(producerConfig)
 	} else if producerType == plainHTTP {
-		producerInstance = newPlainHttpMessageProducer(producerConfig)
+		producerInstance = newPlainHTTPMessageProducer(producerConfig)
 	}
 
 	bridgeApp := &BridgeApp{

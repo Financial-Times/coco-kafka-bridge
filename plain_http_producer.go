@@ -8,18 +8,18 @@ import (
 	"strings"
 )
 
-type PlainHttpMessageProducer struct {
+type plainHTTPMessageProducer struct {
 	config queueProducer.MessageProducerConfig
 	client *http.Client
 }
 
 // newPlainHttpMessageProducer returns a plain-http-producer which behaves as a producer for kafka (writes messages to kafka), but it's actually making a simple http call to an endpoint
-func newPlainHttpMessageProducer(config queueProducer.MessageProducerConfig) queueProducer.MessageProducer {
-	cmsNotifier := &PlainHttpMessageProducer{config, &http.Client{}}
+func newPlainHTTPMessageProducer(config queueProducer.MessageProducerConfig) queueProducer.MessageProducer {
+	cmsNotifier := &plainHTTPMessageProducer{config, &http.Client{}}
 	return cmsNotifier
 }
 
-func (c *PlainHttpMessageProducer) SendMessage(uuid string, message queueProducer.Message) (err error) {
+func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProducer.Message) (err error) {
 
 	req, err := http.NewRequest("POST", c.config.Addr+"/notify", strings.NewReader(message.Body))
 	if err != nil {
