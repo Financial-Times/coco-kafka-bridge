@@ -19,8 +19,8 @@ type BridgeApp struct {
 }
 
 const (
-	PLAIN_HTTP = "plainHTTP"
-	PROXY      = "proxy"
+	plainHTTP = "plainHTTP"
+	proxy     = "proxy"
 )
 
 func newBridgeApp(consumerAddrs string, consumerGroupId string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerHost string, producerHostHeader string, producerVulcanAuth string, producerType string) *BridgeApp {
@@ -39,9 +39,9 @@ func newBridgeApp(consumerAddrs string, consumerGroupId string, consumerOffset s
 	producerConfig.Authorization = producerVulcanAuth
 
 	var producerInstance queueProducer.MessageProducer
-	if producerType == PROXY {
+	if producerType == proxy {
 		producerInstance = queueProducer.NewMessageProducer(producerConfig)
-	} else if producerType == PLAIN_HTTP {
+	} else if producerType == plainHTTP {
 		producerInstance = newPlainHttpMessageProducer(producerConfig)
 	}
 
@@ -68,7 +68,7 @@ func initBridgeApp() *BridgeApp {
 	producerHostHeader := flag.String("producer_host_header", "kafka-proxy", "The host header for the forwarder service (ex: cms-notifier or kafka-proxy).")
 
 	producerVulcanAuth := flag.String("producer_vulcan_auth", "", "Authentication string by which you access cms-notifier via vulcand.")
-	producerType := flag.String("producer_type", PROXY, "Two possible values are accepted: proxy - if the requests are going through the kafka-proxy; or plainHTTP if a normal http request is required.")
+	producerType := flag.String("producer_type", proxy, "Two possible values are accepted: proxy - if the requests are going through the kafka-proxy; or plainHTTP if a normal http request is required.")
 
 	flag.Parse()
 
@@ -77,9 +77,9 @@ func initBridgeApp() *BridgeApp {
 
 func (bridgeApp *BridgeApp) enableHealthchecks() {
 	//create healthcheck service according to the producer type
-	if bridgeApp.producerType == PROXY {
+	if bridgeApp.producerType == proxy {
 		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, kafka-rest-proxy@aws", bridgeApp.consumeHealthcheck(), bridgeApp.proxyForwarderHealthcheck()))
-	} else if bridgeApp.producerType == PLAIN_HTTP {
+	} else if bridgeApp.producerType == plainHTTP {
 		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, cms-notifier@aws", bridgeApp.consumeHealthcheck(), bridgeApp.httpForwarderHealthcheck()))
 	}
 
