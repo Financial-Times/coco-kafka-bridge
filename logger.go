@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-type CombinedLogger interface {
+type combinedLogger interface {
 	info(msg string)
 	warn(msg string)
 	error(msg string)
@@ -43,7 +43,7 @@ func (l simpleCombinedLogger) Write(p []byte) (int, error) {
 	return len(msg), nil
 }
 
-var logger CombinedLogger
+var logger combinedLogger
 
 func initLoggers() {
 	logger = simpleCombinedLogger{
@@ -55,7 +55,7 @@ func initLoggers() {
 }
 
 type TxCombinedLogger struct {
-	wrapped CombinedLogger
+	wrapped combinedLogger
 	txID    string
 }
 
