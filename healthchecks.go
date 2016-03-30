@@ -51,9 +51,8 @@ func (bridge BridgeApp) aggregateConsumableResults() error {
 		error := bridge.checkConsumable(addresses[i])
 		if error == nil {
 			return nil
-		} else {
-			errMsg = errMsg + fmt.Sprintf("For %s there is an error %v \n", addresses[i], error.Error())
 		}
+		errMsg = errMsg + fmt.Sprintf("For %s there is an error %v \n", addresses[i], error.Error())
 	}
 
 	return errors.New(errMsg)
