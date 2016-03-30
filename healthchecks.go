@@ -103,7 +103,7 @@ func checkIfTopicIsPresent(body []byte, searchedTopic string) error {
 
 	err := json.Unmarshal(body, &topics)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Connection could be established to kafka-proxy, but a parsing error occured and topic could not be found. %v", err.Error()))
+		return fmt.Errorf("Connection could be established to kafka-proxy, but a parsing error occured and topic could not be found. %v", err.Error())
 	}
 
 	for _, topic := range topics {
