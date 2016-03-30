@@ -60,7 +60,7 @@ func (bridge BridgeApp) aggregateConsumableResults() error {
 }
 
 func (bridge BridgeApp) checkConsumable(address string) error {
-	body, err := checkProxyConnection(address, bridge.consumerConfig.AuthorizationKey,"")
+	body, err := checkProxyConnection(address, bridge.consumerConfig.AuthorizationKey, "")
 	if err != nil {
 		logger.error(fmt.Sprintf("Healthcheck: Error reading request body: %v", err.Error()))
 		return err
