@@ -6,6 +6,7 @@ import (
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type PlainHttpMessageProducer struct {
@@ -15,7 +16,11 @@ type PlainHttpMessageProducer struct {
 
 // newPlainHttpMessageProducer returns a plain-http-producer which behaves as a producer for kafka (writes messages to kafka), but it's actually making a simple http call to an endpoint
 func newPlainHttpMessageProducer(config queueProducer.MessageProducerConfig) queueProducer.MessageProducer {
-	cmsNotifier := &PlainHttpMessageProducer{config, &http.Client{}}
+	cmsNotifier := &PlainHttpMessageProducer{config, &http.Client{
+		Timeout: 60 * time.Second,
+		Transport: &http.Transport{
+			MaxIdleConnsPerHost: 100,
+		}}}
 	return cmsNotifier
 }
 
