@@ -11,7 +11,7 @@ import (
 
 var httpClient = &http.Client{}
 
-func (bridge BridgeApp) ConsumeHealthcheck() ftHealth.Check {
+func (bridge BridgeApp) consumeHealthcheck() ftHealth.Check {
 	return ftHealth.Check{
 		BusinessImpact:   "Consuming messages through kafka-proxy won't work. Publishing in the containerised stack won't work.",
 		Name:             "Consume from UCS kafka through the proxy",
@@ -22,7 +22,7 @@ func (bridge BridgeApp) ConsumeHealthcheck() ftHealth.Check {
 	}
 }
 
-func (bridge BridgeApp) PROXYForwarderHealthcheck() ftHealth.Check {
+func (bridge BridgeApp) proxyForwarderHealthcheck() ftHealth.Check {
 	return ftHealth.Check{
 		BusinessImpact:   "Forwarding messages to kafka-proxy in coco won't work. Publishing in the containerised stack won't work.",
 		Name:             "Forward messages to kafka-proxy.",
@@ -33,7 +33,7 @@ func (bridge BridgeApp) PROXYForwarderHealthcheck() ftHealth.Check {
 	}
 }
 
-func (bridge BridgeApp) HTTPForwarderHealthcheck() ftHealth.Check {
+func (bridge BridgeApp) httpForwarderHealthcheck() ftHealth.Check {
 	return ftHealth.Check{
 		BusinessImpact:   "Forwarding messages to cms-notifier in coco won't work. Publishing in the containerised stack won't work.",
 		Name:             "Forward messages to cms-notifier",

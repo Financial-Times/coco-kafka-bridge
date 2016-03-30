@@ -78,9 +78,9 @@ func initBridgeApp() *BridgeApp {
 func (bridgeApp *BridgeApp) enableHealthchecks() {
 	//create healthcheck service according to the producer type
 	if bridgeApp.producerType == PROXY {
-		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, kafka-rest-proxy@aws", bridgeApp.ConsumeHealthcheck(), bridgeApp.PROXYForwarderHealthcheck()))
+		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, kafka-rest-proxy@aws", bridgeApp.consumeHealthcheck(), bridgeApp.proxyForwarderHealthcheck()))
 	} else if bridgeApp.producerType == PLAIN_HTTP {
-		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, cms-notifier@aws", bridgeApp.ConsumeHealthcheck(), bridgeApp.HTTPForwarderHealthcheck()))
+		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, cms-notifier@aws", bridgeApp.consumeHealthcheck(), bridgeApp.httpForwarderHealthcheck()))
 	}
 
 	err := http.ListenAndServe(":8080", nil)
