@@ -14,7 +14,7 @@ import (
 type BridgeApp struct {
 	consumerConfig   *queueConsumer.QueueConfig
 	producerConfig   *queueProducer.MessageProducerConfig
-	producerInstance *queueProducer.MessageProducer
+	producerInstance queueProducer.MessageProducer
 	producerType     string
 }
 
@@ -48,7 +48,7 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 	bridgeApp := &BridgeApp{
 		consumerConfig:   &consumerConfig,
 		producerConfig:   &producerConfig,
-		producerInstance: &producerInstance,
+		producerInstance: producerInstance,
 		producerType:     producerType,
 	}
 	return bridgeApp
