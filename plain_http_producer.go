@@ -16,7 +16,7 @@ type plainHTTPMessageProducer struct {
 
 // newPlainHTTPMessageProducer returns a plain-http-producer which behaves as a producer for kafka (writes messages to kafka), but it's actually making a simple http call to an endpoint
 func newPlainHTTPMessageProducer(config queueProducer.MessageProducerConfig) queueProducer.MessageProducer {
-	cmsNotifier := &PlainHttpMessageProducer{config, &http.Client{
+	cmsNotifier := &plainHTTPMessageProducer{config, &http.Client{
 		Timeout: 60 * time.Second,
 		Transport: &http.Transport{
 			MaxIdleConnsPerHost: 100,
