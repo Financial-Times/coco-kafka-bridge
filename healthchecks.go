@@ -9,9 +9,9 @@ import (
 	"net/http"
 )
 
-var httpClient *http.Client = &http.Client{}
+var httpClient = &http.Client{}
 
-func (bridge BridgeApp) ConsumeHealthcheck() ftHealth.Check {
+func (bridge BridgeApp) consumeHealthcheck() ftHealth.Check {
 	return ftHealth.Check{
 		BusinessImpact:   "Consuming messages through kafka-proxy won't work. Publishing in the containerised stack won't work.",
 		Name:             "Consume from UCS kafka through the proxy",
@@ -22,7 +22,7 @@ func (bridge BridgeApp) ConsumeHealthcheck() ftHealth.Check {
 	}
 }
 
-func (bridge BridgeApp) PROXYForwarderHealthcheck() ftHealth.Check {
+func (bridge BridgeApp) proxyForwarderHealthcheck() ftHealth.Check {
 	return ftHealth.Check{
 		BusinessImpact:   "Forwarding messages to kafka-proxy in coco won't work. Publishing in the containerised stack won't work.",
 		Name:             "Forward messages to kafka-proxy.",
@@ -33,7 +33,7 @@ func (bridge BridgeApp) PROXYForwarderHealthcheck() ftHealth.Check {
 	}
 }
 
-func (bridge BridgeApp) HTTPForwarderHealthcheck() ftHealth.Check {
+func (bridge BridgeApp) httpForwarderHealthcheck() ftHealth.Check {
 	return ftHealth.Check{
 		BusinessImpact:   "Forwarding messages to cms-notifier in coco won't work. Publishing in the containerised stack won't work.",
 		Name:             "Forward messages to cms-notifier",
@@ -51,16 +51,15 @@ func (bridge BridgeApp) aggregateConsumableResults() error {
 		error := bridge.checkConsumable(addresses[i])
 		if error == nil {
 			return nil
-		} else {
-			errMsg = errMsg + fmt.Sprintf("For %s there is an error %v \n", addresses[i], error.Error())
 		}
+		errMsg = errMsg + fmt.Sprintf("For %s there is an error %v \n", addresses[i], error.Error())
 	}
 
 	return errors.New(errMsg)
 }
 
 func (bridge BridgeApp) checkConsumable(address string) error {
-	body, err := checkProxyConnection(address, bridge.consumerConfig.AuthorizationKey,"")
+	body, err := checkProxyConnection(address, bridge.consumerConfig.AuthorizationKey, "")
 	if err != nil {
 		logger.error(fmt.Sprintf("Healthcheck: Error reading request body: %v", err.Error()))
 		return err
@@ -104,7 +103,7 @@ func checkIfTopicIsPresent(body []byte, searchedTopic string) error {
 
 	err := json.Unmarshal(body, &topics)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Connection could be established to kafka-proxy, but a parsing error occured and topic could not be found. %v", err.Error()))
+		return fmt.Errorf("Connection could be established to kafka-proxy, but a parsing error occured and topic could not be found. %v", err.Error())
 	}
 
 	for _, topic := range topics {

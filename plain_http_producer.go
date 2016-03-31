@@ -9,14 +9,14 @@ import (
 	"time"
 )
 
-type PlainHttpMessageProducer struct {
+type plainHTTPMessageProducer struct {
 	config queueProducer.MessageProducerConfig
 	client *http.Client
 }
 
-// newPlainHttpMessageProducer returns a plain-http-producer which behaves as a producer for kafka (writes messages to kafka), but it's actually making a simple http call to an endpoint
-func newPlainHttpMessageProducer(config queueProducer.MessageProducerConfig) queueProducer.MessageProducer {
-	cmsNotifier := &PlainHttpMessageProducer{config, &http.Client{
+// newPlainHTTPMessageProducer returns a plain-http-producer which behaves as a producer for kafka (writes messages to kafka), but it's actually making a simple http call to an endpoint
+func newPlainHTTPMessageProducer(config queueProducer.MessageProducerConfig) queueProducer.MessageProducer {
+	cmsNotifier := &plainHTTPMessageProducer{config, &http.Client{
 		Timeout: 60 * time.Second,
 		Transport: &http.Transport{
 			MaxIdleConnsPerHost: 100,
@@ -24,7 +24,7 @@ func newPlainHttpMessageProducer(config queueProducer.MessageProducerConfig) que
 	return cmsNotifier
 }
 
-func (c *PlainHttpMessageProducer) SendMessage(uuid string, message queueProducer.Message) (err error) {
+func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProducer.Message) (err error) {
 
 	req, err := http.NewRequest("POST", c.config.Addr+"/notify", strings.NewReader(message.Body))
 	if err != nil {
@@ -48,7 +48,7 @@ func (c *PlainHttpMessageProducer) SendMessage(uuid string, message queueProduce
 		req.Host = c.config.Queue
 	}
 
-	ctxlogger := TxCombinedLogger{logger, message.Headers["X-Request-Id"]}
+	ctxlogger := txCombinedLogger{logger, message.Headers["X-Request-Id"]}
 
 	resp, err := c.client.Do(req)
 	if err != nil {

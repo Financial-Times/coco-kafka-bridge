@@ -10,8 +10,8 @@ import (
 )
 
 const tidValidRegexp = "(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$"
-const UUIDContextRegexp = "\"uuid\":\"[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\""
-const UUIDValidRegexp = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+const uuidContextRegexp = "\"uuid\":\"[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\""
+const uuidValidRegexp = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
 const systemIDValidRegexp = `[a-zA-Z-]*$`
 
 func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) {
@@ -23,7 +23,7 @@ func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) {
 		logger.info("Generating tid: " + tid)
 	}
 	msg.Headers["X-Request-Id"] = tid
-	ctxlogger := TxCombinedLogger{logger, tid}
+	ctxlogger := txCombinedLogger{logger, tid}
 
 	uuid, err := extractUUID(msg.Body)
 	if err != nil {
@@ -54,13 +54,13 @@ func extractUUID(msg string) (string, error) {
 	if msg == "" {
 		return "", errors.New("Message body is empty.")
 	}
-	contextRegexp := regexp.MustCompile(UUIDContextRegexp)
-	validRegexp := regexp.MustCompile(UUIDValidRegexp)
+	contextRegexp := regexp.MustCompile(uuidContextRegexp)
+	validRegexp := regexp.MustCompile(uuidValidRegexp)
 	uuidContext := contextRegexp.FindString(msg)
 	uuid := validRegexp.FindString(uuidContext)
 
 	if uuid == "" {
-		return "", fmt.Errorf("UUID is not present.")
+		return "", fmt.Errorf("UUID is not present")
 	}
 	return uuid, nil
 }

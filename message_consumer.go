@@ -3,9 +3,9 @@ package main
 import (
 	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"net/http"
-	"sync"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 )
 
