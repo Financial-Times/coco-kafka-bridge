@@ -1,3 +1,4 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea
-*.exe
+coco-kafka-bridge.exe
+coco-kafka-bridge
