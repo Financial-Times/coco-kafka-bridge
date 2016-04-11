@@ -197,6 +197,19 @@ func TestExtractUUID(t *testing.T) {
 			"7543220a-2389-11e5-bd83-71cb60e8f08c",
 			"",
 		},
+		{
+			queueConsumer.Message{
+				Headers: map[string]string{
+					"Message-Id":        "fc429b46-2500-4fe7-88bb-fd507fbaf00c",
+					"Message-Timestamp": "2015-07-06T07:03:09.362Z",
+					"Message-Type":      "cms-content-published",
+					"Content-Type":      "application/json",
+					"X-Request-Id":      "t9happe59y",
+				},
+				Body: `{"uuid":"7543220A-2389-11E5-BD83-71CB60E8F08C","type":"EOM::CompoundStory","value":"test"}`},
+			"7543220a-2389-11e5-bd83-71cb60e8f08c",
+			"",
+		},
 	}
 
 	for _, test := range tests {

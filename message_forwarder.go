@@ -7,11 +7,12 @@ import (
 	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/dchest/uniuri"
 	"regexp"
+	"strings"
 )
 
 const tidValidRegexp = "(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$"
-const uuidContextRegexp = "\"uuid\":\"[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\""
-const uuidValidRegexp = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+const uuidValidRegexp = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+const uuidContextRegexp = "\"uuid\":\"" + uuidValidRegexp + "\""
 const systemIDValidRegexp = `[a-zA-Z-]*$`
 
 func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) {
@@ -56,7 +57,7 @@ func extractUUID(msg string) (string, error) {
 	contextRegexp := regexp.MustCompile(uuidContextRegexp)
 	validRegexp := regexp.MustCompile(uuidValidRegexp)
 	uuidContext := contextRegexp.FindString(msg)
-	uuid := validRegexp.FindString(uuidContext)
+	uuid := strings.ToLower(validRegexp.FindString(uuidContext))
 
 	if uuid == "" {
 		return "", fmt.Errorf("UUID is not present")
