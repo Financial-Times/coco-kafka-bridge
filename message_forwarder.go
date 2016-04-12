@@ -7,33 +7,22 @@ import (
 	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/dchest/uniuri"
 	"regexp"
-	"strings"
 )
 
 const tidValidRegexp = "(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$"
-const uuidValidRegexp = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
-const uuidContextRegexp = "\"uuid\":\"" + uuidValidRegexp + "\""
 const systemIDValidRegexp = `[a-zA-Z-]*$`
 
 func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) {
-
 	tid, err := extractTID(msg.Headers)
 	if err != nil {
-		logger.warn(fmt.Sprintf("Couldn't extract transaction id: %s", err.Error()))
+		logger.info(fmt.Sprintf("Couldn't extract transaction id: %s", err.Error()))
 		tid = "tid_" + uniuri.NewLen(10) + "_kafka_bridge"
-		logger.info("Generating tid: " + tid)
+		logger.info("Generated tid: " + tid)
 	}
 	msg.Headers["X-Request-Id"] = tid
-	ctxlogger := txCombinedLogger{logger, tid}
-
-	uuid, err := extractUUID(msg.Body)
-	if err != nil {
-		logger.error(fmt.Sprintf("Error parsing message for extracting uuid. Skip forwarding message. Reason: %s", err.Error()))
-	}
-
-	bridge.producerInstance.SendMessage(uuid, queueProducer.Message{Headers: msg.Headers, Body: msg.Body})
-
-	ctxlogger.info("Message forwarded")
+	ctxLogger := txCombinedLogger{logger, tid}
+	bridge.producerInstance.SendMessage("", queueProducer.Message{Headers: msg.Headers, Body: msg.Body})
+	ctxLogger.info("Message forwarded")
 }
 
 func extractTID(headers map[string]string) (string, error) {
@@ -47,22 +36,6 @@ func extractTID(headers map[string]string) (string, error) {
 		return "", fmt.Errorf("Transaction ID is in unknown format: %s.", header)
 	}
 	return tid, nil
-}
-
-func extractUUID(msg string) (string, error) {
-
-	if msg == "" {
-		return "", errors.New("Message body is empty.")
-	}
-	contextRegexp := regexp.MustCompile(uuidContextRegexp)
-	validRegexp := regexp.MustCompile(uuidValidRegexp)
-	uuidContext := contextRegexp.FindString(msg)
-	uuid := strings.ToLower(validRegexp.FindString(uuidContext))
-
-	if uuid == "" {
-		return "", fmt.Errorf("UUID is not present")
-	}
-	return uuid, nil
 }
 
 func extractOriginSystem(headers map[string]string) (string, error) {
