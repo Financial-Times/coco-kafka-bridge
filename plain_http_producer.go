@@ -28,7 +28,7 @@ func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProduce
 	req, err := http.NewRequest("POST", c.config.Addr+"/notify", strings.NewReader(message.Body))
 	if err != nil {
 		logger.error(fmt.Sprintf("Error creating new request: %v", err.Error()))
-		return
+		return err
 	}
 	originSystem, err := extractOriginSystem(message.Headers)
 	if err != nil {

@@ -21,8 +21,12 @@ func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) {
 	}
 	msg.Headers["X-Request-Id"] = tid
 	ctxLogger := txCombinedLogger{logger, tid}
-	bridge.producerInstance.SendMessage("", queueProducer.Message{Headers: msg.Headers, Body: msg.Body})
-	ctxLogger.info("Message forwarded")
+	err = bridge.producerInstance.SendMessage("", queueProducer.Message{Headers: msg.Headers, Body: msg.Body})
+	if err != nil {
+		ctxLogger.error("Error happened during message forwarding. " + err.Error())
+	} else {
+		ctxLogger.info("Message forwarded")
+	}
 }
 
 func extractTID(headers map[string]string) (string, error) {
