@@ -50,8 +50,8 @@ func TestExtractTID(t *testing.T) {
 					"X-Request-Id":      "t9happe59y",
 				},
 				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
+			"t9happe59y",
 			"",
-			"Transaction ID is in unknown format",
 		},
 	}
 

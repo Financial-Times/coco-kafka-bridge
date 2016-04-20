@@ -6,7 +6,6 @@ import (
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
 	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/dchest/uniuri"
-	"regexp"
 )
 
 const tidValidRegexp = "(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$"
@@ -33,10 +32,5 @@ func extractTID(headers map[string]string) (string, error) {
 	if header == "" {
 		return "", errors.New("X-Request-Id header could not be found.")
 	}
-	validRegexp := regexp.MustCompile(tidValidRegexp)
-	tid := validRegexp.FindString(header)
-	if tid == "" {
-		return "", fmt.Errorf("Transaction ID is in unknown format: %s.", header)
-	}
-	return tid, nil
+	return header, nil
 }
