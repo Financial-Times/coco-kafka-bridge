@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 	"regexp"
+	"io"
+	"io/ioutil"
 )
 
 type plainHTTPMessageProducer struct {
@@ -55,7 +57,11 @@ func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProduce
 		errMsg := fmt.Sprintf("Error executing POST request to the ELB: %v", err.Error())
 		return errors.New(errMsg)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		io.Copy(ioutil.Discard, resp.Body)
+		resp.Body.Close()
+	}()
+
 	if resp.StatusCode != http.StatusOK {
 		errMsg := fmt.Sprintf("Forwarding message with tid: %s is not successful. Status: %d", message.Headers["X-Request-Id"], resp.StatusCode)
 		return errors.New(errMsg)

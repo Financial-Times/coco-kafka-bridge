@@ -7,9 +7,15 @@ import (
 	ftHealth "github.com/Financial-Times/go-fthealth"
 	"io/ioutil"
 	"net/http"
+	"time"
+	"io"
 )
 
-var httpClient = &http.Client{}
+var httpClient = &http.Client{
+	Timeout: 60 * time.Second,
+	Transport: &http.Transport{
+		MaxIdleConnsPerHost: 100,
+	}}
 
 func (bridge BridgeApp) consumeHealthcheck() ftHealth.Check {
 	return ftHealth.Check{
@@ -88,7 +94,10 @@ func checkProxyConnection(address string, authorizationKey string, hostHeader st
 		logger.error(fmt.Sprintf("Healthcheck: Error executing kafka-proxy GET request: %v", err.Error()))
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		io.Copy(ioutil.Discard, resp.Body)
+		resp.Body.Close()
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		errMsg := fmt.Sprintf("Connecting to kafka proxy was not successful. Status: %d", resp.StatusCode)
@@ -130,7 +139,11 @@ func (bridge BridgeApp) checkForwardableHTTP() error {
 		return err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		io.Copy(ioutil.Discard, resp.Body)
+		resp.Body.Close()
+	}()
+
 	if resp.StatusCode != http.StatusOK {
 		errMsg := fmt.Sprintf("Healthcheck: Request to plainHTTP producer /__health endpoint failed. Status: %d.", resp.StatusCode)
 		logger.warn(errMsg)
