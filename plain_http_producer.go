@@ -12,10 +12,14 @@ import (
 
 type plainHTTPMessageProducer struct {
 	config queueProducer.MessageProducerConfig
-	client *http.Client
+	client plainHttpClient
 }
 
 const systemIDValidRegexp = `[a-zA-Z-]*$`
+
+type plainHttpClient interface {
+	Do(req *http.Request) (resp *http.Response, err error)
+}
 
 // newPlainHTTPMessageProducer returns a plain-http-producer which behaves as a producer for kafka (writes messages to kafka), but it's actually making a simple http call to an endpoint
 func newPlainHTTPMessageProducer(config queueProducer.MessageProducerConfig) queueProducer.MessageProducer {
