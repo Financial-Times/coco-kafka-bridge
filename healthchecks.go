@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 	ftHealth "github.com/Financial-Times/go-fthealth"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"time"
-	"io"
 )
 
 var httpClient = &http.Client{

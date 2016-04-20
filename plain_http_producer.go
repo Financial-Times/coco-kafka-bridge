@@ -4,12 +4,12 @@ import (
 	"errors"
 	"fmt"
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
-	"net/http"
-	"strings"
-	"time"
-	"regexp"
 	"io"
 	"io/ioutil"
+	"net/http"
+	"regexp"
+	"strings"
+	"time"
 )
 
 type plainHTTPMessageProducer struct {

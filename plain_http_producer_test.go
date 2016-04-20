@@ -1,29 +1,29 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
+	"github.com/golang/go/src/pkg/io/ioutil"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"strings"
 	"testing"
-	"fmt"
-	"github.com/golang/go/src/pkg/io/ioutil"
-	"bytes"
 )
 
 func TestSendMessage(t *testing.T) {
 	initLoggers()
 
 	var tests = []struct {
-		config  queueProducer.MessageProducerConfig
-		uuid string
-		message queueProducer.Message
+		config          queueProducer.MessageProducerConfig
+		uuid            string
+		message         queueProducer.Message
 		expectedHeaders map[string]string
 	}{
-		{//happy flow
+		{ //happy flow
 			queueProducer.MessageProducerConfig{
-				Addr: "address",
-				Queue: "kafka",
+				Addr:          "address",
+				Queue:         "kafka",
 				Authorization: "authorizationkey",
 			},
 			"",
@@ -38,14 +38,14 @@ func TestSendMessage(t *testing.T) {
 				},
 				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
 			map[string]string{
-				"X-Origin-System-Id":  "methode-web-pub",
-				"X-Request-Id":  "t9happe59y",
-				"Authorization": "authorizationkey",
+				"X-Origin-System-Id": "methode-web-pub",
+				"X-Request-Id":       "t9happe59y",
+				"Authorization":      "authorizationkey",
 			},
 		},
-		{//authorization missing
+		{ //authorization missing
 			queueProducer.MessageProducerConfig{
-				Addr: "address",
+				Addr:  "address",
 				Queue: "kafka",
 			},
 			"",
@@ -60,12 +60,12 @@ func TestSendMessage(t *testing.T) {
 				},
 				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
 			map[string]string{
-				"X-Origin-System-Id":  "methode-web-pub",
-				"X-Request-Id":  "t9happe59y",
-				"Authorization": "",
+				"X-Origin-System-Id": "methode-web-pub",
+				"X-Request-Id":       "t9happe59y",
+				"Authorization":      "",
 			},
 		},
-		{//host header (queue) is missing
+		{ //host header (queue) is missing
 			queueProducer.MessageProducerConfig{
 				Addr: "address",
 			},
@@ -81,12 +81,12 @@ func TestSendMessage(t *testing.T) {
 				},
 				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
 			map[string]string{
-				"X-Origin-System-Id":  "methode-web-pub",
-				"X-Request-Id":  "t9happe59y",
-				"Authorization": "",
+				"X-Origin-System-Id": "methode-web-pub",
+				"X-Request-Id":       "t9happe59y",
+				"Authorization":      "",
 			},
 		},
-		{//origin system id is missing
+		{ //origin system id is missing
 			queueProducer.MessageProducerConfig{
 				Addr: "address",
 			},
@@ -101,26 +101,26 @@ func TestSendMessage(t *testing.T) {
 				},
 				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
 			map[string]string{
-				"X-Origin-System-Id":  "",
-				"X-Request-Id":  "t9happe59y",
-				"Authorization": "",
+				"X-Origin-System-Id": "",
+				"X-Request-Id":       "t9happe59y",
+				"Authorization":      "",
 			},
 		},
 	}
 
 	for _, test := range tests {
 		cmsNotifierTest := &plainHTTPMessageProducer{
-					test.config,
-					&dummyHttpClient{
-						assert: assert.New(t),
-						address:test.config.Addr,
-						headers:test.expectedHeaders,
-						resp: http.Response{
-							StatusCode: http.StatusOK,
-							Body: ioutil.NopCloser(bytes.NewBuffer([]byte{})),
-						},
-						host: test.config.Queue,
-					},
+			test.config,
+			&dummyHttpClient{
+				assert:  assert.New(t),
+				address: test.config.Addr,
+				headers: test.expectedHeaders,
+				resp: http.Response{
+					StatusCode: http.StatusOK,
+					Body:       ioutil.NopCloser(bytes.NewBuffer([]byte{})),
+				},
+				host: test.config.Queue,
+			},
 		}
 		err := cmsNotifierTest.SendMessage(test.uuid, test.message)
 		if err != nil {
@@ -131,11 +131,11 @@ func TestSendMessage(t *testing.T) {
 }
 
 type dummyHttpClient struct {
-	assert     *assert.Assertions
-	address    string
-	headers    map[string]string
-	resp       http.Response
-	host	   string
+	assert  *assert.Assertions
+	address string
+	headers map[string]string
+	resp    http.Response
+	host    string
 }
 
 func (d *dummyHttpClient) Do(req *http.Request) (resp *http.Response, err error) {
@@ -152,7 +152,6 @@ func (d *dummyHttpClient) Do(req *http.Request) (resp *http.Response, err error)
 
 	return &d.resp, nil
 }
-
 
 func TestExtractOriginSystem(t *testing.T) {
 	var tests = []struct {
