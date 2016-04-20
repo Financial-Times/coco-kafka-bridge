@@ -7,12 +7,15 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"regexp"
 )
 
 type plainHTTPMessageProducer struct {
 	config queueProducer.MessageProducerConfig
 	client *http.Client
 }
+
+const systemIDValidRegexp = `[a-zA-Z-]*$`
 
 // newPlainHTTPMessageProducer returns a plain-http-producer which behaves as a producer for kafka (writes messages to kafka), but it's actually making a simple http call to an endpoint
 func newPlainHTTPMessageProducer(config queueProducer.MessageProducerConfig) queueProducer.MessageProducer {
@@ -54,4 +57,14 @@ func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProduce
 		return errors.New(errMsg)
 	}
 	return nil
+}
+
+func extractOriginSystem(headers map[string]string) (string, error) {
+	origSysHeader := headers["Origin-System-Id"]
+	validRegexp := regexp.MustCompile(systemIDValidRegexp)
+	systemID := validRegexp.FindString(origSysHeader)
+	if systemID == "" {
+		return "", errors.New("Origin system id is not set.")
+	}
+	return systemID, nil
 }

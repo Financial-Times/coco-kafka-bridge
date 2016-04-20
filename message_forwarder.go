@@ -10,7 +10,6 @@ import (
 )
 
 const tidValidRegexp = "(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$"
-const systemIDValidRegexp = `[a-zA-Z-]*$`
 
 func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) {
 	tid, err := extractTID(msg.Headers)
@@ -40,14 +39,4 @@ func extractTID(headers map[string]string) (string, error) {
 		return "", fmt.Errorf("Transaction ID is in unknown format: %s.", header)
 	}
 	return tid, nil
-}
-
-func extractOriginSystem(headers map[string]string) (string, error) {
-	origSysHeader := headers["Origin-System-Id"]
-	validRegexp := regexp.MustCompile(systemIDValidRegexp)
-	systemID := validRegexp.FindString(origSysHeader)
-	if systemID == "" {
-		return "", errors.New("Origin system id is not set.")
-	}
-	return systemID, nil
 }
