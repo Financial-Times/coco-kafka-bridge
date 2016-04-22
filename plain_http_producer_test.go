@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
-	"github.com/golang/go/src/pkg/io/ioutil"
+	"io/ioutil"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"strings"
