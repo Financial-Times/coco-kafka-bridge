@@ -12,7 +12,7 @@ RUN apk add --update bash \
   && mkdir -p $GOPATH/src/${REPO_PATH} \
   && mv /kafka-bridge/* $GOPATH/src/${REPO_PATH} \
   && cd $GOPATH/src/${REPO_PATH} \
-  && go get \
+  && go get -t \
   && go test \
   && go build \
   && mv coco-kafka-bridge /coco-kafka-bridge \
