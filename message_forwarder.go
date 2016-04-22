@@ -6,11 +6,9 @@ import (
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
 	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/dchest/uniuri"
-	"regexp"
 )
 
 const tidValidRegexp = "(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$"
-const systemIDValidRegexp = `[a-zA-Z-]*$`
 
 func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) {
 	tid, err := extractTID(msg.Headers)
@@ -21,8 +19,12 @@ func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) {
 	}
 	msg.Headers["X-Request-Id"] = tid
 	ctxLogger := txCombinedLogger{logger, tid}
-	bridge.producerInstance.SendMessage("", queueProducer.Message{Headers: msg.Headers, Body: msg.Body})
-	ctxLogger.info("Message forwarded")
+	err = bridge.producerInstance.SendMessage("", queueProducer.Message{Headers: msg.Headers, Body: msg.Body})
+	if err != nil {
+		ctxLogger.error("Error happened during message forwarding. " + err.Error())
+	} else {
+		ctxLogger.info("Message forwarded")
+	}
 }
 
 func extractTID(headers map[string]string) (string, error) {
@@ -30,20 +32,5 @@ func extractTID(headers map[string]string) (string, error) {
 	if header == "" {
 		return "", errors.New("X-Request-Id header could not be found.")
 	}
-	validRegexp := regexp.MustCompile(tidValidRegexp)
-	tid := validRegexp.FindString(header)
-	if tid == "" {
-		return "", fmt.Errorf("Transaction ID is in unknown format: %s.", header)
-	}
-	return tid, nil
-}
-
-func extractOriginSystem(headers map[string]string) (string, error) {
-	origSysHeader := headers["Origin-System-Id"]
-	validRegexp := regexp.MustCompile(systemIDValidRegexp)
-	systemID := validRegexp.FindString(origSysHeader)
-	if systemID == "" {
-		return "", errors.New("Origin system id is not set.")
-	}
-	return systemID, nil
+	return header, nil
 }

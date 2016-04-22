@@ -4,14 +4,23 @@ import (
 	"errors"
 	"fmt"
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
+	"io"
+	"io/ioutil"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 )
 
 type plainHTTPMessageProducer struct {
 	config queueProducer.MessageProducerConfig
-	client *http.Client
+	client plainHttpClient
+}
+
+const systemIDValidRegexp = `[a-zA-Z-]*$`
+
+type plainHttpClient interface {
+	Do(req *http.Request) (resp *http.Response, err error)
 }
 
 // newPlainHTTPMessageProducer returns a plain-http-producer which behaves as a producer for kafka (writes messages to kafka), but it's actually making a simple http call to an endpoint
@@ -27,8 +36,8 @@ func newPlainHTTPMessageProducer(config queueProducer.MessageProducerConfig) que
 func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProducer.Message) (err error) {
 	req, err := http.NewRequest("POST", c.config.Addr+"/notify", strings.NewReader(message.Body))
 	if err != nil {
-		logger.error(fmt.Sprintf("Error creating new request: %v", err.Error()))
-		return
+		errMsg := fmt.Sprintf("Error creating new request: %v", err.Error())
+		return errors.New(errMsg)
 	}
 	originSystem, err := extractOriginSystem(message.Headers)
 	if err != nil {
@@ -43,17 +52,29 @@ func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProduce
 	if len(c.config.Queue) > 0 {
 		req.Host = c.config.Queue
 	}
-	ctxLogger := txCombinedLogger{logger, message.Headers["X-Request-Id"]}
 	resp, err := c.client.Do(req)
 	if err != nil {
-		ctxLogger.error(fmt.Sprintf("Error executing POST request to the ELB: %v", err.Error()))
-		return
+		errMsg := fmt.Sprintf("Error executing POST request to the ELB: %v", err.Error())
+		return errors.New(errMsg)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		io.Copy(ioutil.Discard, resp.Body)
+		resp.Body.Close()
+	}()
+
 	if resp.StatusCode != http.StatusOK {
 		errMsg := fmt.Sprintf("Forwarding message with tid: %s is not successful. Status: %d", message.Headers["X-Request-Id"], resp.StatusCode)
-		ctxLogger.error(errMsg)
 		return errors.New(errMsg)
 	}
 	return nil
+}
+
+func extractOriginSystem(headers map[string]string) (string, error) {
+	origSysHeader := headers["Origin-System-Id"]
+	validRegexp := regexp.MustCompile(systemIDValidRegexp)
+	systemID := validRegexp.FindString(origSysHeader)
+	if systemID == "" {
+		return "", errors.New("Origin system id is not set.")
+	}
+	return systemID, nil
 }
