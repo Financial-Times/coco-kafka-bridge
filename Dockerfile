@@ -3,10 +3,11 @@ FROM alpine
 ADD *.go /kafka-bridge/
 ADD start.sh /
 
-RUN apk add --update bash \
-  && apk --update add git bzr \
-  && echo "http://dl-4.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
-  && apk --update add go \
+RUN apk update \ 
+  && apk add bash \
+  && apk add git bzr \
+  && apk add go \
+  && apk add openssl \
   && export GOPATH=/gopath \
   && REPO_PATH="github.com/Financial-Times/coco-kafka-bridge" \
   && mkdir -p $GOPATH/src/${REPO_PATH} \
