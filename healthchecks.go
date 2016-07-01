@@ -4,17 +4,22 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	ftHealth "github.com/Financial-Times/go-fthealth"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"time"
+
+	ftHealth "github.com/Financial-Times/go-fthealth"
 )
 
 var httpClient = &http.Client{
 	Timeout: 60 * time.Second,
 	Transport: &http.Transport{
 		MaxIdleConnsPerHost: 100,
+		Dial: (&net.Dialer{
+			KeepAlive: 30 * time.Second,
+		}).Dial,
 	}}
 
 func (bridge BridgeApp) consumeHealthcheck() ftHealth.Check {

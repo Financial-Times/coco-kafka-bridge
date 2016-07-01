@@ -3,13 +3,15 @@ package main
 import (
 	"errors"
 	"fmt"
-	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"regexp"
 	"strings"
 	"time"
+
+	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
 )
 
 type plainHTTPMessageProducer struct {
@@ -29,6 +31,9 @@ func newPlainHTTPMessageProducer(config queueProducer.MessageProducerConfig) que
 		Timeout: 60 * time.Second,
 		Transport: &http.Transport{
 			MaxIdleConnsPerHost: 100,
+			Dial: (&net.Dialer{
+				KeepAlive: 30 * time.Second,
+			}).Dial,
 		}}}
 	return cmsNotifier
 }
