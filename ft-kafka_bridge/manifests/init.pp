@@ -4,7 +4,7 @@ class kafka_bridge {
 
   class { "go_service_profile" :
     service_module => $module_name,
-    service_name => 'kafka-bridge',
+    service_name => 'coco-kafka-bridge',
     configParameters => $configParameters
   }
 
