@@ -1,11 +1,11 @@
 name    'ft-kafka_bridge'
-version '0.0.1'
-source 'UNKNOWN'
+version '@semver@'
+source 'git@github.com:Financial-Times/coco-kafka-bridge.git'
 author 'ft'
 license 'Apache License, Version 2.0'
 summary 'UNKNOWN'
-description 'UNKNOWN'
-project_page 'UNKNOWN'
+description 'Bridges messages from kafka'
+project_page 'https://github.com/Financial-Times/coco-kafka-bridge'
 
 ## Add dependencies, if any:
 dependency 'ft/common_pp_up', '>=0.0.1'
