@@ -95,16 +95,17 @@ func main() {
 	initLoggers()
 
 	bridgeApp, group := initBridgeApp()
+	fmt.Printf("group is %v\n", group)
 
 	//dont log to file in any containerized environment
 	if strings.Contains(group, "ucs") {
 		f, err := os.OpenFile("/var/log/apps/coco-kafka-bridge-app.log", os.O_WRONLY | os.O_CREATE | os.O_APPEND, 0755)
+		fmt.Printf("Error is %v\n", err)
 		if err == nil {
 			log.SetOutput(f)
 		} else {
 			log.Fatalf("Failed to initialise log file, %v", err)
 		}
-
 		defer f.Close()
 	}
 	logger.info("Starting Kafka Bridge")
