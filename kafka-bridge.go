@@ -8,8 +8,6 @@ import (
 	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"net/http"
 	"strings"
-	"os"
-	"log"
 )
 
 // BridgeApp wraps the config and represents the API for the bridge
@@ -56,7 +54,7 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 	return bridgeApp
 }
 
-func initBridgeApp() (bridgeApp *BridgeApp, group string) {
+func initBridgeApp() *BridgeApp {
 
 	consumerAddrs := flag.String("consumer_proxy_addr", "", "Comma separated kafka proxy hosts for message consuming.")
 	consumerGroup := flag.String("consumer_group_id", "", "Kafka qroup id used for message consuming.")
@@ -74,7 +72,7 @@ func initBridgeApp() (bridgeApp *BridgeApp, group string) {
 
 	flag.Parse()
 
-	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerHost, *producerHostHeader, *producerVulcanAuth, *producerType), *consumerGroup
+	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerHost, *producerHostHeader, *producerVulcanAuth, *producerType)
 }
 
 func (bridgeApp *BridgeApp) enableHealthchecks() {
@@ -94,20 +92,8 @@ func (bridgeApp *BridgeApp) enableHealthchecks() {
 func main() {
 	initLoggers()
 
-	bridgeApp, group := initBridgeApp()
-	fmt.Printf("group is %v\n", group)
+	bridgeApp := initBridgeApp()
 
-	//dont log to file in any containerized environment
-	if strings.Contains(group, "ucs") {
-		f, err := os.OpenFile("/var/log/apps/coco-kafka-bridge-app.log", os.O_WRONLY | os.O_CREATE | os.O_APPEND, 0755)
-		fmt.Printf("Error is %v\n", err)
-		if err == nil {
-			log.SetOutput(f)
-		} else {
-			log.Fatalf("Failed to initialise log file, %v", err)
-		}
-		defer f.Close()
-	}
 	logger.info("Starting Kafka Bridge")
 
 	go bridgeApp.enableHealthchecks()
