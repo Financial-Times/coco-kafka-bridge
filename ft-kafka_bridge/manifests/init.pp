@@ -1,6 +1,6 @@
 class kafka_bridge {
 
-  $binary_name = "coco-kafka-bridge"
+  $binary_name = "kafka-bridge"
   $install_dir = "/usr/local/$binary_name"
   $binary_file = "$install_dir/$binary_name"
   $log_dir = "/var/log/apps"
@@ -17,7 +17,7 @@ file {
 
     $binary_file:
       ensure  => present,
-      source  => "puppet:///modules/$module_name/files/$binary_name",
+      source  => "puppet:///modules/$module_name/files/coco-kafka-bridge",
       mode    => "0755",
       require => File[$install_dir];
 
