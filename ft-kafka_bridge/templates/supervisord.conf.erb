@@ -28,6 +28,6 @@ stdout_logfile=<%= scope['::kafka_bridge::log_dir'] %>/<%= scope['::kafka_bridge
 stdout_logfile_maxbytes=5MB
 stdout_logfile_backups=30
 redirect_stderr=true
-stderr_logfile=<%=log_dir%>/<%= scope['::kafka_bridge::binary_name'] %>-go-app.err
+stderr_logfile=<%= scope['::kafka_bridge::log_dir'] %>/<%= scope['::kafka_bridge::binary_name'] %>-go-app.err
 stderr_logfile_maxbytes=5MB
 stderr_logfile_backups=30
