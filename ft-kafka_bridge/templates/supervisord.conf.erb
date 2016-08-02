@@ -5,7 +5,7 @@ file=/var/run/supervisor.sock
 port=9001
 
 [supervisord]
-logfile=<%= @supervisord_log_dir %>/supervisord.log
+logfile=<%=supervisord_log_dir%>/supervisord.log
 logfile_maxbytes=5MB
 logfile_backups=30
 loglevel=info
@@ -20,11 +20,14 @@ supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 [supervisorctl]
 serverurl=unix:///var/run/supervisor.sock ; use a unix:// URL  for a unix socket
 
-[program:<%= @kafka_proxy %>]
-command=<%= @start_script %>
+[program:<%=binary_name%>]
+command=<%=binary_file%> <%=config_file%>
 autorestart=true
-stopasgroup=true
-killasgroup=true
 startsecs=20
-stdout_logfile=/dev/null
+stdout_logfile=<%=log_dir%>/<%=binary_name%>-go-app.log
+stdout_logfile_maxbytes=5MB
+stdout_logfile_backups=30
 redirect_stderr=true
+stderr_logfile=<%=log_dir%>/<%=binary_name%>-go-app.err
+stderr_logfile_maxbytes=5MB
+stderr_logfile_backups=30

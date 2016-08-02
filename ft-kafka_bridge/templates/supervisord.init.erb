@@ -39,7 +39,7 @@ SUPERVISORCTL=$PREFIX/bin/supervisorctl
 PIDFILE=/var/run/supervisord.pid
 LOCKFILE=/var/lock/subsys/supervisord
 
-OPTIONS="--configuration <%= @supervisord_config_file %>"
+OPTIONS="--configuration <%=supervisord_config_file%>"
 
 # unset this variable if you don't care to wait for child processes to shutdown before removing the $LOCKFILE-lock
 WAIT_FOR_SUBPROCESSES=yes
