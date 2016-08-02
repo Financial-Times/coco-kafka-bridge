@@ -17,7 +17,7 @@ file {
 
     $binary_file:
       ensure  => present,
-      source  => "puppet:///modules/$module_name/files/coco-kafka-bridge",
+      source  => "puppet:///modules/$module_name/files/$binary_name",
       mode    => "0755",
       require => File[$install_dir];
 
