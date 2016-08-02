@@ -60,6 +60,7 @@ func initBridgeApp() (bridgeApp *BridgeApp, group string) {
 
 	consumerAddrs := flag.String("consumer_proxy_addr", "", "Comma separated kafka proxy hosts for message consuming.")
 	consumerGroup := flag.String("consumer_group_id", "", "Kafka qroup id used for message consuming.")
+	fmt.Printf("Consumer Group is %v\n", *consumerGroup)
 	consumerOffset := flag.String("consumer_offset", "", "Kafka read offset.")
 	consumerAutoCommitEnable := flag.Bool("consumer_autocommit_enable", false, "Enable autocommit for small messages.")
 	consumerAuthorizationKey := flag.String("consumer_authorization_key", "", "The authorization key required to UCS access.")
@@ -95,7 +96,7 @@ func main() {
 	initLoggers()
 
 	bridgeApp, group := initBridgeApp()
-	fmt.Printf("group is %v\n", group)
+	fmt.Printf("Group is %v\n", group)
 
 	//dont log to file in any containerized environment
 	if strings.Contains(group, "ucs") {
