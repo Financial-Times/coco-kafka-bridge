@@ -17,7 +17,7 @@ file {
 
     $binary_file:
       ensure  => present,
-      source  => "puppet:///modules/$module_name/$binary_name",
+      source  => "puppet:///modules/$module_name/files/coco-$binary_name",
       mode    => "0755",
       require => File[$install_dir];
 
