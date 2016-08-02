@@ -3,7 +3,6 @@ class kafka_bridge::supervisord {
   $supervisord_init_file = "/etc/init.d/supervisord"
   $supervisord_config_file = "/etc/supervisord.conf"
   $supervisord_log_dir = "/var/log/supervisor"
-  $binary_name = "kafka-bridge"
 
   satellitesubscribe { 'gateway-epel':
     channel_name  => 'epel'
