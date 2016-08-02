@@ -1,16 +1,16 @@
 #Consumer identity
 client_id=go-consumer
-group_id=<%=scope.function_hiera('group_id',nil)%>
+group_id=<%= scope.function_hiera(['group_id’],nil]) %>
 num_consumers=1
 topic=NativeCmsPublicationEvents
 log_level=info
 
 #Zookeeper connection settings
-zookeeper_connect=<%=scope.function_hiera('zookeepers',nil)%>
+zookeeper_connect=<%= scope.function_hiera(['zookeepers'],nil) %>
 zookeeper_timeout=10s
 
 #HTTP endpoint
-http_host=<%=scope.function_hiera('http_host',nil)%>
+http_host=<%= scope.function_hiera(['http_host'],nil) %>
 
 #workers settings
 num_workers=1
