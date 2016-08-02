@@ -8,6 +8,8 @@ import (
 	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"net/http"
 	"strings"
+	"os"
+	"log"
 )
 
 // BridgeApp wraps the config and represents the API for the bridge
@@ -54,10 +56,11 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 	return bridgeApp
 }
 
-func initBridgeApp() *BridgeApp {
+func initBridgeApp() (bridgeApp *BridgeApp, group string) {
 
 	consumerAddrs := flag.String("consumer_proxy_addr", "", "Comma separated kafka proxy hosts for message consuming.")
 	consumerGroup := flag.String("consumer_group_id", "", "Kafka qroup id used for message consuming.")
+	fmt.Printf("Consumer Group is %v\n", *consumerGroup)
 	consumerOffset := flag.String("consumer_offset", "", "Kafka read offset.")
 	consumerAutoCommitEnable := flag.Bool("consumer_autocommit_enable", false, "Enable autocommit for small messages.")
 	consumerAuthorizationKey := flag.String("consumer_authorization_key", "", "The authorization key required to UCS access.")
@@ -72,7 +75,7 @@ func initBridgeApp() *BridgeApp {
 
 	flag.Parse()
 
-	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerHost, *producerHostHeader, *producerVulcanAuth, *producerType)
+	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerHost, *producerHostHeader, *producerVulcanAuth, *producerType), *consumerGroup
 }
 
 func (bridgeApp *BridgeApp) enableHealthchecks() {
@@ -91,9 +94,22 @@ func (bridgeApp *BridgeApp) enableHealthchecks() {
 
 func main() {
 	initLoggers()
-	logger.info("Starting Kafka Bridge")
 
-	bridgeApp := initBridgeApp()
+	bridgeApp, group := initBridgeApp()
+	fmt.Printf("Group is %v\n", group)
+
+	//dont log to file in any containerized environment
+	if strings.Contains(group, "ucs") {
+		f, err := os.OpenFile("/var/log/apps/coco-kafka-bridge-app.log", os.O_WRONLY | os.O_CREATE | os.O_APPEND, 0755)
+		fmt.Printf("Error is %v\n", err)
+		if err == nil {
+			log.SetOutput(f)
+		} else {
+			log.Fatalf("Failed to initialise log file, %v", err)
+		}
+		defer f.Close()
+	}
+	logger.info("Starting Kafka Bridge\n")
 
 	go bridgeApp.enableHealthchecks()
 
