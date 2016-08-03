@@ -1,8 +1,13 @@
 #Consumer identity
-client_id=go-consumer
-group_id=<%= scope.function_hiera(['group_id',nil]) %>
+consumer_proxy_addr=<%= scope.function_hiera(['consumer_proxy_addr',nil]) %>
+consumer_group_id=<%= scope.function_hiera(['consumer_group_id',nil]) %>
+consumer_autocommit_enable=<%= scope.function_hiera(['consumer_autocommit_enable',nil]) %>
+consumer_authorization_key=<%= scope.lookupvar('auth_key') %>
+topic=<%= scope.function_hiera(['topic',nil]) %>
+producer_host=<%= scope.function_hiera(['producer_host',nil]) %>
+producer_host_header=<%= scope.function_hiera(['producer_host_header',nil]) %>
+producer_type=<%= scope.function_hiera(['producer_type',nil]) %>
 num_consumers=1
-topic=NativeCmsPublicationEvents
 log_level=info
 
 #Zookeeper connection settings
