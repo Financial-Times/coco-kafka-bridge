@@ -29,6 +29,13 @@ file {
       ensure  => present,
       content => template("$module_name/start.sh.erb"),
       mode    => "0755";
+
+    "/etc/kafka-bridge-credentials.properties":
+      owner   => root,
+      ensure  => present,
+      replace => 'no',
+      mode    => "0600";
+
   }
 
 exec { 'restart_kafka-bridge':
