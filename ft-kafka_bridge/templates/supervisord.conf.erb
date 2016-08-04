@@ -21,7 +21,7 @@ supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 serverurl=unix:///var/run/supervisor.sock ; use a unix:// URL  for a unix socket
 
 [program:<%= scope['::kafka_bridge::binary_name'] %>]
-command=<%= scope['::kafka_bridge::binary_file'] %> <%= scope['::kafka_bridge::config_file'] %>
+command=<%= scope['::kafka_bridge::start_script'] %>
 autorestart=true
 startsecs=20
 stdout_logfile=<%= scope['::kafka_bridge::log_dir'] %>/<%= scope['::kafka_bridge::binary_name'] %>-go-app.log

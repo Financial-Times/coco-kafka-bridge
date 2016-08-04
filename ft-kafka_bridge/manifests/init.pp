@@ -4,7 +4,7 @@ class kafka_bridge {
   $install_dir = "/usr/local/$binary_name"
   $binary_file = "$install_dir/$binary_name"
   $log_dir = "/var/log/apps"
-  $config_file = "/etc/$binary_name.properties"
+  $start_script = "$install_dir/start.sh"
 
   class { 'common_pp_up': }
 class { "${module_name}::monitoring": }
@@ -21,13 +21,14 @@ file {
       mode    => "0755",
       require => File[$install_dir];
 
-    $config_file:
-      content => template("$module_name/kafka-bridge.properties.erb"),
-      mode    => "0664";
-
     $log_dir:
       ensure  => directory,
-      mode    => "0664"
+      mode    => "0664";
+
+    $start_script:
+      ensure  => present,
+      content => template("$module_name/start.sh.erb"),
+      mode    => "0755";
   }
 
 exec { 'restart_kafka-bridge':
@@ -35,7 +36,7 @@ exec { 'restart_kafka-bridge':
     path        => "/usr/bin:/usr/sbin:/bin",
     subscribe   => [
       File[$binary_file],
-      File[$config_file],
+      File[$start_script],
       Class["${module_name}::supervisord"]
 ],
 refreshonly => true
