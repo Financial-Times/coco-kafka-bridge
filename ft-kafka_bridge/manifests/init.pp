@@ -4,13 +4,13 @@ class kafka_bridge {
   $install_dir = "/usr/local/$binary_name"
   $binary_file = "$install_dir/$binary_name"
   $log_dir = "/var/log/apps"
-  $sysconfig = "sysconfig"
+  $start_script = "$install_dir/start.sh"
 
   class { 'common_pp_up': }
-  class { "${module_name}::monitoring": }
-  class { "${module_name}::supervisord": }
+class { "${module_name}::monitoring": }
+class { "${module_name}::supervisord": }
 
-  file {
+file {
     $install_dir:
       mode    => "0664",
       ensure  => directory;
@@ -21,31 +21,31 @@ class kafka_bridge {
       mode    => "0755",
       require => File[$install_dir];
 
-    $config_file:
-      content => template("$module_name/kafka-bridge.properties.erb"),
-      mode    => "0664";
-
-    $sysconfig:
-      path    => "/etc/sysconfig/kafka-bridge",
-      content => template("${module_name}/sysconfig.erb"),
-      owner   => 'root',
-      group   => 'root'
-
     $log_dir:
       ensure  => directory,
-      mode    => "0664"
+      mode    => "0664";
+
+    $start_script:
+      ensure  => present,
+      content => template("$module_name/start.sh.erb"),
+      mode    => "0755";
+
+    "/etc/kafka-bridge-credentials.properties":
+      owner   => root,
+      ensure  => present,
+      replace => 'no',
+      mode    => "0600";
+
   }
 
-  exec { 'restart_kafka-bridge':
+exec { 'restart_kafka-bridge':
     command     => "supervisorctl restart $binary_name",
     path        => "/usr/bin:/usr/sbin:/bin",
     subscribe   => [
       File[$binary_file],
-      File[$config_file],
-      File[$sysconfig],
+      File[$start_script],
       Class["${module_name}::supervisord"]
-    ],
-    refreshonly => true
-  }
-
+],
+refreshonly => true
+}
 }
