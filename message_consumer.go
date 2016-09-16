@@ -15,7 +15,7 @@ import (
 func (bridge BridgeApp) consumeMessages() {
 	consumerConfig := bridge.consumerConfig
 
-	consumer := queueConsumer.NewConsumer(*consumerConfig, bridge.forwardMsg, queueConsumer.AgeingClient{
+	consumer := queueConsumer.NewAgeingConsumer(*consumerConfig, bridge.forwardMsg, queueConsumer.AgeingClient{
 		Client: http.Client{
 			Timeout: 60 * time.Second,
 			Transport: &http.Transport{
