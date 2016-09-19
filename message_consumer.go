@@ -15,14 +15,18 @@ import (
 func (bridge BridgeApp) consumeMessages() {
 	consumerConfig := bridge.consumerConfig
 
-	consumer := queueConsumer.NewConsumer(*consumerConfig, bridge.forwardMsg, http.Client{
-		Timeout: 60 * time.Second,
-		Transport: &http.Transport{
-			MaxIdleConnsPerHost: 100,
-			Dial: (&net.Dialer{
-				KeepAlive: 30 * time.Second,
-			}).Dial,
-		}})
+	consumer := queueConsumer.NewAgeingConsumer(*consumerConfig, bridge.forwardMsg, queueConsumer.AgeingClient{
+		Client: http.Client{
+			Timeout: 60 * time.Second,
+			Transport: &http.Transport{
+				MaxIdleConnsPerHost: 100,
+				Dial: (&net.Dialer{
+					KeepAlive: 30 * time.Second,
+				}).Dial,
+			},
+		},
+		MaxAge: time.Duration(2) * time.Minute,
+	})
 
 	var wg sync.WaitGroup
 	wg.Add(1)
