@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
-	"io/ioutil"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
@@ -41,6 +41,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Origin-System-Id": "methode-web-pub",
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "authorizationkey",
+				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
 			},
 		},
 		{ //authorization missing
@@ -102,6 +103,26 @@ func TestSendMessage(t *testing.T) {
 				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
 			map[string]string{
 				"X-Origin-System-Id": "",
+				"X-Request-Id":       "t9happe59y",
+				"Authorization":      "",
+			},
+		},
+		{ //Message-Timestamp is missing
+			queueProducer.MessageProducerConfig{
+				Addr: "address",
+			},
+			"",
+			queueProducer.Message{
+				Headers: map[string]string{
+					"Message-Id":       "fc429b46-2500-4fe7-88bb-fd507fbaf00c",
+					"Origin-System-Id": "http://cmdb.ft.com/systems/methode-web-pub",
+					"Message-Type":     "cms-content-published",
+					"Content-Type":     "application/json",
+					"X-Request-Id":     "t9happe59y",
+				},
+				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
+			map[string]string{
+				"X-Origin-System-Id": "methode-web-pub",
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 			},
