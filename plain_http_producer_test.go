@@ -64,6 +64,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Origin-System-Id": "methode-web-pub",
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
+				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
 			},
 		},
 		{ //host header (queue) is missing
@@ -85,6 +86,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Origin-System-Id": "methode-web-pub",
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
+				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
 			},
 		},
 		{ //origin system id is missing
@@ -105,6 +107,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Origin-System-Id": "",
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
+				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
 			},
 		},
 		{ //Message-Timestamp is missing
@@ -125,6 +128,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Origin-System-Id": "methode-web-pub",
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
+				"Message-Timestamp":  "",
 			},
 		},
 	}
