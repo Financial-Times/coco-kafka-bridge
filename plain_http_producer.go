@@ -51,6 +51,11 @@ func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProduce
 		req.Header.Add("X-Origin-System-Id", originSystem)
 	}
 	req.Header.Add("X-Request-Id", message.Headers["X-Request-Id"])
+
+	timestamp := message.Headers["Message-Timestamp"]
+	if timestamp != "" {
+		req.Header.Add("Message-Timestamp", timestamp)
+	}
 	if len(c.config.Authorization) > 0 {
 		req.Header.Add("Authorization", c.config.Authorization)
 	}
