@@ -1,8 +1,6 @@
 ###Kafka consumer listening to kafka-proxy and forwarding messages to another KAFKA-PROXY or a simple HTTP endpoint.
 
-Run: `./start.sh`
-
-* Change parameters in start.sh, or set the following environment variables:
+* Set the following environment variables:
     * $QUEUE_PROXY_ADDRS
     * $GROUP_ID
     $ CONSUMER_AUTOCOMMIT_ENABLE (enable autocommit when consuming from kafka proxy - use `true` for smaller, `false` for larger messages)
