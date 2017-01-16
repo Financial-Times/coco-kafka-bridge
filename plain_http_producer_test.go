@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	"testing"
 )
 
@@ -38,7 +37,7 @@ func TestSendMessage(t *testing.T) {
 				},
 				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
 			map[string]string{
-				"X-Origin-System-Id": "methode-web-pub",
+				"X-Origin-System-Id": "http://cmdb.ft.com/systems/methode-web-pub",
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "authorizationkey",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
@@ -61,7 +60,7 @@ func TestSendMessage(t *testing.T) {
 				},
 				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
 			map[string]string{
-				"X-Origin-System-Id": "methode-web-pub",
+				"X-Origin-System-Id": "http://cmdb.ft.com/systems/methode-web-pub",
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
@@ -83,7 +82,7 @@ func TestSendMessage(t *testing.T) {
 				},
 				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
 			map[string]string{
-				"X-Origin-System-Id": "methode-web-pub",
+				"X-Origin-System-Id": "http://cmdb.ft.com/systems/methode-web-pub",
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
@@ -110,6 +109,30 @@ func TestSendMessage(t *testing.T) {
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
 			},
 		},
+		{ // origin system id is invalid (but the bridge shouldn't care)
+			queueProducer.MessageProducerConfig{
+				Addr:          "address",
+				Queue:         "kafka",
+				Authorization: "authorizationkey",
+			},
+			"",
+			queueProducer.Message{
+				Headers: map[string]string{
+					"Message-Id":        "fc429b46-2500-4fe7-88bb-fd507fbaf00c",
+					"Message-Timestamp": "2015-07-06T07:03:09.362Z",
+					"Message-Type":      "cms-content-published",
+					"Origin-System-Id":  "http://foo.ft.com/systems/bar",
+					"Content-Type":      "application/json",
+					"X-Request-Id":      "t9happe59y",
+				},
+				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
+			map[string]string{
+				"X-Origin-System-Id": "http://foo.ft.com/systems/bar",
+				"X-Request-Id":       "t9happe59y",
+				"Authorization":      "authorizationkey",
+				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
+			},
+		},
 		{ //Message-Timestamp is missing
 			queueProducer.MessageProducerConfig{
 				Addr: "address",
@@ -125,7 +148,7 @@ func TestSendMessage(t *testing.T) {
 				},
 				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
 			map[string]string{
-				"X-Origin-System-Id": "methode-web-pub",
+				"X-Origin-System-Id": "http://cmdb.ft.com/systems/methode-web-pub",
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "",
@@ -176,64 +199,4 @@ func (d *dummyHttpClient) Do(req *http.Request) (resp *http.Response, err error)
 	d.assert.Equal(d.host, req.Host, fmt.Sprintf("%s Host header value differs."))
 
 	return &d.resp, nil
-}
-
-func TestExtractOriginSystem(t *testing.T) {
-	var tests = []struct {
-		msg                  queueProducer.Message
-		expectedSystemOrigin string
-		expectedErrorMsg     string
-	}{
-		{
-			queueProducer.Message{
-				Headers: map[string]string{
-					"Message-Id":        "fc429b46-2500-4fe7-88bb-fd507fbaf00c",
-					"Message-Timestamp": "2015-07-06T07:03:09.362Z",
-					"Message-Type":      "cms-content-published",
-					"Origin-System-Id":  "http://cmdb.ft.com/systems/methode-web-pub",
-					"Content-Type":      "application/json",
-					"X-Request-Id":      "t9happe59y",
-				},
-				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
-			"methode-web-pub",
-			"",
-		},
-		{
-			queueProducer.Message{
-				Headers: map[string]string{
-					"Message-Id":        "fc429b46-2500-4fe7-88bb-fd507fbaf00c",
-					"Message-Timestamp": "2015-07-06T07:03:09.362Z",
-					"Message-Type":      "cms-content-published",
-					"Content-Type":      "application/json",
-					"X-Request-Id":      "t9happe59y",
-				},
-				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
-			"",
-			"Origin system id is not set",
-		},
-		{
-			queueProducer.Message{
-				Headers: map[string]string{
-					"Message-Id":        "fc429b46-2500-4fe7-88bb-fd507fbaf00c",
-					"Message-Timestamp": "2015-07-06T07:03:09.362Z",
-					"Message-Type":      "cms-content-published",
-					"Origin-System-Id":  "",
-					"Content-Type":      "application/json",
-					"X-Request-Id":      "t9happe59y",
-				},
-				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
-			"",
-			"Origin system id is not set",
-		},
-	}
-
-	for _, test := range tests {
-		actualSystemOrigin, err := extractOriginSystem(test.msg.Headers)
-		if err != nil && !strings.Contains(err.Error(), test.expectedErrorMsg) {
-			t.Errorf("\nExpected: %s\nActual: %s", test.expectedErrorMsg, err.Error())
-		}
-		if err == nil && test.expectedSystemOrigin != actualSystemOrigin {
-			t.Errorf("\nExpected: %s\nActual: %s", test.expectedSystemOrigin, actualSystemOrigin)
-		}
-	}
 }
