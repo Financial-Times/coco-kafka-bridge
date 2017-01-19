@@ -1,0 +1,7 @@
+machine:
+  services:
+    - docker
+
+test:
+  post:
+    - docker build --rm=false -t test/coco-kafka-bridge .
