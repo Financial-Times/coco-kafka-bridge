@@ -5,5 +5,3 @@ machine:
 test:
   post:
     - docker build --rm=false -t test/coco-kafka-bridge .
-    - docker run -d -p 9200:8080 test/coco-kafka-bridge; sleep 3
-    - curl --retry 10 --retry-delay 5 -v http://localhost:9200/__health
