@@ -1,11 +1,11 @@
-FROM alpine
+FROM alpine:3.5
 
 ADD *.go /kafka-bridge/
 
-RUN apk update \ 
+RUN apk update \
   && apk add bash \
   && apk add git bzr \
-  && apk add go \
+  && apk add go libc-dev \
   && export GOPATH=/gopath \
   && REPO_PATH="github.com/Financial-Times/coco-kafka-bridge" \
   && mkdir -p $GOPATH/src/${REPO_PATH} \
@@ -15,8 +15,8 @@ RUN apk update \
   && go test \
   && go build \
   && mv coco-kafka-bridge /coco-kafka-bridge \
-  && apk del go git bzr \
-  && rm -rf $GOPATH /var/cache/apk/* 
+  && apk del go git bzr libc-dev \
+  && rm -rf $GOPATH /var/cache/apk/*
 
 CMD exec ./coco-kafka-bridge -consumer_proxy_addr=$QUEUE_PROXY_ADDRS \
                              -consumer_group_id=$GROUP_ID \
