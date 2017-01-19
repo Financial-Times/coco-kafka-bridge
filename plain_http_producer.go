@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"regexp"
 	"strings"
 	"time"
 
@@ -18,8 +17,6 @@ type plainHTTPMessageProducer struct {
 	config queueProducer.MessageProducerConfig
 	client plainHttpClient
 }
-
-const systemIDValidRegexp = `[a-zA-Z-]*$`
 
 type plainHttpClient interface {
 	Do(req *http.Request) (resp *http.Response, err error)
@@ -44,9 +41,9 @@ func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProduce
 		errMsg := fmt.Sprintf("Error creating new request: %v", err.Error())
 		return errors.New(errMsg)
 	}
-	originSystem, err := extractOriginSystem(message.Headers)
-	if err != nil {
-		logger.info(fmt.Sprintf("Couldn't extract origin system id: %s . Going on.", err.Error()))
+	originSystem, found := message.Headers["Origin-System-Id"]
+	if !found {
+		logger.info("Couldn't extract origin system id. Going on.")
 	} else {
 		req.Header.Add("X-Origin-System-Id", originSystem)
 	}
@@ -77,14 +74,4 @@ func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProduce
 		return errors.New(errMsg)
 	}
 	return nil
-}
-
-func extractOriginSystem(headers map[string]string) (string, error) {
-	origSysHeader := headers["Origin-System-Id"]
-	validRegexp := regexp.MustCompile(systemIDValidRegexp)
-	systemID := validRegexp.FindString(origSysHeader)
-	if systemID == "" {
-		return "", errors.New("Origin system id is not set.")
-	}
-	return systemID, nil
 }
