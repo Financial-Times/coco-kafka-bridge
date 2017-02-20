@@ -59,18 +59,18 @@ func (bridge BridgeApp) aggregateConsumableResults() error {
 	addresses := bridge.consumerConfig.Addrs
 	errMsg := ""
 	for i := 0; i < len(addresses); i++ {
-		error := bridge.checkConsumable(addresses[i])
-		if error == nil {
+		err := bridge.checkConsumable(addresses[i])
+		if err == nil {
 			return nil
 		}
-		errMsg = errMsg + fmt.Sprintf("For %s there is an error %v \n", addresses[i], error.Error())
+		errMsg = errMsg + fmt.Sprintf("For %s there is an error %v \n", addresses[i], err.Error())
 	}
 
 	return errors.New(errMsg)
 }
 
 func (bridge BridgeApp) checkConsumable(address string) error {
-	body, err := checkProxyConnection(address, bridge.consumerConfig.AuthorizationKey, "")
+	body, err := checkProxyConnection(address, bridge.consumerConfig.AuthorizationKey)
 	if err != nil {
 		logger.error(fmt.Sprintf("Healthcheck: Error reading request body: %v", err.Error()))
 		return err
@@ -78,7 +78,7 @@ func (bridge BridgeApp) checkConsumable(address string) error {
 	return checkIfTopicIsPresent(body, bridge.consumerConfig.Topic)
 }
 
-func checkProxyConnection(address string, authorizationKey string, hostHeader string) (body []byte, err error) {
+func checkProxyConnection(address string, authorizationKey string) ([]byte, error) {
 	//check if proxy is running and topic is present
 	req, err := http.NewRequest("GET", address+"/topics", nil)
 	if err != nil {
@@ -88,10 +88,6 @@ func checkProxyConnection(address string, authorizationKey string, hostHeader st
 
 	if authorizationKey != "" {
 		req.Header.Add("Authorization", authorizationKey)
-	}
-
-	if hostHeader != "" {
-		req.Host = hostHeader
 	}
 
 	resp, err := httpClient.Do(req)
@@ -135,7 +131,6 @@ func (bridge BridgeApp) checkForwardableHTTP() error {
 		logger.error(fmt.Sprintf("Error creating new plainHttp producer healthcheck request: %v", err.Error()))
 		return err
 	}
-	req.Host = bridge.producerConfig.Queue
 	req.Header.Add("Authorization", bridge.producerConfig.Authorization)
 
 	resp, err := httpClient.Do(req)
@@ -159,6 +154,6 @@ func (bridge BridgeApp) checkForwardableHTTP() error {
 }
 
 func (bridge BridgeApp) checkForwardableProxy() error {
-	_, err := checkProxyConnection(bridge.producerConfig.Addr, bridge.producerConfig.Authorization, bridge.producerConfig.Queue)
+	_, err := checkProxyConnection(bridge.producerConfig.Addr, bridge.producerConfig.Authorization)
 	return err
 }
