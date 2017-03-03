@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	ftHealth "github.com/Financial-Times/go-fthealth"
+	"github.com/Financial-Times/service-status-go/gtg"
 	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"time"
-	"github.com/Financial-Times/service-status-go/gtg"
-	ftHealth "github.com/Financial-Times/go-fthealth"
 )
 
 var httpClient = &http.Client{
@@ -58,29 +58,29 @@ func (bridge BridgeApp) httpForwarderHealthcheck() ftHealth.Check {
 func (bridge BridgeApp) proxyGtgCheck() gtg.Status {
 	err := bridge.aggregateConsumableResults()
 	if err != nil {
-		return gtg.Status{GoodToGo:false, Message:"Consuming messages is broken."}
+		return gtg.Status{GoodToGo: false, Message: "Consuming messages is broken."}
 	}
 
 	err = bridge.checkForwardableProxy()
 	if err != nil {
-		return gtg.Status{GoodToGo:false, Message:"Proxy connection is failing"}
+		return gtg.Status{GoodToGo: false, Message: "Proxy connection is failing"}
 	}
 
-	return gtg.Status{GoodToGo:true}
+	return gtg.Status{GoodToGo: true}
 }
 
 func (bridge BridgeApp) httpGtgCheck() gtg.Status {
 	err := bridge.aggregateConsumableResults()
 	if err != nil {
-		return gtg.Status{GoodToGo:false, Message:"Consuming messages is broken."}
+		return gtg.Status{GoodToGo: false, Message: "Consuming messages is broken."}
 	}
 
 	err = bridge.checkForwardableHTTP()
 	if err != nil {
-		return gtg.Status{GoodToGo:false, Message:"Forwarding messages is broken."}
+		return gtg.Status{GoodToGo: false, Message: "Forwarding messages is broken."}
 	}
 
-	return gtg.Status{GoodToGo:true}
+	return gtg.Status{GoodToGo: true}
 }
 
 func (bridge BridgeApp) aggregateConsumableResults() error {
@@ -108,7 +108,7 @@ func (bridge BridgeApp) checkConsumable(address string) error {
 
 func checkProxyConnection(address string, authorizationKey string, hostHeader string) (body []byte, err error) {
 	//check if proxy is running and topic is present
-	req, err := http.NewRequest("GET", address + "/topics", nil)
+	req, err := http.NewRequest("GET", address+"/topics", nil)
 	if err != nil {
 		logger.error(fmt.Sprintf("Error creating new kafka-proxy healthcheck request: %v", err.Error()))
 		return nil, err
@@ -158,7 +158,7 @@ func checkIfTopicIsPresent(body []byte, searchedTopic string) error {
 }
 
 func (bridge BridgeApp) checkForwardableHTTP() error {
-	req, err := http.NewRequest("GET", bridge.producerConfig.Addr + "/__health", nil)
+	req, err := http.NewRequest("GET", bridge.producerConfig.Addr+"/__health", nil)
 	if err != nil {
 		logger.error(fmt.Sprintf("Error creating new plainHttp producer healthcheck request: %v", err.Error()))
 		return err

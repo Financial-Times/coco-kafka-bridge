@@ -6,8 +6,8 @@ import (
 	fthealth "github.com/Financial-Times/go-fthealth"
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
 	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
-	"github.com/Financial-Times/service-status-go/httphandlers"
 	"github.com/Financial-Times/service-status-go/gtg"
+	"github.com/Financial-Times/service-status-go/httphandlers"
 	"net/http"
 	"strings"
 )
@@ -22,7 +22,7 @@ type BridgeApp struct {
 
 const (
 	plainHTTP = "plainHTTP"
-	proxy = "proxy"
+	proxy     = "proxy"
 )
 
 func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerHost string, producerHostHeader string, producerVulcanAuth string, producerType string) *BridgeApp {
