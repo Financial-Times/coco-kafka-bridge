@@ -6,6 +6,8 @@ import (
 	fthealth "github.com/Financial-Times/go-fthealth"
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
 	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
+	"github.com/Financial-Times/service-status-go/gtg"
+	"github.com/Financial-Times/service-status-go/httphandlers"
 	"net/http"
 	"strings"
 )
@@ -73,13 +75,18 @@ func initBridgeApp() *BridgeApp {
 	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerHost, *producerVulcanAuth, *producerType)
 }
 
-func (bridgeApp *BridgeApp) enableHealthchecks() {
-	//create healthcheck service according to the producer type
+func (bridgeApp *BridgeApp) enableHealthchecksAndGTG() {
+	var gtgHandler func(http.ResponseWriter, *http.Request)
+	//create healthcheck and gtg endpoints according to the producer type
 	if bridgeApp.producerType == proxy {
 		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, kafka-rest-proxy@aws", bridgeApp.consumeHealthcheck(), bridgeApp.proxyForwarderHealthcheck()))
+		gtgHandler = httphandlers.NewGoodToGoHandler(gtg.StatusChecker(bridgeApp.proxyGtgCheck))
 	} else if bridgeApp.producerType == plainHTTP {
 		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, cms-notifier@aws", bridgeApp.consumeHealthcheck(), bridgeApp.httpForwarderHealthcheck()))
+		gtgHandler = httphandlers.NewGoodToGoHandler(gtg.StatusChecker(bridgeApp.httpGtgCheck))
 	}
+
+	http.HandleFunc(httphandlers.GTGPath, gtgHandler)
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
@@ -93,7 +100,7 @@ func main() {
 
 	bridgeApp := initBridgeApp()
 
-	go bridgeApp.enableHealthchecks()
+	go bridgeApp.enableHealthchecksAndGTG()
 
 	bridgeApp.consumeMessages()
 }

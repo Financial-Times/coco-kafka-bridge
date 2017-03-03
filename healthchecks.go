@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	ftHealth "github.com/Financial-Times/go-fthealth"
+	"github.com/Financial-Times/service-status-go/gtg"
 	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"time"
-
-	ftHealth "github.com/Financial-Times/go-fthealth"
 )
 
 var httpClient = &http.Client{
@@ -53,6 +53,34 @@ func (bridge BridgeApp) httpForwarderHealthcheck() ftHealth.Check {
 		TechnicalSummary: "Forwarding messages is broken. Check networking, aws cluster reachability and/or coco cms-notifier state.",
 		Checker:          bridge.checkForwardableHTTP,
 	}
+}
+
+func (bridge BridgeApp) proxyGtgCheck() gtg.Status {
+	err := bridge.aggregateConsumableResults()
+	if err != nil {
+		return gtg.Status{GoodToGo: false, Message: "Consuming messages is broken."}
+	}
+
+	err = bridge.checkForwardableProxy()
+	if err != nil {
+		return gtg.Status{GoodToGo: false, Message: "Proxy connection is failing"}
+	}
+
+	return gtg.Status{GoodToGo: true}
+}
+
+func (bridge BridgeApp) httpGtgCheck() gtg.Status {
+	err := bridge.aggregateConsumableResults()
+	if err != nil {
+		return gtg.Status{GoodToGo: false, Message: "Consuming messages is broken."}
+	}
+
+	err = bridge.checkForwardableHTTP()
+	if err != nil {
+		return gtg.Status{GoodToGo: false, Message: "Forwarding messages is broken."}
+	}
+
+	return gtg.Status{GoodToGo: true}
 }
 
 func (bridge BridgeApp) aggregateConsumableResults() error {
