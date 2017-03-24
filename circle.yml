@@ -1,7 +1,11 @@
 machine:
   services:
     - docker
-
+dependencies:
+  pre:
+    - go get -u github.com/kardianos/govendor
+  override:
+    - cd $GO_PROJECT_PATH && govendor sync
 test:
   post:
     - docker build --rm=false -t test/coco-kafka-bridge .

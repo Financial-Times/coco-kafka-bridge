@@ -12,6 +12,8 @@ RUN apk update \
   && mv /kafka-bridge/* $GOPATH/src/${REPO_PATH} \
   && cd $GOPATH/src/${REPO_PATH} \
   && go get -t \
+  && go get -u github.com/kardianos/govendor \
+  && $GOPATH/bin/govendor sync \
   && go test \
   && go build \
   && mv coco-kafka-bridge /coco-kafka-bridge \
