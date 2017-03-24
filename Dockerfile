@@ -1,6 +1,7 @@
 FROM alpine:3.5
 
 ADD *.go /kafka-bridge/
+ADD vendor /kafka-bridge/vendor
 
 RUN apk update \
   && apk add bash \

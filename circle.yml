@@ -1,11 +1,21 @@
 machine:
-  services:
-    - docker
+  environment:
+    GOPATH: "${HOME}/.go_workspace:/usr/local/go_workspace:${HOME}/.go_project"
+    GO_PROJECT_PATH: "${HOME}/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
+
+checkout:
+  post:
+    # Get the project sources to a proper GO path
+    - mkdir -p $(dirname ${GO_PROJECT_PATH})
+    - ln -sf "${HOME}/${CIRCLE_PROJECT_REPONAME}/" "${GO_PROJECT_PATH}"
 dependencies:
   pre:
     - go get -u github.com/kardianos/govendor
   override:
-    - cd $GO_PROJECT_PATH && govendor sync
+    - cd ${GO_PROJECT_PATH} && govendor sync
+
 test:
+  override:
+    - cd ${GO_PROJECT_PATH} && govendor test +local
   post:
     - docker build --rm=false -t test/coco-kafka-bridge .
