@@ -15,7 +15,7 @@ RUN apk update \
   && go get -t \
   && go get -u github.com/kardianos/govendor \
   && $GOPATH/bin/govendor sync \
-  && $GOPATH/bin/govendor +local \
+  && $GOPATH/bin/govendor test +local \
   && go build \
   && mv coco-kafka-bridge /coco-kafka-bridge \
   && apk del go git bzr libc-dev \
