@@ -1,4 +1,6 @@
 machine:
+  services:
+    - docker
   environment:
     GOPATH: "${HOME}/.go_workspace:/usr/local/go_workspace:${HOME}/.go_project"
     GO_PROJECT_PATH: "${HOME}/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
