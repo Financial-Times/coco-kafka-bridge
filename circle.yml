@@ -8,13 +8,13 @@ machine:
 checkout:
   post:
     # Get the project sources to a proper GO path
-    - mkdir -p $(dirname ${GO_PROJECT_PATH})
-    - ln -sf "${HOME}/${CIRCLE_PROJECT_REPONAME}/" "${GO_PROJECT_PATH}"
+    - mkdir -p $(dirname $GO_PROJECT_PATH)
+    - ln -sf "$HOME/$CIRCLE_PROJECT_REPONAME/" "$GO_PROJECT_PATH"
 dependencies:
   pre:
     - go get -u github.com/kardianos/govendor
   override:
-    - cd ${GO_PROJECT_PATH} && govendor sync
+    - cd $GO_PROJECT_PATH && govendor sync
     - cd $GO_PROJECT_PATH && go get -t -d -v ./...
     - cd $GO_PROJECT_PATH && go build -v
 
