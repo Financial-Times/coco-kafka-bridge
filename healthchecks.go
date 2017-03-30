@@ -44,21 +44,7 @@ func (bridge BridgeApp) httpForwarderHealthcheck() ftHealth.Check {
 	}
 }
 
-func (bridge BridgeApp) proxyGtgCheck() gtg.Status {
-	msg, err := bridge.aggregateConsumableResults()
-	if err != nil {
-		return gtg.Status{GoodToGo: false, Message: msg}
-	}
-
-	msg, err = bridge.producerInstance.ConnectivityCheck()
-	if err != nil {
-		return gtg.Status{GoodToGo: false, Message: msg}
-	}
-
-	return gtg.Status{GoodToGo: true}
-}
-
-func (bridge BridgeApp) httpGtgCheck() gtg.Status {
+func (bridge BridgeApp) gtgCheck() gtg.Status {
 	msg, err := bridge.aggregateConsumableResults()
 	if err != nil {
 		return gtg.Status{GoodToGo: false, Message: msg}

@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"io/ioutil"
 	"strings"
+	"github.com/Financial-Times/message-queue-go-producer/producer"
+	"errors"
 )
 
 const (
@@ -18,6 +20,22 @@ const (
 type mockTransport struct {
 	responseStatusCode int
 	responseBody       string
+}
+
+type mockProducerInstance struct {
+	isConnectionHealthy bool
+}
+
+func (p *mockProducerInstance) SendMessage(string, producer.Message) error {
+	return nil
+}
+
+func (p *mockProducerInstance) ConnectivityCheck() (string, error) {
+	if p.isConnectionHealthy {
+		return "", nil
+	}
+
+	return "", errors.New("test")
 }
 
 func (t *mockTransport) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -44,19 +62,24 @@ func initializeMockedHTTPClient(responseStatusCode int, responseBody string) *ht
 }
 
 func initializeHappyBridge() BridgeApp {
-	return initializeBridge(http.StatusOK)
+	return initializeBridge(http.StatusOK, true)
 }
 
 func initializeBrokenProxyBridge() BridgeApp {
-	return initializeBridge(http.StatusInternalServerError)
+	return initializeBridge(http.StatusInternalServerError, false)
 }
 
-func initializeBridge(statusCode int) BridgeApp {
+func initializeBrokenProducerBridge() BridgeApp {
+	return initializeBridge(http.StatusOK, false)
+}
+
+func initializeBridge(statusCode int, isProducerConnectionHealthy bool) BridgeApp {
 	httpClient := initializeMockedHTTPClient(statusCode, kafkaTopicsResponseBody)
 	consumerConfig := &queueConsumer.QueueConfig{AuthorizationKey:"dummy", Topic:presentTopic, Addrs:[]string{"abc"}}
 	return BridgeApp{
 		httpClient:httpClient,
 		consumerConfig:consumerConfig,
+		producerInstance:&mockProducerInstance{isConnectionHealthy:isProducerConnectionHealthy},
 	}
 }
 
@@ -129,18 +152,26 @@ func TestAggregateConsumableNoAddressProxy(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestHttpGtgBrokenProxy(t *testing.T) {
+func TestGtgBrokenProxy(t *testing.T) {
 	initLoggers()
 	bridge := initializeBrokenProxyBridge()
-	gtgStatus := bridge.httpGtgCheck()
+	gtgStatus := bridge.gtgCheck()
 
 	assert.False(t, gtgStatus.GoodToGo)
 }
 
-func TestProxyGtgBrokenProxy(t *testing.T) {
+func TestGtgHappyFlow(t *testing.T) {
 	initLoggers()
-	bridge := initializeBrokenProxyBridge()
-	gtgStatus := bridge.httpGtgCheck()
+	bridge := initializeHappyBridge()
+	gtgStatus := bridge.gtgCheck()
+
+	assert.True(t, gtgStatus.GoodToGo)
+}
+
+func TestGtgConnectionDown(t *testing.T) {
+	initLoggers()
+	bridge := initializeBrokenProducerBridge()
+	gtgStatus := bridge.gtgCheck()
 
 	assert.False(t, gtgStatus.GoodToGo)
 }
