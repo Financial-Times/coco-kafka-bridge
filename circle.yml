@@ -17,7 +17,16 @@ dependencies:
     - cd ${GO_PROJECT_PATH} && govendor sync
 
 test:
+  pre:
+    - go get -u github.com/jstemmer/go-junit-report
+    - go get -u github.com/mattn/goveralls
   override:
-    - cd ${GO_PROJECT_PATH} && govendor test +local
+    - mkdir -p $CIRCLE_TEST_REPORTS/golang
+    - cd $GO_PROJECT_PATH && govendor test -race -v +local | go-junit-report > $CIRCLE_TEST_REPORTS/golang/junit.xml
+    - cd $GO_PROJECT_PATH && govendor test -v -cover -race -coverprofile=$CIRCLE_ARTIFACTS/coverage.out +local
+    - cd $CIRCLE_ARTIFACTS && sed -i '1d' *.out
+    - |
+      echo "mode: atomic" > $CIRCLE_ARTIFACTS/overall-coverage.result
+    - cd $CIRCLE_ARTIFACTS && cat *.out >> overall-coverage.result
   post:
-    - docker build --rm=false -t test/coco-kafka-bridge .
+    - goveralls -coverprofile=$CIRCLE_ARTIFACTS/overall-coverage.result -service=circle-ci -repotoken=$COVERALLS_TOKEN

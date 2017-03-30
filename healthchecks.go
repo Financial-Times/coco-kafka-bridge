@@ -108,7 +108,7 @@ func (bridge BridgeApp) checkConsumable(address string) error {
 
 func checkProxyConnection(address string, authorizationKey string, hostHeader string) (body []byte, err error) {
 	//check if proxy is running and topic is present
-	req, err := http.NewRequest("GET", address + "/topics", nil)
+	req, err := http.NewRequest("GET", address+"/topics", nil)
 	if err != nil {
 		logger.error(fmt.Sprintf("Error creating new kafka-proxy healthcheck request: %v", err.Error()))
 		return nil, err

@@ -82,10 +82,10 @@ func (bridgeApp *BridgeApp) enableHealthchecksAndGTG() {
 	//create healthcheck and gtg endpoints according to the producer type
 	if bridgeApp.producerType == proxy {
 		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, kafka-rest-proxy@aws", bridgeApp.consumeHealthcheck(), bridgeApp.proxyForwarderHealthcheck()))
-		gtgHandler = httphandlers.NewGoodToGoHandler(gtg.StatusChecker(bridgeApp.proxyGtgCheck))
+		gtgHandler = httphandlers.NewGoodToGoHandler(bridgeApp.proxyGtgCheck)
 	} else if bridgeApp.producerType == plainHTTP {
 		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, cms-notifier@aws", bridgeApp.consumeHealthcheck(), bridgeApp.httpForwarderHealthcheck()))
-		gtgHandler = httphandlers.NewGoodToGoHandler(gtg.StatusChecker(bridgeApp.httpGtgCheck))
+		gtgHandler = httphandlers.NewGoodToGoHandler(bridgeApp.httpGtgCheck)
 	}
 
 	http.HandleFunc(httphandlers.GTGPath, gtgHandler)

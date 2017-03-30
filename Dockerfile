@@ -1,13 +1,10 @@
-FROM alpine:3.5
+FROM golang:1.7-alpine3.5
 
 ADD *.go /kafka-bridge/
 ADD vendor /kafka-bridge/vendor
 
 RUN apk update \
-  && apk add bash \
   && apk add git bzr \
-  && apk add go libc-dev \
-  && export GOPATH=/gopath \
   && REPO_PATH="github.com/Financial-Times/coco-kafka-bridge" \
   && mkdir -p $GOPATH/src/${REPO_PATH} \
   && mv /kafka-bridge/* $GOPATH/src/${REPO_PATH} \
