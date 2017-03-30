@@ -6,7 +6,6 @@ import (
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
 	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
-	"github.com/Financial-Times/service-status-go/gtg"
 	"github.com/Financial-Times/service-status-go/httphandlers"
 	"net/http"
 	"strings"
