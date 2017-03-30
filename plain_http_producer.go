@@ -85,7 +85,7 @@ func (c *plainHTTPMessageProducer) ConnectivityCheck() (string, error) {
 	req.Host = c.config.Queue
 	req.Header.Add("Authorization", c.config.Authorization)
 
-	resp, err := httpClient.Do(req)
+	resp, err := c.client.Do(req)
 	if err != nil {
 		logger.warn(fmt.Sprintf("Healthcheck: Error executing GET request: %v", err.Error()))
 		return "Forwarding messages is broken.", err

@@ -8,19 +8,8 @@ import (
 	"github.com/Financial-Times/service-status-go/gtg"
 	"io"
 	"io/ioutil"
-	"net"
 	"net/http"
-	"time"
 )
-
-var httpClient = &http.Client{
-	Timeout: 60 * time.Second,
-	Transport: &http.Transport{
-		MaxIdleConnsPerHost: 100,
-		Dial: (&net.Dialer{
-			KeepAlive: 30 * time.Second,
-		}).Dial,
-	}}
 
 func (bridge BridgeApp) consumeHealthcheck() ftHealth.Check {
 	return ftHealth.Check{
@@ -98,7 +87,7 @@ func (bridge BridgeApp) aggregateConsumableResults() (string, error) {
 }
 
 func (bridge BridgeApp) checkConsumable(address string) error {
-	body, err := checkProxyConnection(address, bridge.consumerConfig.AuthorizationKey, "")
+	body, err := bridge.checkProxyConnection(address, bridge.consumerConfig.AuthorizationKey, "")
 	if err != nil {
 		logger.error(fmt.Sprintf("Healthcheck: Error reading request body: %v", err.Error()))
 		return err
@@ -106,9 +95,9 @@ func (bridge BridgeApp) checkConsumable(address string) error {
 	return checkIfTopicIsPresent(body, bridge.consumerConfig.Topic)
 }
 
-func checkProxyConnection(address string, authorizationKey string, hostHeader string) (body []byte, err error) {
+func (bridge BridgeApp)  checkProxyConnection(address string, authorizationKey string, hostHeader string) (body []byte, err error) {
 	//check if proxy is running and topic is present
-	req, err := http.NewRequest("GET", address+"/topics", nil)
+	req, err := http.NewRequest("GET", address + "/topics", nil)
 	if err != nil {
 		logger.error(fmt.Sprintf("Error creating new kafka-proxy healthcheck request: %v", err.Error()))
 		return nil, err
@@ -122,7 +111,7 @@ func checkProxyConnection(address string, authorizationKey string, hostHeader st
 		req.Host = hostHeader
 	}
 
-	resp, err := httpClient.Do(req)
+	resp, err := bridge.httpClient.Do(req)
 	if err != nil {
 		logger.error(fmt.Sprintf("Healthcheck: Error executing kafka-proxy GET request: %v", err.Error()))
 		return nil, err
