@@ -56,6 +56,12 @@ func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProduce
 	if len(c.config.Authorization) > 0 {
 		req.Header.Add("Authorization", c.config.Authorization)
 	}
+
+	nativeHash, found := message.Headers["Native-Hash"]
+	if found {
+		req.Header.Add("X-Native-Hash", nativeHash)
+	}
+
 	if len(c.config.Queue) > 0 {
 		req.Host = c.config.Queue
 	}
