@@ -16,7 +16,7 @@ RUN apk update \
   && apk del go git bzr libc-dev \
   && rm -rf $GOPATH /var/cache/apk/*
 
-CMD exec ./coco-kafka-bridge -consumer_proxy_addr=$QUEUE_PROXY_ADDRS \
+CMD exec /coco-kafka-bridge -consumer_proxy_addr=$QUEUE_PROXY_ADDRS \
                              -consumer_group_id=$GROUP_ID \
                              -consumer_offset=largest \
                              -consumer_autocommit_enable=$CONSUMER_AUTOCOMMIT_ENABLE \
