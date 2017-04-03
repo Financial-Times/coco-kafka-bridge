@@ -155,7 +155,7 @@ func TestSendMessage(t *testing.T) {
 				"Message-Timestamp":  "",
 			},
 		},
-		{ //happy flow
+		{ //native-hash forward
 			queueProducer.MessageProducerConfig{
 				Addr:          "address",
 				Queue:         "kafka",
