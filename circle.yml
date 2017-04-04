@@ -1,7 +1,33 @@
 machine:
   services:
     - docker
+  environment:
+    GOPATH: "${HOME}/.go_workspace:/usr/local/go_workspace:${HOME}/.go_project"
+    GO_PROJECT_PATH: "${HOME}/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}"
+
+checkout:
+  post:
+    # Get the project sources to a proper GO path
+    - mkdir -p $(dirname $GO_PROJECT_PATH)
+    - ln -sf "$HOME/$CIRCLE_PROJECT_REPONAME/" "$GO_PROJECT_PATH"
+dependencies:
+  pre:
+    - go get -u github.com/kardianos/govendor
+  override:
+    - cd $GO_PROJECT_PATH && govendor sync
+    - cd $GO_PROJECT_PATH && go build -v
 
 test:
+  pre:
+    - go get -u github.com/jstemmer/go-junit-report
+    - go get -u github.com/mattn/goveralls
+  override:
+    - mkdir -p $CIRCLE_TEST_REPORTS/golang
+    - cd $GO_PROJECT_PATH && govendor test -race -v +local | go-junit-report > $CIRCLE_TEST_REPORTS/golang/junit.xml
+    - cd $GO_PROJECT_PATH && govendor test -v -cover -race -coverprofile=$CIRCLE_ARTIFACTS/coverage.out +local
+    - cd $CIRCLE_ARTIFACTS && sed -i '1d' *.out
+    - |
+      echo "mode: atomic" > $CIRCLE_ARTIFACTS/overall-coverage.result
+    - cd $CIRCLE_ARTIFACTS && cat *.out >> overall-coverage.result
   post:
-    - docker build --rm=false -t test/coco-kafka-bridge .
+    - goveralls -coverprofile=$CIRCLE_ARTIFACTS/overall-coverage.result -service=circle-ci -repotoken=$COVERALLS_TOKEN
