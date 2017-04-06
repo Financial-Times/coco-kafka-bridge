@@ -3,11 +3,12 @@ package main
 import (
 	"bytes"
 	"fmt"
-	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSendMessage(t *testing.T) {
@@ -154,6 +155,32 @@ func TestSendMessage(t *testing.T) {
 				"Message-Timestamp":  "",
 			},
 		},
+		{ //native-hash forward
+			queueProducer.MessageProducerConfig{
+				Addr:          "address",
+				Queue:         "kafka",
+				Authorization: "authorizationkey",
+			},
+			"",
+			queueProducer.Message{
+				Headers: map[string]string{
+					"Message-Id":        "fc429b46-2500-4fe7-88bb-fd507fbaf00c",
+					"Message-Timestamp": "2015-07-06T07:03:09.362Z",
+					"Message-Type":      "cms-content-published",
+					"Origin-System-Id":  "http://cmdb.ft.com/systems/methode-web-pub",
+					"Content-Type":      "application/json",
+					"X-Request-Id":      "t9happe59y",
+					"Native-Hash":       "27f79e6d884acdd642d1758c4fd30d43074f8384d552d1ebb1959345",
+				},
+				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
+			map[string]string{
+				"X-Origin-System-Id": "http://cmdb.ft.com/systems/methode-web-pub",
+				"X-Request-Id":       "t9happe59y",
+				"Authorization":      "authorizationkey",
+				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
+				"X-Native-Hash":      "27f79e6d884acdd642d1758c4fd30d43074f8384d552d1ebb1959345",
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -196,7 +223,7 @@ func (d *dummyHttpClient) Do(req *http.Request) (resp *http.Response, err error)
 	}
 
 	// Check that host is set as expected
-	d.assert.Equal(d.host, req.Host, fmt.Sprintf("%s Host header value differs."))
+	d.assert.Equal(d.host, req.Host, "Host header value differs.")
 
 	return &d.resp, nil
 }
