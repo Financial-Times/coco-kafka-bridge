@@ -1,0 +1,87 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "FUhczVSvt/VQAlWfzATo1YLez2E=",
+			"path": "github.com/Financial-Times/go-fthealth/v1a",
+			"revision": "f9074331b3ab48bca0e6d0afc211a673d88ac925",
+			"revisionTime": "2016-06-16T09:04:59Z",
+			"version": "0.1.0",
+			"versionExact": "0.1.0"
+		},
+		{
+			"checksumSHA1": "yceqWuIbFzntmSHl66OwNoP/c6E=",
+			"path": "github.com/Financial-Times/message-queue-go-producer/producer",
+			"revision": "163efbf93f1a2ba839b317d26e37426bcfa3850a",
+			"revisionTime": "2017-03-20T10:55:12Z",
+			"version": "v0.1.0",
+			"versionExact": "v0.1.0"
+		},
+		{
+			"checksumSHA1": "/kMYtkcxWV4dZNvJaEGkDUwt3TA=",
+			"path": "github.com/Financial-Times/message-queue-gonsumer/consumer",
+			"revision": "4e173298922ba4c10721b1b5b3e0d35be7f162e9",
+			"revisionTime": "2017-03-20T10:34:32Z",
+			"version": "0.3.0",
+			"versionExact": "0.3.0"
+		},
+		{
+			"checksumSHA1": "fqpohN7Qp2qj7TLMbUxh/cK4oH0=",
+			"path": "github.com/Financial-Times/service-status-go/buildinfo",
+			"revision": "3f5199736a3d7ae52394c63aac36834786825e21",
+			"revisionTime": "2016-03-23T11:15:42Z",
+			"version": "0.1.0",
+			"versionExact": "0.1.0"
+		},
+		{
+			"checksumSHA1": "2rGNLXdRC3qr5n5ll7BpYt8HCK8=",
+			"path": "github.com/Financial-Times/service-status-go/gtg",
+			"revision": "3f5199736a3d7ae52394c63aac36834786825e21",
+			"revisionTime": "2016-03-23T11:15:42Z",
+			"version": "0.1.0",
+			"versionExact": "0.1.0"
+		},
+		{
+			"checksumSHA1": "973POGyMCoyaKQuIYX2f7EKFwlQ=",
+			"path": "github.com/Financial-Times/service-status-go/httphandlers",
+			"revision": "3f5199736a3d7ae52394c63aac36834786825e21",
+			"revisionTime": "2016-03-23T11:15:42Z",
+			"version": "0.1.0",
+			"versionExact": "0.1.0"
+		},
+		{
+			"checksumSHA1": "OFu4xJEIjiI8Suu+j/gabfp+y6Q=",
+			"origin": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "4d4bfba8f1d1027c4fdbe371823030df51419987",
+			"revisionTime": "2017-01-30T11:31:45Z"
+		},
+		{
+			"checksumSHA1": "pXA0VXOMBMY18/4WFJjqnsT51jo=",
+			"path": "github.com/dchest/uniuri",
+			"revision": "8902c56451e9b58ff940bbe5fec35d5f9c04584a",
+			"revisionTime": "2016-02-12T16:43:26Z"
+		},
+		{
+			"checksumSHA1": "tUGxc7rfX0cmhOOUDhMuAZ9rWsA=",
+			"path": "github.com/hashicorp/go-version",
+			"revision": "03c5bf6be031b6dd45afec16b1cf94fc8938bc77",
+			"revisionTime": "2017-02-02T08:07:59Z"
+		},
+		{
+			"checksumSHA1": "zKKp5SZ3d3ycKe4EKMNT0BqAWBw=",
+			"origin": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
+			"path": "github.com/pmezard/go-difflib/difflib",
+			"revision": "4d4bfba8f1d1027c4fdbe371823030df51419987",
+			"revisionTime": "2017-01-30T11:31:45Z"
+		},
+		{
+			"checksumSHA1": "JXUVA1jky8ZX8w09p2t5KLs97Nc=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "4d4bfba8f1d1027c4fdbe371823030df51419987",
+			"revisionTime": "2017-01-30T11:31:45Z"
+		}
+	],
+	"rootPath": "github.com/Financial-Times/coco-kafka-bridge"
+}

@@ -3,13 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	fthealth "github.com/Financial-Times/go-fthealth"
+	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
 	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
-	"github.com/Financial-Times/service-status-go/gtg"
 	"github.com/Financial-Times/service-status-go/httphandlers"
+	"net"
 	"net/http"
 	"strings"
+	"time"
 )
 
 // BridgeApp wraps the config and represents the API for the bridge
@@ -18,6 +19,7 @@ type BridgeApp struct {
 	producerConfig   *queueProducer.MessageProducerConfig
 	producerInstance queueProducer.MessageProducer
 	producerType     string
+	httpClient       *http.Client
 }
 
 const (
@@ -46,11 +48,21 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 		producerInstance = newPlainHTTPMessageProducer(producerConfig)
 	}
 
+	httpClient := &http.Client{
+		Timeout: 60 * time.Second,
+		Transport: &http.Transport{
+			MaxIdleConnsPerHost: 100,
+			Dial: (&net.Dialer{
+				KeepAlive: 30 * time.Second,
+			}).Dial,
+		}}
+
 	bridgeApp := &BridgeApp{
 		consumerConfig:   &consumerConfig,
 		producerConfig:   &producerConfig,
 		producerInstance: producerInstance,
 		producerType:     producerType,
+		httpClient:       httpClient,
 	}
 	return bridgeApp
 }
@@ -80,12 +92,11 @@ func (bridgeApp *BridgeApp) enableHealthchecksAndGTG() {
 	//create healthcheck and gtg endpoints according to the producer type
 	if bridgeApp.producerType == proxy {
 		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, kafka-rest-proxy@aws", bridgeApp.consumeHealthcheck(), bridgeApp.proxyForwarderHealthcheck()))
-		gtgHandler = httphandlers.NewGoodToGoHandler(gtg.StatusChecker(bridgeApp.proxyGtgCheck))
 	} else if bridgeApp.producerType == plainHTTP {
 		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, cms-notifier@aws", bridgeApp.consumeHealthcheck(), bridgeApp.httpForwarderHealthcheck()))
-		gtgHandler = httphandlers.NewGoodToGoHandler(gtg.StatusChecker(bridgeApp.httpGtgCheck))
 	}
 
+	gtgHandler = httphandlers.NewGoodToGoHandler(bridgeApp.gtgCheck)
 	http.HandleFunc(httphandlers.GTGPath, gtgHandler)
 
 	err := http.ListenAndServe(":8080", nil)

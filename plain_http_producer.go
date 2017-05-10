@@ -56,6 +56,12 @@ func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProduce
 	if len(c.config.Authorization) > 0 {
 		req.Header.Add("Authorization", c.config.Authorization)
 	}
+
+	nativeHash, found := message.Headers["Native-Hash"]
+	if found {
+		req.Header.Add("X-Native-Hash", nativeHash)
+	}
+
 	if len(c.config.Queue) > 0 {
 		req.Host = c.config.Queue
 	}
@@ -74,4 +80,33 @@ func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProduce
 		return errors.New(errMsg)
 	}
 	return nil
+}
+
+func (c *plainHTTPMessageProducer) ConnectivityCheck() (string, error) {
+	req, err := http.NewRequest("GET", c.config.Addr+"/__health", nil)
+	if err != nil {
+		logger.error(fmt.Sprintf("Error creating new plainHttp producer healthcheck request: %v", err.Error()))
+		return "Forwarding messages is broken.", err
+	}
+	req.Host = c.config.Queue
+	req.Header.Add("Authorization", c.config.Authorization)
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		logger.warn(fmt.Sprintf("Healthcheck: Error executing GET request: %v", err.Error()))
+		return "Forwarding messages is broken.", err
+	}
+
+	defer func() {
+		io.Copy(ioutil.Discard, resp.Body)
+		resp.Body.Close()
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		errMsg := fmt.Sprintf("Healthcheck: Request to plainHTTP producer /__health endpoint failed. Status: %d.", resp.StatusCode)
+		logger.warn(errMsg)
+		return "Forwarding messages is broken.", errors.New(errMsg)
+	}
+
+	return "", nil
 }

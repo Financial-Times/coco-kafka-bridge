@@ -1,3 +1,6 @@
+# COCO Kafka Bridge
+[![CircleCI](https://circleci.com/gh/Financial-Times/coco-kafka-bridge.svg?style=shield)](https://circleci.com/gh/Financial-Times/coco-kafka-bridge)[![Coverage Status](https://coveralls.io/repos/github/Financial-Times/coco-kafka-bridge/badge.svg)](https://coveralls.io/github/Financial-Times/coco-kafka-bridge)
+
 ###Kafka consumer listening to kafka-proxy and forwarding messages to another KAFKA-PROXY or a simple HTTP endpoint.
 
 * Set the following environment variables:
