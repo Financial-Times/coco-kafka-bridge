@@ -99,14 +99,14 @@ func TestCheckIfTopicIsPresentTopicIsNotPresent(t *testing.T) {
 
 func TestCheckProxyConnectionInternalServerError(t *testing.T) {
 	bridge := initializeBrokenProxyBridge()
-	_, err := bridge.checkProxyConnection("dummy", "dummy", "dummy")
+	_, err := bridge.checkProxyConnection("dummy", "dummy")
 
 	assert.NotNil(t, err)
 }
 
 func TestCheckProxyConnectionHappyFlow(t *testing.T) {
 	bridge := initializeHappyBridge()
-	body, err := bridge.checkProxyConnection("dummy", "dummy", "dummy")
+	body, err := bridge.checkProxyConnection("dummy", "dummy")
 
 	assert.Nil(t, err)
 	assert.NotNil(t, body)
