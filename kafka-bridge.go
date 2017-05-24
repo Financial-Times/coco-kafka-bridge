@@ -7,10 +7,10 @@ import (
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
 	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/Financial-Times/service-status-go/httphandlers"
+	"net"
 	"net/http"
 	"strings"
 	"time"
-	"net"
 )
 
 // BridgeApp wraps the config and represents the API for the bridge
@@ -24,7 +24,7 @@ type BridgeApp struct {
 
 const (
 	plainHTTP = "plainHTTP"
-	proxy = "proxy"
+	proxy     = "proxy"
 )
 
 func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerHost string, producerHostHeader string, producerVulcanAuth string, producerType string) *BridgeApp {
@@ -63,7 +63,7 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 		producerConfig:   &producerConfig,
 		producerInstance: producerInstance,
 		producerType:     producerType,
-		httpClient:httpClient,
+		httpClient:       httpClient,
 	}
 	return bridgeApp
 }
