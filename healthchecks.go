@@ -1,14 +1,14 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	ftHealth "github.com/Financial-Times/go-fthealth/v1a"
-	"github.com/Financial-Times/service-status-go/gtg"
 	"io"
 	"io/ioutil"
 	"net/http"
+
+	ftHealth "github.com/Financial-Times/go-fthealth/v1a"
+	"github.com/Financial-Times/service-status-go/gtg"
 )
 
 func (bridge BridgeApp) consumeHealthcheck() ftHealth.Check {
@@ -73,20 +73,20 @@ func (bridge BridgeApp) aggregateConsumableResults() (string, error) {
 }
 
 func (bridge BridgeApp) checkConsumable(address string) error {
-	body, err := bridge.checkProxyConnection(address, bridge.consumerConfig.AuthorizationKey)
+	err := bridge.checkProxyConnection(address, bridge.consumerConfig.AuthorizationKey)
 	if err != nil {
 		logger.error(fmt.Sprintf("Healthcheck: Error reading request body: %v", err.Error()))
 		return err
 	}
-	return checkIfTopicIsPresent(body, bridge.consumerConfig.Topic)
+	return nil
 }
 
-func (bridge BridgeApp) checkProxyConnection(address string, authorizationKey string) (body []byte, err error) {
-	//check if proxy is running and topic is present
+func (bridge BridgeApp) checkProxyConnection(address string, authorizationKey string) error {
+	//check if proxy is running
 	req, err := http.NewRequest("GET", address+"/topics", nil)
 	if err != nil {
 		logger.error(fmt.Sprintf("Error creating new kafka-proxy healthcheck request: %v", err.Error()))
-		return nil, err
+		return err
 	}
 
 	if authorizationKey != "" {
@@ -96,7 +96,7 @@ func (bridge BridgeApp) checkProxyConnection(address string, authorizationKey st
 	resp, err := bridge.httpClient.Do(req)
 	if err != nil {
 		logger.error(fmt.Sprintf("Healthcheck: Error executing kafka-proxy GET request: %v", err.Error()))
-		return nil, err
+		return err
 	}
 	defer func() {
 		io.Copy(ioutil.Discard, resp.Body)
@@ -105,25 +105,7 @@ func (bridge BridgeApp) checkProxyConnection(address string, authorizationKey st
 
 	if resp.StatusCode != http.StatusOK {
 		errMsg := fmt.Sprintf("Connecting to kafka proxy was not successful. Status: %d", resp.StatusCode)
-		return nil, errors.New(errMsg)
+		return errors.New(errMsg)
 	}
-
-	return ioutil.ReadAll(resp.Body)
-}
-
-func checkIfTopicIsPresent(body []byte, searchedTopic string) error {
-	var topics []string
-
-	err := json.Unmarshal(body, &topics)
-	if err != nil {
-		return fmt.Errorf("Connection could be established to kafka-proxy, but a parsing error occured and topic could not be found. %v", err.Error())
-	}
-
-	for _, topic := range topics {
-		if topic == searchedTopic {
-			return nil
-		}
-	}
-
-	return errors.New("Connection could be established to kafka-proxy, but topic was not found")
+	return nil
 }

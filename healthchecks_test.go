@@ -2,19 +2,14 @@ package main
 
 import (
 	"errors"
-	"github.com/Financial-Times/message-queue-go-producer/producer"
-	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
-)
 
-const (
-	kafkaTopicsResponseBody = "[\"Concept\", \"NativeCmsMetadataPublicationEvents\"]"
-	presentTopic            = "Concept"
-	nonExistingTopic        = "invalid"
+	"github.com/Financial-Times/message-queue-go-producer/producer"
+	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
+	"github.com/stretchr/testify/assert"
 )
 
 type mockTransport struct {
@@ -51,11 +46,10 @@ func (t *mockTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	return response, nil
 }
 
-func initializeMockedHTTPClient(responseStatusCode int, responseBody string) *http.Client {
+func initializeMockedHTTPClient(responseStatusCode int) *http.Client {
 	client := http.DefaultClient
 	client.Transport = &mockTransport{
 		responseStatusCode: responseStatusCode,
-		responseBody:       responseBody,
 	}
 
 	return client
@@ -74,8 +68,8 @@ func initializeBrokenProducerBridge() BridgeApp {
 }
 
 func initializeBridge(statusCode int, isProducerConnectionHealthy bool) BridgeApp {
-	httpClient := initializeMockedHTTPClient(statusCode, kafkaTopicsResponseBody)
-	consumerConfig := &queueConsumer.QueueConfig{AuthorizationKey: "dummy", Topic: presentTopic, Addrs: []string{"abc"}}
+	httpClient := initializeMockedHTTPClient(statusCode)
+	consumerConfig := &queueConsumer.QueueConfig{AuthorizationKey:"dummy",  Addrs:[]string{"abc"}}
 	return BridgeApp{
 		httpClient:       httpClient,
 		consumerConfig:   consumerConfig,
@@ -83,33 +77,18 @@ func initializeBridge(statusCode int, isProducerConnectionHealthy bool) BridgeAp
 	}
 }
 
-func TestCheckIfTopicIsPresentHappyFlow(t *testing.T) {
-	requestBody := []byte(kafkaTopicsResponseBody)
-	err := checkIfTopicIsPresent(requestBody, presentTopic)
-
-	assert.Nil(t, err)
-}
-
-func TestCheckIfTopicIsPresentTopicIsNotPresent(t *testing.T) {
-	requestBody := []byte(kafkaTopicsResponseBody)
-	err := checkIfTopicIsPresent(requestBody, nonExistingTopic)
-
-	assert.NotNil(t, err)
-}
-
 func TestCheckProxyConnectionInternalServerError(t *testing.T) {
 	bridge := initializeBrokenProxyBridge()
-	_, err := bridge.checkProxyConnection("dummy", "dummy")
+	err := bridge.checkProxyConnection("dummy", "dummy")
 
 	assert.NotNil(t, err)
 }
 
 func TestCheckProxyConnectionHappyFlow(t *testing.T) {
 	bridge := initializeHappyBridge()
-	body, err := bridge.checkProxyConnection("dummy", "dummy")
+	err := bridge.checkProxyConnection("dummy", "dummy")
 
 	assert.Nil(t, err)
-	assert.NotNil(t, body)
 }
 
 func TestCheckConsumableProxyReturnsInternalServerError(t *testing.T) {
