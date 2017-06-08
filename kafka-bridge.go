@@ -3,21 +3,22 @@ package main
 import (
 	"flag"
 	"fmt"
-	fthealth "github.com/Financial-Times/go-fthealth/v1a"
-	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
-	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
-	"github.com/Financial-Times/service-status-go/httphandlers"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 	"time"
+
+	"github.com/Financial-Times/message-queue-go-producer/producer"
+	"github.com/Financial-Times/message-queue-gonsumer/consumer"
+	"github.com/Financial-Times/service-status-go/httphandlers"
 )
 
 // BridgeApp wraps the config and represents the API for the bridge
 type BridgeApp struct {
-	consumerConfig   *queueConsumer.QueueConfig
-	producerConfig   *queueProducer.MessageProducerConfig
-	producerInstance queueProducer.MessageProducer
+	consumerConfig   *consumer.QueueConfig
+	producerConfig   *producer.MessageProducerConfig
+	producerInstance producer.MessageProducer
 	producerType     string
 	httpClient       *http.Client
 }
@@ -28,7 +29,7 @@ const (
 )
 
 func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerHost string, producerHostHeader string, producerVulcanAuth string, producerType string) *BridgeApp {
-	consumerConfig := queueConsumer.QueueConfig{}
+	consumerConfig := consumer.QueueConfig{}
 	consumerConfig.Addrs = strings.Split(consumerAddrs, ",")
 	consumerConfig.Group = consumerGroupID
 	consumerConfig.Topic = topic
@@ -36,17 +37,21 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 	consumerConfig.AuthorizationKey = consumerAuthorizationKey
 	consumerConfig.AutoCommitEnable = consumerAutoCommitEnable
 
-	producerConfig := queueProducer.MessageProducerConfig{}
+	producerConfig := producer.MessageProducerConfig{}
 	producerConfig.Addr = producerHost
 	producerConfig.Topic = topic
 	producerConfig.Queue = producerHostHeader
 	producerConfig.Authorization = producerVulcanAuth
 
-	var producerInstance queueProducer.MessageProducer
-	if producerType == proxy {
-		producerInstance = queueProducer.NewMessageProducer(producerConfig)
-	} else if producerType == plainHTTP {
+	var producerInstance producer.MessageProducer
+	switch producerType {
+	case proxy:
+		producerInstance = producer.NewMessageProducer(producerConfig)
+	case plainHTTP:
 		producerInstance = newPlainHTTPMessageProducer(producerConfig)
+	default:
+		logger.error(fmt.Sprintf("The provided producer type '%v' is invalid", producerType))
+		os.Exit(1)
 	}
 
 	httpClient := &http.Client{
@@ -91,14 +96,10 @@ func initBridgeApp() *BridgeApp {
 
 func (bridgeApp *BridgeApp) enableHealthchecksAndGTG() {
 	var gtgHandler func(http.ResponseWriter, *http.Request)
-	//create healthcheck and gtg endpoints according to the producer type
-	if bridgeApp.producerType == proxy {
-		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, kafka-rest-proxy@aws", bridgeApp.consumeHealthcheck(), bridgeApp.proxyForwarderHealthcheck()))
-	} else if bridgeApp.producerType == plainHTTP {
-		http.HandleFunc("/__health", fthealth.Handler("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, cms-notifier@aws", bridgeApp.consumeHealthcheck(), bridgeApp.httpForwarderHealthcheck()))
-	}
+	hc := newHealthcheck(bridgeApp.consumerConfig, bridgeApp.producerConfig, bridgeApp.producerType)
+	http.HandleFunc("/__health", hc.Health())
 
-	gtgHandler = httphandlers.NewGoodToGoHandler(bridgeApp.gtgCheck)
+	gtgHandler = httphandlers.NewGoodToGoHandler(hc.GTG)
 	http.HandleFunc(httphandlers.GTGPath, gtgHandler)
 
 	err := http.ListenAndServe(":8080", nil)
