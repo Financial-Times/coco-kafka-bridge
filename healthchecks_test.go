@@ -1,23 +1,22 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
-	"io/ioutil"
 	"net/http"
-	"strings"
+	"net/http/httptest"
 	"testing"
 
+	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	"github.com/Financial-Times/message-queue-go-producer/producer"
-	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/stretchr/testify/assert"
 )
 
-type mockTransport struct {
-	responseStatusCode int
-	responseBody       string
+type mockProducerInstance struct {
+	isConnectionHealthy bool
 }
 
-type mockProducerInstance struct {
+type mockConsumerInstance struct {
 	isConnectionHealthy bool
 }
 
@@ -30,127 +29,140 @@ func (p *mockProducerInstance) ConnectivityCheck() (string, error) {
 		return "", nil
 	}
 
-	return "", errors.New("test")
+	return "Error connecting to producer", errors.New("test")
 }
 
-func (t *mockTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	response := &http.Response{
-		Header:     make(http.Header),
-		Request:    req,
-		StatusCode: t.responseStatusCode,
+func (c *mockConsumerInstance) Start() {
+}
+
+func (c *mockConsumerInstance) Stop() {
+}
+
+func (c *mockConsumerInstance) ConnectivityCheck() (string, error) {
+	if c.isConnectionHealthy {
+		return "", nil
 	}
 
-	response.Header.Set("Content-Type", "application/json")
-	response.Body = ioutil.NopCloser(strings.NewReader(t.responseBody))
-
-	return response, nil
+	return "Error connecting to consumer", errors.New("test")
 }
 
-func initializeMockedHTTPClient(responseStatusCode int) *http.Client {
-	client := http.DefaultClient
-	client.Transport = &mockTransport{
-		responseStatusCode: responseStatusCode,
-	}
-
-	return client
-}
-
-func initializeHappyBridge() BridgeApp {
-	return initializeBridge(http.StatusOK, true)
-}
-
-func initializeBrokenProxyBridge() BridgeApp {
-	return initializeBridge(http.StatusInternalServerError, false)
-}
-
-func initializeBrokenProducerBridge() BridgeApp {
-	return initializeBridge(http.StatusOK, false)
-}
-
-func initializeBridge(statusCode int, isProducerConnectionHealthy bool) BridgeApp {
-	httpClient := initializeMockedHTTPClient(statusCode)
-	consumerConfig := &queueConsumer.QueueConfig{AuthorizationKey:"dummy",  Addrs:[]string{"abc"}}
-	return BridgeApp{
-		httpClient:       httpClient,
-		consumerConfig:   consumerConfig,
+func initializeHealthcheck(isProducerConnectionHealthy bool, isConsumerConnectionHealthy bool, producerType string) Healthcheck {
+	return Healthcheck{
+		consumerInstance: &mockConsumerInstance{isConnectionHealthy: isConsumerConnectionHealthy},
 		producerInstance: &mockProducerInstance{isConnectionHealthy: isProducerConnectionHealthy},
+		producerType:     producerType,
 	}
 }
 
-func TestCheckProxyConnectionInternalServerError(t *testing.T) {
-	bridge := initializeBrokenProxyBridge()
-	err := bridge.checkProxyConnection("dummy", "dummy")
+func TestGTGHappyFlow(t *testing.T) {
+	hc := initializeHealthcheck(true, true, proxy)
 
-	assert.NotNil(t, err)
+	status := hc.GTG()
+	assert.True(t, status.GoodToGo)
+	assert.Empty(t, status.Message)
 }
 
-func TestCheckProxyConnectionHappyFlow(t *testing.T) {
-	bridge := initializeHappyBridge()
-	err := bridge.checkProxyConnection("dummy", "dummy")
+func TestGTGBrokenConsumer(t *testing.T) {
+	hc := initializeHealthcheck(true, false, proxy)
 
-	assert.Nil(t, err)
+	status := hc.GTG()
+	assert.False(t, status.GoodToGo)
+	assert.Equal(t, "Error connecting to consumer", status.Message)
 }
 
-func TestCheckConsumableProxyReturnsInternalServerError(t *testing.T) {
-	initLoggers()
-	bridge := initializeBrokenProxyBridge()
-	err := bridge.checkConsumable("dummy")
+func TestGTGCheckBrokenProducer(t *testing.T) {
+	hc := initializeHealthcheck(false, true, proxy)
 
-	assert.NotNil(t, err)
+	status := hc.GTG()
+	assert.False(t, status.GoodToGo)
+	assert.Equal(t, "Error connecting to producer", status.Message)
 }
 
-func TestCheckConsumableHappyFlow(t *testing.T) {
-	initLoggers()
-	bridge := initializeHappyBridge()
-	err := bridge.checkConsumable("dummy")
+func TestHealthHappyFlow(t *testing.T) {
+	hc := initializeHealthcheck(true, true, proxy)
 
-	assert.Nil(t, err)
+	req := httptest.NewRequest("GET", "http://example.com/__health", nil)
+	w := httptest.NewRecorder()
+	endpoint := hc.Health()
+
+	endpoint(w, req)
+	assert.Equal(t, http.StatusOK, w.Code, "Healthcheck should return 200")
+	checks, err := parseHealthcheck(w.Body.String())
+	assert.NoError(t, err)
+
+	for _, check := range checks {
+		assert.True(t, check.Ok)
+	}
 }
 
-func TestAggregateConsumableResults(t *testing.T) {
-	initLoggers()
-	bridge := initializeHappyBridge()
-	_, err := bridge.aggregateConsumableResults()
+func TestHealthBrokenProxyProducer(t *testing.T) {
+	hc := initializeHealthcheck(false, true, proxy)
 
-	assert.Nil(t, err)
+	req := httptest.NewRequest("GET", "http://example.com/__health", nil)
+	w := httptest.NewRecorder()
+	endpoint := hc.Health()
+
+	endpoint(w, req)
+	assert.Equal(t, http.StatusOK, w.Code, "Healthcheck should return 200")
+	checks, err := parseHealthcheck(w.Body.String())
+	assert.NoError(t, err)
+
+	for _, check := range checks {
+		if check.Name == "Forward messages to kafka-proxy." {
+			assert.False(t, check.Ok)
+		} else {
+			assert.True(t, check.Ok)
+		}
+	}
 }
 
-func TestAggregateConsumableResultsBrokenProxy(t *testing.T) {
-	initLoggers()
-	bridge := initializeBrokenProxyBridge()
-	_, err := bridge.aggregateConsumableResults()
+func TestHealthBrokenPlainHTTPProducer(t *testing.T) {
+	hc := initializeHealthcheck(false, true, plainHTTP)
 
-	assert.NotNil(t, err)
+	req := httptest.NewRequest("GET", "http://example.com/__health", nil)
+	w := httptest.NewRecorder()
+	endpoint := hc.Health()
+
+	endpoint(w, req)
+	assert.Equal(t, http.StatusOK, w.Code, "Healthcheck should return 200")
+	checks, err := parseHealthcheck(w.Body.String())
+	assert.NoError(t, err)
+
+	for _, check := range checks {
+		if check.Name == "Forward messages to cms-notifier" {
+			assert.False(t, check.Ok)
+		} else {
+			assert.True(t, check.Ok)
+		}
+	}
 }
 
-func TestAggregateConsumableNoAddressProxy(t *testing.T) {
-	initLoggers()
-	bridge := initializeBrokenProxyBridge()
-	_, err := bridge.aggregateConsumableResults()
+func TestHealthBrokenConsumer(t *testing.T) {
+	hc := initializeHealthcheck(true, false, proxy)
 
-	assert.NotNil(t, err)
+	req := httptest.NewRequest("GET", "http://example.com/__health", nil)
+	w := httptest.NewRecorder()
+	endpoint := hc.Health()
+
+	endpoint(w, req)
+	assert.Equal(t, http.StatusOK, w.Code, "Healthcheck should return 200")
+	checks, err := parseHealthcheck(w.Body.String())
+	assert.NoError(t, err)
+
+	for _, check := range checks {
+		if check.Name == "Consume from UCS kafka through the proxy" {
+			assert.False(t, check.Ok)
+		} else {
+			assert.True(t, check.Ok)
+		}
+	}
 }
 
-func TestGtgBrokenProxy(t *testing.T) {
-	initLoggers()
-	bridge := initializeBrokenProxyBridge()
-	gtgStatus := bridge.gtgCheck()
+func parseHealthcheck(healthcheckJSON string) ([]fthealth.CheckResult, error) {
+	result := &struct {
+		Checks []fthealth.CheckResult `json:"checks"`
+	}{}
 
-	assert.False(t, gtgStatus.GoodToGo)
-}
-
-func TestGtgHappyFlow(t *testing.T) {
-	initLoggers()
-	bridge := initializeHappyBridge()
-	gtgStatus := bridge.gtgCheck()
-
-	assert.True(t, gtgStatus.GoodToGo)
-}
-
-func TestGtgConnectionDown(t *testing.T) {
-	initLoggers()
-	bridge := initializeBrokenProducerBridge()
-	gtgStatus := bridge.gtgCheck()
-
-	assert.False(t, gtgStatus.GoodToGo)
+	err := json.Unmarshal([]byte(healthcheckJSON), result)
+	return result.Checks, err
 }
