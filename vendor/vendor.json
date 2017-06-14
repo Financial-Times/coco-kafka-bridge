@@ -11,20 +11,20 @@
 			"versionExact": "0.1.0"
 		},
 		{
-			"checksumSHA1": "GrgODPqXv7QebQjfjrxMHctK0wE=",
+			"checksumSHA1": "4OtkapGYP9WO5JGqL3Dct/MUWTI=",
 			"path": "github.com/Financial-Times/message-queue-go-producer/producer",
-			"revision": "e0d20e2c97fff205138d33c3dee9347878640b5e",
-			"revisionTime": "2017-05-26T06:27:13Z",
-			"version": "0.2.0-xp-remove-kafka-topic-check-rc.1",
-			"versionExact": "0.2.0-xp-remove-kafka-topic-check-rc.1"
+			"revision": "3885ddaee76749d4b60329b94549edfebc4045ce",
+			"revisionTime": "2017-05-26T06:52:08Z",
+			"version": "0.2.0-k8s-remove-kafka-topic-check-rc1",
+			"versionExact": "0.2.0-k8s-remove-kafka-topic-check-rc1"
 		},
 		{
-			"checksumSHA1": "mirNgwWRdRte0ku/g4u4fNbzQP0=",
+			"checksumSHA1": "J+4afTatHVLwU1wboY/SvxigwbA=",
 			"path": "github.com/Financial-Times/message-queue-gonsumer/consumer",
-			"revision": "0a481ff94df47f766a74867475247eaf1ed40107",
-			"revisionTime": "2017-05-26T12:08:30Z",
-			"version": "0.4.0-xp-remove-kafka-topic-check-rc.1",
-			"versionExact": "0.4.0-xp-remove-kafka-topic-check-rc.1"
+			"revision": "ebabf884866eecf81fe38f10893570d959fae01e",
+			"revisionTime": "2017-05-26T12:24:38Z",
+			"version": "0.4.0-k8s-remove-kafka-topic-check-rc1",
+			"versionExact": "0.4.0-k8s-remove-kafka-topic-check-rc1"
 		},
 		{
 			"checksumSHA1": "fqpohN7Qp2qj7TLMbUxh/cK4oH0=",

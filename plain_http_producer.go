@@ -62,9 +62,6 @@ func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProduce
 		req.Header.Add("X-Native-Hash", nativeHash)
 	}
 
-	if len(c.config.Queue) > 0 {
-		req.Host = c.config.Queue
-	}
 	resp, err := c.client.Do(req)
 	if err != nil {
 		errMsg := fmt.Sprintf("Error executing POST request to the ELB: %v", err.Error())
@@ -88,7 +85,6 @@ func (c *plainHTTPMessageProducer) ConnectivityCheck() (string, error) {
 		logger.error(fmt.Sprintf("Error creating new plainHttp producer healthcheck request: %v", err.Error()))
 		return "Forwarding messages is broken.", err
 	}
-	req.Host = c.config.Queue
 	req.Header.Add("Authorization", c.config.Authorization)
 
 	resp, err := c.client.Do(req)
