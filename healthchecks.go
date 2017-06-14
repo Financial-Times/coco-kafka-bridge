@@ -31,18 +31,18 @@ func newHealthcheck(consumerConfig *consumer.QueueConfig, producerConfig *produc
 
 func (hc Healthcheck) Health() func(w http.ResponseWriter, r *http.Request) {
 	if hc.producerType == proxy {
-		return fthealth.HandlerParallel("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, kafka-rest-proxy@aws", hc.consumeHealthcheck(), hc.proxyForwarderHealthcheck())
+		return fthealth.HandlerParallel("Dependent services healthcheck", "Services: source-kafka-proxy, destination-kafka-proxy", hc.consumeHealthcheck(), hc.proxyForwarderHealthcheck())
 	}
-	return fthealth.HandlerParallel("Dependent services healthcheck", "Services: kafka-rest-proxy@ucs, cms-notifier@aws", hc.consumeHealthcheck(), hc.httpForwarderHealthcheck())
+	return fthealth.HandlerParallel("Dependent services healthcheck", "Services: source-kafka-proxy, cms-notifier", hc.consumeHealthcheck(), hc.httpForwarderHealthcheck())
 }
 
 func (hc Healthcheck) consumeHealthcheck() fthealth.Check {
 	return fthealth.Check{
 		BusinessImpact:   "Consuming messages through kafka-proxy won't work. Publishing in the containerised stack won't work.",
-		Name:             "Consume from UCS kafka through the proxy",
+		Name:             "Consume from kafka through the proxy",
 		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",
 		Severity:         1,
-		TechnicalSummary: "Consuming messages is broken. Check if kafka-proxy in aws is reachable.",
+		TechnicalSummary: "Consuming messages is broken. Check if source proxy is reachable.",
 		Checker:          hc.consumer.ConnectivityCheck,
 	}
 }
@@ -53,7 +53,7 @@ func (hc Healthcheck) proxyForwarderHealthcheck() fthealth.Check {
 		Name:             "Forward messages to kafka-proxy.",
 		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",
 		Severity:         1,
-		TechnicalSummary: "Forwarding messages is broken. Check if kafka-proxy in coco is reachable.",
+		TechnicalSummary: "Forwarding messages is broken. Check if destination proxy is reachable.",
 		Checker:          hc.producer.ConnectivityCheck,
 	}
 }
@@ -64,7 +64,7 @@ func (hc Healthcheck) httpForwarderHealthcheck() fthealth.Check {
 		Name:             "Forward messages to cms-notifier",
 		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",
 		Severity:         1,
-		TechnicalSummary: "Forwarding messages is broken. Check networking, aws cluster reachability and/or coco cms-notifier state.",
+		TechnicalSummary: "Forwarding messages is broken. Check networking, cluster reachability and/or cms-notifier state.",
 		Checker:          hc.producer.ConnectivityCheck,
 	}
 }
