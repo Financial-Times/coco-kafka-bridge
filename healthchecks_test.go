@@ -29,7 +29,7 @@ func (p *mockProducerInstance) ConnectivityCheck() (string, error) {
 		return "", nil
 	}
 
-	return "Error connecting to producer", errors.New("test")
+	return "", errors.New("Error connecting to the queue")
 }
 
 func (c *mockConsumerInstance) Start() {
@@ -43,14 +43,14 @@ func (c *mockConsumerInstance) ConnectivityCheck() (string, error) {
 		return "", nil
 	}
 
-	return "Error connecting to consumer", errors.New("test")
+	return "", errors.New("Error connecting to the queue")
 }
 
 func initializeHealthcheck(isProducerConnectionHealthy bool, isConsumerConnectionHealthy bool, producerType string) Healthcheck {
 	return Healthcheck{
-		consumerInstance: &mockConsumerInstance{isConnectionHealthy: isConsumerConnectionHealthy},
-		producerInstance: &mockProducerInstance{isConnectionHealthy: isProducerConnectionHealthy},
-		producerType:     producerType,
+		consumer:     &mockConsumerInstance{isConnectionHealthy: isConsumerConnectionHealthy},
+		producer:     &mockProducerInstance{isConnectionHealthy: isProducerConnectionHealthy},
+		producerType: producerType,
 	}
 }
 
@@ -67,7 +67,7 @@ func TestGTGBrokenConsumer(t *testing.T) {
 
 	status := hc.GTG()
 	assert.False(t, status.GoodToGo)
-	assert.Equal(t, "Error connecting to consumer", status.Message)
+	assert.Equal(t, "Error connecting to the queue", status.Message)
 }
 
 func TestGTGCheckBrokenProducer(t *testing.T) {
@@ -75,7 +75,7 @@ func TestGTGCheckBrokenProducer(t *testing.T) {
 
 	status := hc.GTG()
 	assert.False(t, status.GoodToGo)
-	assert.Equal(t, "Error connecting to producer", status.Message)
+	assert.Equal(t, "Error connecting to the queue", status.Message)
 }
 
 func TestHealthHappyFlow(t *testing.T) {
