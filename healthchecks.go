@@ -13,9 +13,9 @@ import (
 const requestTimeout = 4500
 
 type Healthcheck struct {
-	consumerInstance consumer.MessageConsumer
-	producerInstance producer.MessageProducer
-	producerType     string
+	consumer     consumer.MessageConsumer
+	producer     producer.MessageProducer
+	producerType string
 }
 
 func newHealthcheck(consumerConfig *consumer.QueueConfig, producerConfig *producer.MessageProducerConfig, producerType string) *Healthcheck {
@@ -23,9 +23,9 @@ func newHealthcheck(consumerConfig *consumer.QueueConfig, producerConfig *produc
 	consumerInstance := consumer.NewConsumer(*consumerConfig, func(m consumer.Message) {}, httpClient)
 	producerInstance := producer.NewMessageProducerWithHTTPClient(*producerConfig, httpClient)
 	return &Healthcheck{
-		consumerInstance: consumerInstance,
-		producerInstance: producerInstance,
-		producerType:     producerType,
+		consumer:     consumerInstance,
+		producer:     producerInstance,
+		producerType: producerType,
 	}
 }
 
@@ -43,7 +43,7 @@ func (hc Healthcheck) consumeHealthcheck() fthealth.Check {
 		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",
 		Severity:         1,
 		TechnicalSummary: "Consuming messages is broken. Check if kafka-proxy in aws is reachable.",
-		Checker:          hc.consumerInstance.ConnectivityCheck,
+		Checker:          hc.consumer.ConnectivityCheck,
 	}
 }
 
@@ -54,7 +54,7 @@ func (hc Healthcheck) proxyForwarderHealthcheck() fthealth.Check {
 		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",
 		Severity:         1,
 		TechnicalSummary: "Forwarding messages is broken. Check if kafka-proxy in coco is reachable.",
-		Checker:          hc.producerInstance.ConnectivityCheck,
+		Checker:          hc.producer.ConnectivityCheck,
 	}
 }
 
@@ -65,20 +65,28 @@ func (hc Healthcheck) httpForwarderHealthcheck() fthealth.Check {
 		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",
 		Severity:         1,
 		TechnicalSummary: "Forwarding messages is broken. Check networking, aws cluster reachability and/or coco cms-notifier state.",
-		Checker:          hc.producerInstance.ConnectivityCheck,
+		Checker:          hc.producer.ConnectivityCheck,
 	}
 }
 
 func (hc Healthcheck) GTG() gtg.Status {
-	msg, err := hc.consumerInstance.ConnectivityCheck()
-	if err != nil {
-		return gtg.Status{GoodToGo: false, Message: msg}
+	consumerCheck := func() gtg.Status {
+		return gtgCheck(hc.consumer.ConnectivityCheck)
 	}
 
-	msg, err = hc.producerInstance.ConnectivityCheck()
-	if err != nil {
-		return gtg.Status{GoodToGo: false, Message: msg}
+	producerCheck := func() gtg.Status {
+		return gtgCheck(hc.producer.ConnectivityCheck)
 	}
 
+	return gtg.FailFastParallelCheck([]gtg.StatusChecker{
+		consumerCheck,
+		producerCheck,
+	})()
+}
+
+func gtgCheck(handler func() (string, error)) gtg.Status {
+	if _, err := handler(); err != nil {
+		return gtg.Status{GoodToGo: false, Message: err.Error()}
+	}
 	return gtg.Status{GoodToGo: true}
 }
