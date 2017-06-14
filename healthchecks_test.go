@@ -150,7 +150,7 @@ func TestHealthBrokenConsumer(t *testing.T) {
 	assert.NoError(t, err)
 
 	for _, check := range checks {
-		if check.Name == "Consume from UCS kafka through the proxy" {
+		if check.Name == "Consume messages from kafka-proxy" {
 			assert.False(t, check.Ok)
 		} else {
 			assert.True(t, check.Ok)

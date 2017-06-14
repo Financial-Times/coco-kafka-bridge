@@ -39,7 +39,7 @@ func (hc Healthcheck) Health() func(w http.ResponseWriter, r *http.Request) {
 func (hc Healthcheck) consumeHealthcheck() fthealth.Check {
 	return fthealth.Check{
 		BusinessImpact:   "Consuming messages through kafka-proxy won't work. Publishing in the containerised stack won't work.",
-		Name:             "Consume from kafka through the proxy",
+		Name:             "Consume messages from kafka-proxy",
 		PanicGuide:       "https://sites.google.com/a/ft.com/ft-technology-service-transition/home/run-book-library/kafka-bridge-run-book",
 		Severity:         1,
 		TechnicalSummary: "Consuming messages is broken. Check if source proxy is reachable.",
