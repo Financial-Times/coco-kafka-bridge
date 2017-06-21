@@ -96,7 +96,7 @@ func initBridgeApp() *BridgeApp {
 
 func (bridgeApp *BridgeApp) enableHealthchecksAndGTG() {
 	var gtgHandler func(http.ResponseWriter, *http.Request)
-	hc := newHealthcheck(bridgeApp.consumerConfig, bridgeApp.producerConfig, bridgeApp.producerType)
+	hc := NewHealthCheck(bridgeApp.consumerConfig, bridgeApp.producerConfig, bridgeApp.producerType, bridgeApp.httpClient)
 	http.HandleFunc("/__health", hc.Health())
 
 	gtgHandler = httphandlers.NewGoodToGoHandler(hc.GTG)
