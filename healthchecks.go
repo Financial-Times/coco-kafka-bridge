@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"time"
 
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	"github.com/Financial-Times/message-queue-go-producer/producer"
@@ -10,33 +9,30 @@ import (
 	"github.com/Financial-Times/service-status-go/gtg"
 )
 
-const requestTimeout = 4500
-
-type Healthcheck struct {
+type HealthCheck struct {
 	consumer     consumer.MessageConsumer
 	producer     producer.MessageProducer
 	producerType string
 }
 
-func newHealthcheck(consumerConfig *consumer.QueueConfig, producerConfig *producer.MessageProducerConfig, producerType string) *Healthcheck {
-	httpClient := &http.Client{Timeout: requestTimeout * time.Millisecond}
-	consumerInstance := consumer.NewConsumer(*consumerConfig, func(m consumer.Message) {}, httpClient)
-	producerInstance := producer.NewMessageProducerWithHTTPClient(*producerConfig, httpClient)
-	return &Healthcheck{
+func NewHealthCheck(consumerConfig *consumer.QueueConfig, producerConfig *producer.MessageProducerConfig, producerType string, client *http.Client) *HealthCheck {
+	consumerInstance := consumer.NewConsumer(*consumerConfig, func(m consumer.Message) {}, client)
+	producerInstance := producer.NewMessageProducerWithHTTPClient(*producerConfig, client)
+	return &HealthCheck{
 		consumer:     consumerInstance,
 		producer:     producerInstance,
 		producerType: producerType,
 	}
 }
 
-func (hc Healthcheck) Health() func(w http.ResponseWriter, r *http.Request) {
+func (hc HealthCheck) Health() func(w http.ResponseWriter, r *http.Request) {
 	if hc.producerType == proxy {
 		return fthealth.HandlerParallel("Dependent services healthcheck", "Services: source-kafka-proxy, destination-kafka-proxy", hc.consumeHealthcheck(), hc.proxyForwarderHealthcheck())
 	}
 	return fthealth.HandlerParallel("Dependent services healthcheck", "Services: source-kafka-proxy, cms-notifier", hc.consumeHealthcheck(), hc.httpForwarderHealthcheck())
 }
 
-func (hc Healthcheck) consumeHealthcheck() fthealth.Check {
+func (hc HealthCheck) consumeHealthcheck() fthealth.Check {
 	return fthealth.Check{
 		BusinessImpact:   "Consuming messages through kafka-proxy won't work. Publishing in the containerised stack won't work.",
 		Name:             "Consume messages from kafka-proxy",
@@ -47,7 +43,7 @@ func (hc Healthcheck) consumeHealthcheck() fthealth.Check {
 	}
 }
 
-func (hc Healthcheck) proxyForwarderHealthcheck() fthealth.Check {
+func (hc HealthCheck) proxyForwarderHealthcheck() fthealth.Check {
 	return fthealth.Check{
 		BusinessImpact:   "Forwarding messages to kafka-proxy in coco won't work. Publishing in the containerised stack won't work.",
 		Name:             "Forward messages to kafka-proxy.",
@@ -58,7 +54,7 @@ func (hc Healthcheck) proxyForwarderHealthcheck() fthealth.Check {
 	}
 }
 
-func (hc Healthcheck) httpForwarderHealthcheck() fthealth.Check {
+func (hc HealthCheck) httpForwarderHealthcheck() fthealth.Check {
 	return fthealth.Check{
 		BusinessImpact:   "Forwarding messages to cms-notifier in coco won't work. Publishing in the containerised stack won't work.",
 		Name:             "Forward messages to cms-notifier",
@@ -69,7 +65,7 @@ func (hc Healthcheck) httpForwarderHealthcheck() fthealth.Check {
 	}
 }
 
-func (hc Healthcheck) GTG() gtg.Status {
+func (hc HealthCheck) GTG() gtg.Status {
 	consumerCheck := func() gtg.Status {
 		return gtgCheck(hc.consumer.ConnectivityCheck)
 	}

@@ -9,6 +9,7 @@ import (
 
 	fthealth "github.com/Financial-Times/go-fthealth/v1a"
 	"github.com/Financial-Times/message-queue-go-producer/producer"
+	"github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -46,12 +47,25 @@ func (c *mockConsumerInstance) ConnectivityCheck() (string, error) {
 	return "", errors.New("Error connecting to the queue")
 }
 
-func initializeHealthcheck(isProducerConnectionHealthy bool, isConsumerConnectionHealthy bool, producerType string) Healthcheck {
-	return Healthcheck{
+func initializeHealthcheck(isProducerConnectionHealthy bool, isConsumerConnectionHealthy bool, producerType string) HealthCheck {
+	return HealthCheck{
 		consumer:     &mockConsumerInstance{isConnectionHealthy: isConsumerConnectionHealthy},
 		producer:     &mockProducerInstance{isConnectionHealthy: isProducerConnectionHealthy},
 		producerType: producerType,
 	}
+}
+
+func TestNewHealthCheck(t *testing.T) {
+	hc := NewHealthCheck(
+		&consumer.QueueConfig{},
+		&producer.MessageProducerConfig{},
+		"proxy",
+		http.DefaultClient,
+	)
+
+	assert.NotNil(t, hc.consumer)
+	assert.NotNil(t, hc.producer)
+	assert.Equal(t, "proxy", hc.producerType)
 }
 
 func TestGTGHappyFlow(t *testing.T) {
@@ -86,7 +100,7 @@ func TestHealthHappyFlow(t *testing.T) {
 	endpoint := hc.Health()
 
 	endpoint(w, req)
-	assert.Equal(t, http.StatusOK, w.Code, "Healthcheck should return 200")
+	assert.Equal(t, http.StatusOK, w.Code, "HealthCheck should return 200")
 	checks, err := parseHealthcheck(w.Body.String())
 	assert.NoError(t, err)
 
@@ -103,7 +117,7 @@ func TestHealthBrokenProxyProducer(t *testing.T) {
 	endpoint := hc.Health()
 
 	endpoint(w, req)
-	assert.Equal(t, http.StatusOK, w.Code, "Healthcheck should return 200")
+	assert.Equal(t, http.StatusOK, w.Code, "HealthCheck should return 200")
 	checks, err := parseHealthcheck(w.Body.String())
 	assert.NoError(t, err)
 
@@ -124,7 +138,7 @@ func TestHealthBrokenPlainHTTPProducer(t *testing.T) {
 	endpoint := hc.Health()
 
 	endpoint(w, req)
-	assert.Equal(t, http.StatusOK, w.Code, "Healthcheck should return 200")
+	assert.Equal(t, http.StatusOK, w.Code, "HealthCheck should return 200")
 	checks, err := parseHealthcheck(w.Body.String())
 	assert.NoError(t, err)
 
@@ -145,7 +159,7 @@ func TestHealthBrokenConsumer(t *testing.T) {
 	endpoint := hc.Health()
 
 	endpoint(w, req)
-	assert.Equal(t, http.StatusOK, w.Code, "Healthcheck should return 200")
+	assert.Equal(t, http.StatusOK, w.Code, "HealthCheck should return 200")
 	checks, err := parseHealthcheck(w.Body.String())
 	assert.NoError(t, err)
 
