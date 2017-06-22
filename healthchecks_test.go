@@ -58,7 +58,7 @@ func initializeHealthcheck(isProducerConnectionHealthy bool, isConsumerConnectio
 func TestNewHealthCheck(t *testing.T) {
 	hc := NewHealthCheck(
 		&consumer.QueueConfig{},
-		&producer.MessageProducerConfig{},
+		producer.NewMessageProducer(producer.MessageProducerConfig{}),
 		"proxy",
 		http.DefaultClient,
 	)
