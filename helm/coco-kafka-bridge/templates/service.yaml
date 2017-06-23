@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{.Values.service.name}} 
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{.Values.service.name}}
+    visualize: "true" 
+    hasHealthcheck: "{{ .Values.service.hasHealthcheck }}" 
+spec:
+  ports: 
+    - port: 8080 
+#      name: # The name of this port within the service. Optional if only one port is defined on this service
+      targetPort: 8080 
+  selector: 
+    app: {{ .Values.service.name }} 

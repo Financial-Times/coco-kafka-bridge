@@ -1,0 +1,67 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.service.name }} 
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}" 
+    visualize: "true" 
+    app: {{ .Values.service.name }} 
+spec:
+  replicas: {{ .Values.replicaCount }} 
+  selector: 
+    matchLabels:
+      app: {{ .Values.service.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.service.name }}
+        visualize: "true" 
+    spec:
+      containers: 
+      - name: {{ .Chart.Name }} 
+        image: "{{ .Values.image.repository }}:{{ required "Please provide a valid docker image version by adding the argument at install '--set image.version=...'" .Values.image.version }}" 
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /etc/ssl/certs
+          name: certificates-storage
+        env: 
+        - name: CONSUMER_AUTOCOMMIT_ENABLE 
+          value: "true" 
+        - name: PRODUCER_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: global-config
+              key: kafka.proxy.url.with.protocol 
+        - name: PRODUCER_TYPE
+          value: "proxy"
+        - name: QUEUE_PROXY_ADDRS
+          value: "{{ .Values.env.QUEUE_PROXY_ADDRS }}"
+        - name: GROUP_ID
+          value: "{{ .Values.env.GROUP_ID }}"
+        - name: TOPIC
+          value: "{{ .Values.env.TOPIC }}"
+        - name: AUTHORIZATION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.env.AUTHORIZATION_KEY_secret_name }}"
+              key: "{{ .Values.env.AUTHORIZATION_KEY_secret_key }}"
+        ports: 
+        - containerPort: 8080 
+        livenessProbe: 
+          tcpSocket: 
+            port: 8080 
+          initialDelaySeconds: 5
+        readinessProbe: 
+          httpGet: 
+            path: "/__gtg" 
+            port: 8080 
+          initialDelaySeconds: 10
+          periodSeconds: 30 
+        resources: 
+            limits:
+              memory: 64Mi
+      volumes:
+      - name: certificates-storage
+        hostPath:
+          path: /usr/share/ca-certificates
+

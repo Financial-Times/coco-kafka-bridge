@@ -1,6 +1,6 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea
 coco-kafka-bridge.exe
-coco-kafka-bridge
+/coco-kafka-bridge
 /.project
 vendor/*/

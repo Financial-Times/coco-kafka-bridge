@@ -1,0 +1,12 @@
+# Default values for coco-kafka-bridge.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+service:
+  name: "" # The name of the service, should be defined in the specific app-configs folder.
+  hasHealthcheck: "true"
+image:
+  repository: coco/coco-kafka-bridge
+  version: "" # should be set explicitly at installation
+  
+
+
