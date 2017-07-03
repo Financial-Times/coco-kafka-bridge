@@ -18,8 +18,8 @@ spec:
         visualize: "true" 
     spec:
       containers: 
-      - name: {{ .Chart.Name }} 
-        image: "{{ .Values.image.repository }}:{{ required "Please provide a valid docker image version by adding the argument at install '--set image.version=...'" .Values.image.version }}" 
+      - name: {{ .Values.service.name }} 
+        image: "{{ .Values.image.repository }}:{{ .Chart.Version }}"
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - mountPath: /etc/ssl/certs
