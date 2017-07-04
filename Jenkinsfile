@@ -7,6 +7,6 @@ BuildConfig config = new BuildConfig()
 // adjust this to the cluster the application should be deployed to.
 // The available values are currently Cluster.DELIVERY, Cluster.PUBLISHING.
 // If the app should be deployed in both clusters, put them both in the list
-config.deployToClusters = [Cluster.PUBLISHING]
+config.deployToClusters = [Cluster.PUBLISHING, Cluster.DELIVERY]
  
 entryPointForReleaseAndDev(config)
