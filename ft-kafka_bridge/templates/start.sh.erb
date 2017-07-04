@@ -7,6 +7,5 @@
 -consumer_authorization_key="`cat /etc/kafka-bridge-credentials.properties`" \
 -topic=<%= scope.function_hiera(['topic',nil]) %> \
 -producer_host=<%= scope.function_hiera(['producer_host',nil]) %> \
--producer_host_header=<%= scope.function_hiera(['producer_host_header',nil]) %> \
 -producer_type=<%= scope.function_hiera(['producer_type',nil]) %>
 
