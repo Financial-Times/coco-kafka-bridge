@@ -58,8 +58,7 @@ spec:
           initialDelaySeconds: 10
           periodSeconds: 30 
         resources: 
-            limits:
-              memory: 64Mi
+{{ toYaml .Values.resources | indent 12 }}
       volumes:
       - name: certificates-storage
         hostPath:

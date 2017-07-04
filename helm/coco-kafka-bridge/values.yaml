@@ -6,6 +6,11 @@ service:
   hasHealthcheck: "true"
 image:
   repository: coco/coco-kafka-bridge
-  
-
-
+env:
+  QUEUE_PROXY_ADDRS: "" # source queue
+  GROUP_ID: "" # bridge consumer group ID
+  TOPIC: "" # one topic, representing both source and destination 
+  AUTHORIZATION_KEY_secret_name: "" # auth for source queue cluster
+  AUTHORIZATION_KEY_secret_key: "" # auth for source queue cluster
+limits:
+  memory: 64Mi
