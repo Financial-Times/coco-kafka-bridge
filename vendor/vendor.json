@@ -11,20 +11,20 @@
 			"versionExact": "0.1.0"
 		},
 		{
-			"checksumSHA1": "yceqWuIbFzntmSHl66OwNoP/c6E=",
+			"checksumSHA1": "GrgODPqXv7QebQjfjrxMHctK0wE=",
 			"path": "github.com/Financial-Times/message-queue-go-producer/producer",
-			"revision": "163efbf93f1a2ba839b317d26e37426bcfa3850a",
-			"revisionTime": "2017-03-20T10:55:12Z",
-			"version": "v0.1.0",
-			"versionExact": "v0.1.0"
+			"revision": "0bb065111416c0de78db51acb926ba3a3ae3c4e2",
+			"revisionTime": "2017-06-22T11:18:49Z",
+			"version": "0.2.0",
+			"versionExact": "0.2.0"
 		},
 		{
-			"checksumSHA1": "/kMYtkcxWV4dZNvJaEGkDUwt3TA=",
+			"checksumSHA1": "mirNgwWRdRte0ku/g4u4fNbzQP0=",
 			"path": "github.com/Financial-Times/message-queue-gonsumer/consumer",
-			"revision": "4e173298922ba4c10721b1b5b3e0d35be7f162e9",
-			"revisionTime": "2017-03-20T10:34:32Z",
-			"version": "0.3.0",
-			"versionExact": "0.3.0"
+			"revision": "6f96a5cb1e34c4baa8bc64f56524a7f2e0092ed3",
+			"revisionTime": "2017-06-22T11:17:49Z",
+			"version": "0.4.0",
+			"versionExact": "0.4.0"
 		},
 		{
 			"checksumSHA1": "fqpohN7Qp2qj7TLMbUxh/cK4oH0=",
