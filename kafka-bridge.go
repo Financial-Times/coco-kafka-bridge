@@ -21,7 +21,6 @@ type BridgeApp struct {
 	producerInstance producer.MessageProducer
 	producerType     string
 	httpClient       *http.Client
-	serviceName      string
 }
 
 const (
@@ -90,10 +89,10 @@ func initBridgeApp() *BridgeApp {
 	producerType := flag.String("producer_type", proxy, "Two possible values are accepted: proxy - if the requests are going through the kafka-proxy; or plainHTTP if a normal http request is required.")
 	serviceName := flag.String("service_name", "kafka-bridge", "The full name for the bridge app, like: `cms-kafka-bridge-pub-xp`")
 
+	flag.Parse()
+
 	logger.InitDefaultLogger(*serviceName)
 	logger.Infof(nil, "Starting Kafka Bridge")
-
-	flag.Parse()
 
 	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerHost, *producerHostHeader, *producerVulcanAuth, *producerType)
 }
