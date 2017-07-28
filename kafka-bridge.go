@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
+	"github.com/Financial-Times/go-logger"
 	"github.com/Financial-Times/message-queue-go-producer/producer"
 	"github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/Financial-Times/service-status-go/httphandlers"
@@ -21,6 +21,7 @@ type BridgeApp struct {
 	producerInstance producer.MessageProducer
 	producerType     string
 	httpClient       *http.Client
+	serviceName      string
 }
 
 const (
@@ -50,8 +51,7 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 	case plainHTTP:
 		producerInstance = newPlainHTTPMessageProducer(producerConfig)
 	default:
-		logger.error(fmt.Sprintf("The provided producer type '%v' is invalid", producerType))
-		os.Exit(1)
+		logger.FatalEvent(fmt.Sprintf("The provided producer type '%v' is invalid", producerType), nil)
 	}
 
 	httpClient := &http.Client{
@@ -88,6 +88,10 @@ func initBridgeApp() *BridgeApp {
 
 	producerVulcanAuth := flag.String("producer_vulcan_auth", "", "Authentication string by which you access cms-notifier via vulcand.")
 	producerType := flag.String("producer_type", proxy, "Two possible values are accepted: proxy - if the requests are going through the kafka-proxy; or plainHTTP if a normal http request is required.")
+	serviceName := flag.String("service_name", "kafka-bridge", "The full name for the bridge app, like: `cms-kafka-bridge-pub-xp`")
+
+	logger.InitDefaultLogger(*serviceName)
+	logger.Infof(nil, "Starting Kafka Bridge")
 
 	flag.Parse()
 
@@ -104,17 +108,12 @@ func (bridgeApp *BridgeApp) enableHealthchecksAndGTG() {
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
-		logger.error(fmt.Sprintf("Couldn't set up HTTP listener for healthcheck: %+v", err))
+		logger.Errorf(nil, "Couldn't set up HTTP listener for healthcheck: %+v", err)
 	}
 }
 
 func main() {
-	initLoggers()
-	logger.info("Starting Kafka Bridge")
-
 	bridgeApp := initBridgeApp()
-
 	go bridgeApp.enableHealthchecksAndGTG()
-
 	bridgeApp.consumeMessages()
 }
