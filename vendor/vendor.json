@@ -11,6 +11,12 @@
 			"versionExact": "0.1.0"
 		},
 		{
+			"checksumSHA1": "e2f5y/lzWdiHBgufdQccz72xCug=",
+			"path": "github.com/Financial-Times/go-logger",
+			"revision": "d1c80aa40279df1fdae64d24e293fd779d5c74e4",
+			"revisionTime": "2017-08-10T11:21:38Z"
+		},
+		{
 			"checksumSHA1": "GrgODPqXv7QebQjfjrxMHctK0wE=",
 			"path": "github.com/Financial-Times/message-queue-go-producer/producer",
 			"revision": "0bb065111416c0de78db51acb926ba3a3ae3c4e2",
@@ -51,6 +57,18 @@
 			"versionExact": "0.1.0"
 		},
 		{
+			"checksumSHA1": "cT6+XPBZiXsFbb7cXT6AYNrZyuM=",
+			"path": "github.com/Sirupsen/logrus",
+			"revision": "3f603f494d61c73457fb234161d8982b9f0f0b71",
+			"revisionTime": "2017-02-07T18:34:08Z"
+		},
+		{
+			"checksumSHA1": "VLLpfioPkGDIhtY86DHsZaCPXQo=",
+			"path": "github.com/Sirupsen/logrus/hooks/test",
+			"revision": "a62b1531c0b6f08944e96850e76a95a1dd6e8f9b",
+			"revisionTime": "2017-05-25T00:53:41Z"
+		},
+		{
 			"checksumSHA1": "OFu4xJEIjiI8Suu+j/gabfp+y6Q=",
 			"origin": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
 			"path": "github.com/davecgh/go-spew/spew",
@@ -81,24 +99,6 @@
 			"path": "github.com/stretchr/testify/assert",
 			"revision": "4d4bfba8f1d1027c4fdbe371823030df51419987",
 			"revisionTime": "2017-01-30T11:31:45Z"
-		},
-		{
-			"checksumSHA1": "cT6+XPBZiXsFbb7cXT6AYNrZyuM=",
-			"path": "github.com/Sirupsen/logrus",
-			"revision": "3f603f494d61c73457fb234161d8982b9f0f0b71",
-			"revisionTime": "2017-02-07T18:34:08Z"
-		},
-		{
-			"checksumSHA1": "Lglgc8iIRhqbqd8fpAZKpo/eqeY=",
-			"path": "github.com/Sirupsen/logrus/hooks/test",
-			"revision": "3f603f494d61c73457fb234161d8982b9f0f0b71",
-			"revisionTime": "2017-02-07T18:34:08Z"
-		},
-		{
-			"checksumSHA1": "45GvFsXaiSwzsbJjHirwQkGfDno=",
-			"path": "github.com/Financial-Times/go-logger",
-			"revision": "a9c029b152cbd4b940c901c6e5a4ff603a46e8d2",
-			"revisionTime": "2017-07-27T14:33:01Z"
 		}
 	],
 	"rootPath": "github.com/Financial-Times/coco-kafka-bridge"
