@@ -50,7 +50,7 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 	case plainHTTP:
 		producerInstance = newPlainHTTPMessageProducer(producerConfig)
 	default:
-		logger.FatalEvent(fmt.Sprintf("The provided producer type '%v' is invalid", producerType), nil)
+		logger.Fatalf(map[string]interface{}{}, "The provided producer type '%v' is invalid", producerType)
 	}
 
 	httpClient := &http.Client{

@@ -22,7 +22,7 @@ func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) {
 	if err != nil {
 		logger.ErrorEvent(tid, "Error happened during message forwarding. ", err)
 	} else {
-		logger.MonitoringEvent("forwarding", tid, "","Message has been forwarded ")
+		logger.MonitoringEvent("forwarding", tid, "", "Message has been forwarded")
 	}
 }
 
