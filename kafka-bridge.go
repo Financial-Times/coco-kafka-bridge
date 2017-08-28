@@ -11,6 +11,7 @@ import (
 	"github.com/Financial-Times/message-queue-go-producer/producer"
 	"github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/Financial-Times/service-status-go/httphandlers"
+	"fmt"
 )
 
 // BridgeApp wraps the config and represents the API for the bridge
@@ -49,7 +50,7 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 	case plainHTTP:
 		producerInstance = newPlainHTTPMessageProducer(producerConfig)
 	default:
-		logger.Fatalf(map[string]interface{}{}, "The provided producer type '%v' is invalid", producerType)
+		logger.Fatalf(nil, fmt.Errorf("Unknown producer type %s", producerType), "The provided producer type '%v' is invalid", producerType)
 	}
 
 	httpClient := &http.Client{
@@ -106,7 +107,7 @@ func (bridgeApp *BridgeApp) enableHealthchecksAndGTG() {
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
-		logger.Errorf(nil, "Couldn't set up HTTP listener for healthcheck: %+v", err)
+		logger.Errorf(nil, err, "Couldn't set up HTTP listener for healthcheck")
 	}
 }
 

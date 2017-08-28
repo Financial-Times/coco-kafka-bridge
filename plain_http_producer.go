@@ -47,7 +47,7 @@ func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProduce
 
 	originSystem, found := message.Headers["Origin-System-Id"]
 	if !found {
-		logger.InfoEventWithUUID(message.Headers["X-Request-Id"], uuid, "Couldn't extract origin system id. Going on.")
+		logger.NewEntry(message.Headers["X-Request-Id"]).WithUUID(uuid).Info("Couldn't extract origin system id. Going on.")
 	} else {
 		req.Header.Add("X-Origin-System-Id", originSystem)
 	}
