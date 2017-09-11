@@ -25,4 +25,5 @@ CMD exec /coco-kafka-bridge -consumer_proxy_addr=$QUEUE_PROXY_ADDRS \
                             -producer_host=$PRODUCER_HOST \
                             -producer_host_header=$PRODUCER_HOST_HEADER \
                             -producer_vulcan_auth="$PRODUCER_VULCAN_AUTH" \
-                            -producer_type=$PRODUCER_TYPE
+                            -producer_type=$PRODUCER_TYPE \
+                            -service_name=$SERVICE_NAME

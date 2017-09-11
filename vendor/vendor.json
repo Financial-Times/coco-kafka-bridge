@@ -11,6 +11,12 @@
 			"versionExact": "0.1.0"
 		},
 		{
+			"checksumSHA1": "d6isi10Jfk7YMltYxVNgQ68MYSQ=",
+			"path": "github.com/Financial-Times/go-logger",
+			"revision": "8847817bc6f87aa25c2e3e0e90f39ccaafcc00d4",
+			"revisionTime": "2017-08-25T09:01:56Z"
+		},
+		{
 			"checksumSHA1": "GrgODPqXv7QebQjfjrxMHctK0wE=",
 			"path": "github.com/Financial-Times/message-queue-go-producer/producer",
 			"revision": "0bb065111416c0de78db51acb926ba3a3ae3c4e2",
@@ -49,6 +55,18 @@
 			"revisionTime": "2016-03-23T11:15:42Z",
 			"version": "0.1.0",
 			"versionExact": "0.1.0"
+		},
+		{
+			"checksumSHA1": "cT6+XPBZiXsFbb7cXT6AYNrZyuM=",
+			"path": "github.com/Sirupsen/logrus",
+			"revision": "3f603f494d61c73457fb234161d8982b9f0f0b71",
+			"revisionTime": "2017-02-07T18:34:08Z"
+		},
+		{
+			"checksumSHA1": "VLLpfioPkGDIhtY86DHsZaCPXQo=",
+			"path": "github.com/Sirupsen/logrus/hooks/test",
+			"revision": "a62b1531c0b6f08944e96850e76a95a1dd6e8f9b",
+			"revisionTime": "2017-05-25T00:53:41Z"
 		},
 		{
 			"checksumSHA1": "OFu4xJEIjiI8Suu+j/gabfp+y6Q=",
