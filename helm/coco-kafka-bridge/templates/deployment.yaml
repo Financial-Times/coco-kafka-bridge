@@ -28,7 +28,7 @@ spec:
         env: 
         - name: CONSUMER_AUTOCOMMIT_ENABLE 
           value: "true" 
-        - name: PRODUCER_HOST
+        - name: PRODUCER_ADDRESS
           valueFrom:
             configMapKeyRef:
               name: global-config

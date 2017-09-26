@@ -45,7 +45,7 @@ func TestSendMessage(t *testing.T) {
 		},
 		{ //authorization missing
 			queueProducer.MessageProducerConfig{
-				Addr:  "address",
+				Addr: "address",
 			},
 			"",
 			queueProducer.Message{

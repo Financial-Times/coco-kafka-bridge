@@ -6,6 +6,6 @@
 -consumer_autocommit_enable=<%= scope.function_hiera(['consumer_autocommit_enable',nil]) %> \
 -consumer_authorization_key="`cat /etc/kafka-bridge-credentials.properties`" \
 -topic=<%= scope.function_hiera(['topic',nil]) %> \
--producer_host=<%= scope.function_hiera(['producer_host',nil]) %> \
+-producer_address=<%= scope.function_hiera(['producer_address',nil]) %> \
 -producer_type=<%= scope.function_hiera(['producer_type',nil]) %>
 
