@@ -12,3 +12,4 @@
     * $PRODUCER_ADDRESS
     * $PRODUCER_VULCAN_AUTH
     * $PRODUCER_TYPE (possible values: `proxy` or `plainHTTP`)
+    * $SERVICE_NAME

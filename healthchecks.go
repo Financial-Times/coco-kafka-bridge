@@ -15,12 +15,11 @@ type HealthCheck struct {
 	producerType string
 }
 
-func NewHealthCheck(consumerConfig *consumer.QueueConfig, producerConfig *producer.MessageProducerConfig, producerType string, client *http.Client) *HealthCheck {
-	consumerInstance := consumer.NewConsumer(*consumerConfig, func(m consumer.Message) {}, client)
-	producerInstance := producer.NewMessageProducerWithHTTPClient(*producerConfig, client)
+func NewHealthCheck(consumerConf *consumer.QueueConfig, p producer.MessageProducer, producerType string, client *http.Client) *HealthCheck {
+	c := consumer.NewConsumer(*consumerConf, func(m consumer.Message) {}, client)
 	return &HealthCheck{
-		consumer:     consumerInstance,
-		producer:     producerInstance,
+		consumer:     c,
+		producer:     p,
 		producerType: producerType,
 	}
 }

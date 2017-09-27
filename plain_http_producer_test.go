@@ -7,13 +7,13 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/Financial-Times/go-logger"
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSendMessage(t *testing.T) {
-	initLoggers()
-
+	logger.InitDefaultLogger("kafka-bridge")
 	var tests = []struct {
 		config          queueProducer.MessageProducerConfig
 		uuid            string

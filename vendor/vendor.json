@@ -11,20 +11,26 @@
 			"versionExact": "0.1.0"
 		},
 		{
-			"checksumSHA1": "4OtkapGYP9WO5JGqL3Dct/MUWTI=",
+			"checksumSHA1": "R32X8CuDAJV1JimomUEh9SFmc8s=",
+			"path": "github.com/Financial-Times/go-logger",
+			"revision": "83fc3e64dc5506fdb4e56b704949d157a121c76c",
+			"revisionTime": "2017-09-14T08:19:45Z"
+		},
+		{
+			"checksumSHA1": "GrgODPqXv7QebQjfjrxMHctK0wE=",
 			"path": "github.com/Financial-Times/message-queue-go-producer/producer",
-			"revision": "3885ddaee76749d4b60329b94549edfebc4045ce",
-			"revisionTime": "2017-05-26T06:52:08Z",
-			"version": "0.2.0-k8s-remove-kafka-topic-check-rc1",
-			"versionExact": "0.2.0-k8s-remove-kafka-topic-check-rc1"
+			"revision": "0bb065111416c0de78db51acb926ba3a3ae3c4e2",
+			"revisionTime": "2017-06-22T11:18:49Z",
+			"version": "0.2.0",
+			"versionExact": "0.2.0"
 		},
 		{
 			"checksumSHA1": "J+4afTatHVLwU1wboY/SvxigwbA=",
 			"path": "github.com/Financial-Times/message-queue-gonsumer/consumer",
-			"revision": "ebabf884866eecf81fe38f10893570d959fae01e",
-			"revisionTime": "2017-05-26T12:24:38Z",
-			"version": "0.4.0-k8s-remove-kafka-topic-check-rc1",
-			"versionExact": "0.4.0-k8s-remove-kafka-topic-check-rc1"
+			"revision": "6f96a5cb1e34c4baa8bc64f56524a7f2e0092ed3",
+			"revisionTime": "2017-06-22T11:17:49Z",
+			"version": "0.4.0",
+			"versionExact": "0.4.0"
 		},
 		{
 			"checksumSHA1": "fqpohN7Qp2qj7TLMbUxh/cK4oH0=",
@@ -77,10 +83,41 @@
 			"revisionTime": "2017-01-30T11:31:45Z"
 		},
 		{
+			"checksumSHA1": "BYvROBsiyAXK4sq6yhDe8RgT4LM=",
+			"path": "github.com/sirupsen/logrus",
+			"revision": "89742aefa4b206dcf400792f3bd35b542998eb3b",
+			"revisionTime": "2017-08-22T13:27:46Z"
+		},
+		{
+			"checksumSHA1": "Kt+BhrXMyYvOc9TGiBVOSNn6wcc=",
+			"path": "github.com/sirupsen/logrus/hooks/test",
+			"revision": "89742aefa4b206dcf400792f3bd35b542998eb3b",
+			"revisionTime": "2017-08-22T13:27:46Z"
+		},
+		{
 			"checksumSHA1": "JXUVA1jky8ZX8w09p2t5KLs97Nc=",
 			"path": "github.com/stretchr/testify/assert",
 			"revision": "4d4bfba8f1d1027c4fdbe371823030df51419987",
 			"revisionTime": "2017-01-30T11:31:45Z"
+		},
+		{
+			"checksumSHA1": "nqWNlnMmVpt628zzvyo6Yv2CX5Q=",
+			"path": "golang.org/x/crypto/ssh/terminal",
+			"revision": "faadfbdc035307d901e69eea569f5dda451a3ee3",
+			"revisionTime": "2017-09-12T19:17:24Z"
+		},
+		{
+			"checksumSHA1": "XIt75royO77B3XRYyViU7tng2xM=",
+			"path": "golang.org/x/sys/unix",
+			"revision": "062cd7e4e68206d8bab9b18396626e855c992658",
+			"revisionTime": "2017-09-12T16:19:26Z"
+		},
+
+		{
+			"checksumSHA1": "pBPFzDGt3AVSRffB7ffiUnruFUk=",
+			"path": "golang.org/x/sys/windows",
+			"revision": "062cd7e4e68206d8bab9b18396626e855c992658",
+			"revisionTime": "2017-09-12T16:19:26Z"
 		}
 	],
 	"rootPath": "github.com/Financial-Times/coco-kafka-bridge"
