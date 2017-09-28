@@ -1,0 +1,10 @@
+# Values used for the deployed application.
+replicaCount: 2
+service:
+  name: cms-metadata-kafka-bridge-pub-pre-prod
+env:
+  QUEUE_PROXY_ADDRS: https://pub-pre-prod-uk-up.ft.com/__kafka-rest-proxy
+  GROUP_ID: k8s-metadata-kafka-bridge-pub-pre-prod-infraprod
+  TOPIC: PreNativeCmsMetadataPublicationEvents
+  AUTHORIZATION_KEY_secret_name: pub-auth
+  AUTHORIZATION_KEY_secret_key: pub-pre-prod-auth

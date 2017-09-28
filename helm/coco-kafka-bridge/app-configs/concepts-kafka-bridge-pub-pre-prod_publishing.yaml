@@ -1,0 +1,10 @@
+# Values used for the deployed application.
+replicaCount: 1
+service:
+  name: concepts-kafka-bridge-pub-pre-prod
+env:
+  QUEUE_PROXY_ADDRS: https://pub-pre-prod-up.ft.com/__kafka-rest-proxy
+  GROUP_ID: k8s-concepts-kafka-bridge-pub-pre-prod-infraprod
+  TOPIC: Concept
+  AUTHORIZATION_KEY_secret_name: pub-auth
+  AUTHORIZATION_KEY_secret_key: pub-pre-prod-auth

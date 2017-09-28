@@ -23,7 +23,6 @@ func TestSendMessage(t *testing.T) {
 		{ //happy flow
 			queueProducer.MessageProducerConfig{
 				Addr:          "address",
-				Queue:         "kafka",
 				Authorization: "authorizationkey",
 			},
 			"",
@@ -46,8 +45,7 @@ func TestSendMessage(t *testing.T) {
 		},
 		{ //authorization missing
 			queueProducer.MessageProducerConfig{
-				Addr:  "address",
-				Queue: "kafka",
+				Addr: "address",
 			},
 			"",
 			queueProducer.Message{
@@ -113,7 +111,6 @@ func TestSendMessage(t *testing.T) {
 		{ // origin system id is invalid (but the bridge shouldn't care)
 			queueProducer.MessageProducerConfig{
 				Addr:          "address",
-				Queue:         "kafka",
 				Authorization: "authorizationkey",
 			},
 			"",
@@ -158,7 +155,6 @@ func TestSendMessage(t *testing.T) {
 		{ //native-hash forward
 			queueProducer.MessageProducerConfig{
 				Addr:          "address",
-				Queue:         "kafka",
 				Authorization: "authorizationkey",
 			},
 			"",
@@ -194,7 +190,6 @@ func TestSendMessage(t *testing.T) {
 					StatusCode: http.StatusOK,
 					Body:       ioutil.NopCloser(bytes.NewBuffer([]byte{})),
 				},
-				host: test.config.Queue,
 			},
 		}
 		err := cmsNotifierTest.SendMessage(test.uuid, test.message)

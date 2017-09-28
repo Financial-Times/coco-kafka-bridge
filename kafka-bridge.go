@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
+	"fmt"
 	"github.com/Financial-Times/go-logger"
 	"github.com/Financial-Times/message-queue-go-producer/producer"
 	"github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/Financial-Times/service-status-go/httphandlers"
-	"fmt"
 )
 
 // BridgeApp wraps the config and represents the API for the bridge
@@ -28,7 +28,7 @@ const (
 	proxy     = "proxy"
 )
 
-func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerHost string, producerHostHeader string, producerVulcanAuth string, producerType string) *BridgeApp {
+func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerAddress string, producerVulcanAuth string, producerType string) *BridgeApp {
 	consumerConfig := consumer.QueueConfig{}
 	consumerConfig.Addrs = strings.Split(consumerAddrs, ",")
 	consumerConfig.Group = consumerGroupID
@@ -38,9 +38,8 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 	consumerConfig.AutoCommitEnable = consumerAutoCommitEnable
 
 	producerConfig := producer.MessageProducerConfig{}
-	producerConfig.Addr = producerHost
+	producerConfig.Addr = producerAddress
 	producerConfig.Topic = topic
-	producerConfig.Queue = producerHostHeader
 	producerConfig.Authorization = producerVulcanAuth
 
 	var producerInstance producer.MessageProducer
@@ -82,8 +81,7 @@ func initBridgeApp() *BridgeApp {
 
 	topic := flag.String("topic", "", "Kafka topic.")
 
-	producerHost := flag.String("producer_host", "", "The host the messages are forwarded to.")
-	producerHostHeader := flag.String("producer_host_header", "kafka-proxy", "The host header for the forwarder service (ex: cms-notifier or kafka-proxy).")
+	producerAddress := flag.String("producer_address", "", "The address the messages are forwarded to.")
 
 	producerVulcanAuth := flag.String("producer_vulcan_auth", "", "Authentication string by which you access cms-notifier via vulcand.")
 	producerType := flag.String("producer_type", proxy, "Two possible values are accepted: proxy - if the requests are going through the kafka-proxy; or plainHTTP if a normal http request is required.")
@@ -94,7 +92,7 @@ func initBridgeApp() *BridgeApp {
 	logger.InitDefaultLogger(*serviceName)
 	logger.Infof(nil, "Starting Kafka Bridge")
 
-	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerHost, *producerHostHeader, *producerVulcanAuth, *producerType)
+	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerAddress, *producerVulcanAuth, *producerType)
 }
 
 func (bridgeApp *BridgeApp) enableHealthchecksAndGTG() {

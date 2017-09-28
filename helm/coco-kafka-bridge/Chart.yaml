@@ -1,0 +1,4 @@
+apiVersion: v1
+description: coco-kafka-bridge Helm chart for Kubernetes
+name: coco-kafka-bridge
+version: 0.0.0
