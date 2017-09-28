@@ -26,13 +26,15 @@ spec:
         - mountPath: /etc/ssl/certs
           name: certificates-storage
         env: 
-        - name: CONSUMER_AUTOCOMMIT_ENABLE 
+        - name: SERVICE_NAME
+          value: "{{ .Values.service.name }}"
+        - name: CONSUMER_AUTOCOMMIT_ENABLE
           value: "true" 
         - name: PRODUCER_ADDRESS
           valueFrom:
             configMapKeyRef:
               name: global-config
-              key: kafka.proxy.url.with.protocol 
+              key: kafka.proxy.url.with.protocol
         - name: PRODUCER_TYPE
           value: "proxy"
         - name: QUEUE_PROXY_ADDRS

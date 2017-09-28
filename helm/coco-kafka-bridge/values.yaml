@@ -13,4 +13,4 @@ env:
   AUTHORIZATION_KEY_secret_name: "" # auth for source queue cluster
   AUTHORIZATION_KEY_secret_key: "" # auth for source queue cluster
 limits:
-  memory: 64Mi
+  memory: 256Mi
