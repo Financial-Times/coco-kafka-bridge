@@ -1,0 +1,10 @@
+# Values used for the deployed application.
+replicaCount: 2
+service:
+  name: cms-kafka-bridge-pub-k8s
+env:
+  QUEUE_PROXY_ADDRS: https://upp-k8s-publishing-test-eu.ft.com/__kafka-rest-proxy
+  GROUP_ID: kafka-bridge-pub-k8s
+  TOPIC: NativeCmsPublicationEvents
+  AUTHORIZATION_KEY_secret_name: pub-auth
+  AUTHORIZATION_KEY_secret_key: pub-k8s-auth
