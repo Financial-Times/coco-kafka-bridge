@@ -6,6 +6,7 @@ import (
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
 	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/dchest/uniuri"
+	"fmt"
 )
 
 const tidValidRegexp = "(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$"
@@ -20,6 +21,7 @@ func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) {
 	err = bridge.producerInstance.SendMessage("", queueProducer.Message{Headers: msg.Headers, Body: msg.Body})
 	if err != nil {
 		logger.NewMonitoringEntry("Forwarding", tid, "").Error("Error happened during message forwarding")
+		fmt.Printf("The actual error: [%v]", err)
 	} else {
 		logger.NewMonitoringEntry("Forwarding", tid, "").Info("Message has been forwarded")
 	}
