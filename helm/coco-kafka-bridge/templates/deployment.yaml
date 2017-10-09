@@ -40,7 +40,7 @@ spec:
         - name: QUEUE_PROXY_ADDRS
           value: "{{ .Values.env.QUEUE_PROXY_ADDRS }}"
         - name: GROUP_ID
-          value: "{{ .Values.env.GROUP_ID }}"
+          value: {{ .Values.env.GROUP_ID }}-{{ template "env-full-name" . }}
         - name: TOPIC
           value: "{{ .Values.env.TOPIC }}"
         - name: AUTHORIZATION_KEY

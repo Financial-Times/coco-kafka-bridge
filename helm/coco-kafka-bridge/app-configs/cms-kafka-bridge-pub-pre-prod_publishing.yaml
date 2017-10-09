@@ -4,7 +4,7 @@ service:
   name: cms-kafka-bridge-pub-pre-prod
 env:
   QUEUE_PROXY_ADDRS: https://pub-pre-prod-uk-up.ft.com/__kafka-rest-proxy
-  GROUP_ID: k8s-kafka-bridge-pub-pre-prod-infraprod
+  GROUP_ID: k8s-kafka-bridge-pub-pre-prod
   TOPIC: PreNativeCmsPublicationEvents
   AUTHORIZATION_KEY_secret_name: pub-auth
   AUTHORIZATION_KEY_secret_key: pub-pre-prod-auth

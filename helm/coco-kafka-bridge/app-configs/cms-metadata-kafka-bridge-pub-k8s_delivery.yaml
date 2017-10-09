@@ -4,7 +4,7 @@ service:
   name: cms-metadata-kafka-bridge-pub-k8s
 env:
   QUEUE_PROXY_ADDRS: https://k8s-publishing-upp-eu.ft.com/__kafka-rest-proxy
-  GROUP_ID: metadata-kafka-bridge-pub-k8s
+  GROUP_ID: metadata-kafka-bridge-pub
   TOPIC: NativeCmsMetadataPublicationEvents
   AUTHORIZATION_KEY_secret_name: pub-auth
   AUTHORIZATION_KEY_secret_key: pub-k8s-auth
