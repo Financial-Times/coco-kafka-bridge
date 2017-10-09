@@ -6,7 +6,6 @@ import (
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
 	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/dchest/uniuri"
-	"fmt"
 )
 
 const tidValidRegexp = "(tid|SYNTHETIC-REQ-MON)[a-zA-Z0-9_-]*$"
