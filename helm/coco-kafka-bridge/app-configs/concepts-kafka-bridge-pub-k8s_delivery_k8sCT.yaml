@@ -3,7 +3,7 @@ replicaCount: 1
 service:
   name: concepts-kafka-bridge-pub-k8s
 env:
-  QUEUE_PROXY_ADDRS: https://k8s-publishing-upp-eu.ft.com/__kafka-rest-proxy
+  QUEUE_PROXY_ADDRS: https://upp-k8s-publishing-test-eu.ft.com/__kafka-rest-proxy
   GROUP_ID: concepts-kafka-bridge-pub
   TOPIC: Concept
   AUTHORIZATION_KEY_secret_name: pub-auth

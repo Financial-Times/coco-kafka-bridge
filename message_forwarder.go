@@ -19,7 +19,7 @@ func (bridge BridgeApp) forwardMsg(msg queueConsumer.Message) {
 	msg.Headers["X-Request-Id"] = tid
 	err = bridge.producerInstance.SendMessage("", queueProducer.Message{Headers: msg.Headers, Body: msg.Body})
 	if err != nil {
-		logger.NewMonitoringEntry("Forwarding", tid, "").Error("Error happened during message forwarding")
+		logger.NewMonitoringEntry("Forwarding", tid, "").Error("Error happened during message forwarding: " + err.Error())
 	} else {
 		logger.NewMonitoringEntry("Forwarding", tid, "").Info("Message has been forwarded")
 	}
