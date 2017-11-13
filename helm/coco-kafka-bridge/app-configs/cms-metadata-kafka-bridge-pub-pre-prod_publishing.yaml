@@ -3,7 +3,7 @@ replicaCount: 2
 service:
   name: cms-metadata-kafka-bridge-pub-pre-prod
 env:
-  QUEUE_PROXY_ADDRS: https://pub-pre-prod-uk-up.ft.com/__kafka-rest-proxy
+  QUEUE_PROXY_ADDRS: https://pub-pre-prod-up.ft.com/__kafka-rest-proxy
   GROUP_ID: k8s-metadata-kafka-bridge-pub-pre-prod
   TOPIC: PreNativeCmsMetadataPublicationEvents
   AUTHORIZATION_KEY_secret_name: pub-auth
