@@ -20,11 +20,11 @@ We truncate at 24 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{- define "env-full-name" -}}
-{{- $region := .Values.region -}}
-{{- $env := required "The target_env value is required for this app. Use helm upgrade ... --set target_env=... when installing." .Values.target_env -}}
-{{- if eq $region "null" -}}
-{{- printf "%s" $env -}}
-{{- else -}}
-{{- printf "%s-%s" $env $region -}}
-{{- end -}}
+  {{- $region := .Values.region -}}
+  {{- $env := required "The target_env value is required for this app. Use helm upgrade ... --set target_env=... when installing." .Values.target_env -}}
+  {{- if eq $region "null" -}}
+    {{- printf "%s" $env -}}
+  {{- else -}}
+    {{- printf "%s-%s" $env $region -}}
+  {{- end -}}
 {{- end -}}

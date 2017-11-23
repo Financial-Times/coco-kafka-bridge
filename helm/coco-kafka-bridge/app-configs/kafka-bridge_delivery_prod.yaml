@@ -1,0 +1,48 @@
+# Default values that will be applied to the prod cluster.
+# In delivery we have bridges only to the pub cluster of the prod env
+
+replicaCount: 2
+
+bridges:
+## Begin prod bridges
+#CMS
+- name: cms-kafka-bridge-pub-prod-eu
+  kafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
+  groupIdPrefix: kafka-bridge-pub-prod-eu
+  topic: NativeCmsPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+- name: cms-kafka-bridge-pub-prod-us
+  kafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
+  groupIdPrefix: kafka-bridge-pub-prod-us
+  topic: NativeCmsPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+#CMS metadata
+- name: cms-metadata-kafka-bridge-pub-prod-eu
+  kafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-prod-eu
+  topic: NativeCmsMetadataPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+- name: cms-metadata-kafka-bridge-pub-prod-us
+  kafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-prod-us
+  topic: NativeCmsMetadataPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+
+# Concepts
+- name: concepts-kafka-bridge-pub-pub-prod-eu
+  kafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
+  groupIdPrefix: concepts-kafka-bridge-pub-prod-eu
+  topic: Concept
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+- name: concepts-kafka-bridge-pub-pub-prod-us
+  kafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
+  groupIdPrefix: concepts-kafka-bridge-pub-prod-us
+  topic: Concept
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+## END prod bridges

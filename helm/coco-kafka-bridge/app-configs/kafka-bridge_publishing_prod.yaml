@@ -1,0 +1,50 @@
+# Default values that will be applied to the prod cluster.
+# In pub we shouldn't have any bridges.
+# For now we bridge prod k8s to the coco prod
+replicaCount: 2
+
+bridges:
+## Begin prod bridges
+# todo [sb] remove the bridges when the publishes come only to this cluster (we are 100% live)
+#CMS
+- name: cms-kafka-bridge-pub-coco-prod-eu
+  kafkaProxyUrl: "https://pub-prod-uk-up.ft.com"
+  groupIdPrefix: kafka-bridge-pub-coco-prod-eu
+  topic: NativeCmsPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-coco-prod-auth
+- name: cms-kafka-bridge-pub-coco-prod-us
+  kafkaProxyUrl: "https://pub-prod-us-up.ft.com"
+  groupIdPrefix: kafka-bridge-pub-coco-prod-us
+  topic: NativeCmsPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-coco-prod-auth
+#CMS metadata
+- name: cms-metadata-kafka-bridge-pub-coco-prod-eu
+  kafkaProxyUrl: "https://pub-prod-uk-up.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-coco-prod-eu
+  topic: NativeCmsMetadataPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-coco-prod-auth
+- name: cms-metadata-kafka-bridge-pub-coco-prod-us
+  kafkaProxyUrl: "https://pub-prod-us-up.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-coco-prod-us
+  topic: NativeCmsMetadataPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-coco-prod-auth
+
+# Concepts 
+- name: concepts-kafka-bridge-pub-pub-coco-prod-eu
+  kafkaProxyUrl: "https://pub-prod-uk-up.ft.com"
+  groupIdPrefix: concepts-kafka-bridge-pub-coco-prod-eu
+  topic: Concept
+  authSecretName: pub-auth
+  authSecretKey: pub-coco-prod-auth
+- name: concepts-kafka-bridge-pub-pub-coco-prod-us
+  kafkaProxyUrl: "https://pub-prod-us-up.ft.com"
+  groupIdPrefix: concepts-kafka-bridge-pub-coco-prod-us
+  topic: Concept
+  authSecretName: pub-auth
+  authSecretKey: pub-coco-prod-auth
+## END prod bridges
+
