@@ -43,7 +43,7 @@ spec:
         - name: PRODUCER_TYPE
           value: "proxy"
 {{- /* we'll be using the value of the publishing cluster if the kafkaProxyUrl is not set on the bridge */}}
-{{- $proxyUrlValue := default $bridge.kafkaProxyUrl $global.Values.cluster.publishing.url }}
+{{- $proxyUrlValue := default $global.Values.cluster.publishing.url $bridge.kafkaProxyUrl }}
         - name: QUEUE_PROXY_ADDRS
           value: "{{ $proxyUrlValue }}/__kafka-rest-proxy"
         - name: GROUP_ID
