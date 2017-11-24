@@ -1,6 +1,5 @@
 # Default values that will be applied to team clusters.
 # In team clusters, in pub we have bridges to both Prod and Staging to all regions.
-replicaCount: 2
 
 bridges:
 ## Begin prod bridges
@@ -11,12 +10,14 @@ bridges:
   topic: NativeCmsPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
+  replicas: 2
 - name: cms-kafka-bridge-pub-prod-us
   kafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
   groupIdPrefix: kafka-bridge-pub-prod-us
   topic: NativeCmsPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
+  replicas: 2
 #CMS metadata
 - name: cms-metadata-kafka-bridge-pub-prod-eu
   kafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
@@ -24,12 +25,14 @@ bridges:
   topic: NativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
+  replicas: 2
 - name: cms-metadata-kafka-bridge-pub-prod-us
   kafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-prod-us
   topic: NativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
+  replicas: 2
 
 # Concepts 
 - name: concepts-kafka-bridge-pub-pub-prod-eu
@@ -38,12 +41,14 @@ bridges:
   topic: Concept
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
+  replicas: 1
 - name: concepts-kafka-bridge-pub-pub-prod-us
   kafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
   groupIdPrefix: concepts-kafka-bridge-pub-prod-us
   topic: Concept
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
+  replicas: 1
 ## END prod bridges
 
 ## Start staging bridges
@@ -55,12 +60,14 @@ bridges:
   topic: NativeCmsPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  replicas: 2
 - name: cms-kafka-bridge-pub-staging-us
   kafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
   groupIdPrefix: kafka-bridge-pub-staging-us
   topic: NativeCmsPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  replicas: 2
 #CMS metadata
 - name: cms-metadata-kafka-bridge-pub-staging-eu
   kafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
@@ -68,12 +75,14 @@ bridges:
   topic: NativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  replicas: 2
 - name: cms-metadata-kafka-bridge-pub-staging-us
   kafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-us
   topic: NativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  replicas: 2
 
 # Concepts
 - name: concepts-kafka-bridge-pub-pub-staging-eu
@@ -82,11 +91,12 @@ bridges:
   topic: Concept
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  replicas: 1
 - name: concepts-kafka-bridge-pub-pub-staging-us
   kafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
   groupIdPrefix: concepts-kafka-bridge-pub-staging-us
   topic: Concept
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
-
+  replicas: 1
 ## END staging bridges

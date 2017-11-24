@@ -1,8 +1,6 @@
 # Default values that will be applied to the prod cluster.
 # In delivery we have bridges only to the pub cluster of the prod env
 
-replicaCount: 2
-
 bridges:
 ## Start staging bridges
 # todo remove all bridges once we are 100% live and methode publishes directly to this staging. 
@@ -13,12 +11,14 @@ bridges:
   topic: NativeCmsPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  replicas: 2
 - name: cms-kafka-bridge-pub-staging-us
   kafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
   groupIdPrefix: kafka-bridge-pub-staging-us
   topic: NativeCmsPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  replicas: 2
 #CMS metadata
 - name: cms-metadata-kafka-bridge-pub-staging-eu
   kafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
@@ -26,12 +26,14 @@ bridges:
   topic: NativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  replicas: 2
 - name: cms-metadata-kafka-bridge-pub-staging-us
   kafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-us
   topic: NativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  replicas: 2
 
 # Concepts
 - name: concepts-kafka-bridge-pub-pub-staging-eu
@@ -40,11 +42,13 @@ bridges:
   topic: Concept
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  replicas: 1
 - name: concepts-kafka-bridge-pub-pub-staging-us
   kafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
   groupIdPrefix: concepts-kafka-bridge-pub-staging-us
   topic: Concept
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  replicas: 1
 
 ## END staging bridges

@@ -2,15 +2,9 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 service:
-  name: "" # The name of the service, should be defined in the specific app-configs folder.
   hasHealthcheck: "true"
 image:
   repository: coco/coco-kafka-bridge
-env:
-  QUEUE_PROXY_ADDRS: "" # source queue
-  GROUP_ID: "" # bridge consumer group ID
-  TOPIC: "" # one topic, representing both source and destination 
-  AUTHORIZATION_KEY_secret_name: "" # auth for source queue cluster
-  AUTHORIZATION_KEY_secret_key: "" # auth for source queue cluster
+bridges: # The bridges should be defined in the app config file
 limits:
   memory: 256Mi

@@ -1,8 +1,6 @@
 # Default values that will be applied to team clusters.
 # In team clusters, in delivery we have bridges only to the pub cluster of the team env
 
-replicaCount: 2
-
 bridges:
 # Cms bridge to pub cluster
 - name: cms-kafka-bridge-pub
@@ -11,6 +9,7 @@ bridges:
   topic: NativeCmsPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-k8s-auth
+  replicas: 2
 # Cms metadata bridge to pub cluster
 - name: cms-metadata-kafka-bridge-pub
   kafkaProxyUrl: "" # use the pub cluster url
@@ -18,6 +17,7 @@ bridges:
   topic: NativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-k8s-auth
+  replicas: 2
 # Concepts bridge to pub cluster
 - name: concepts-kafka-bridge-pub
   kafkaProxyUrl: "" # use the pub cluster url
@@ -25,3 +25,5 @@ bridges:
   topic: Concept
   authSecretName: pub-auth
   authSecretKey: pub-k8s-auth
+  replicas: 1
+

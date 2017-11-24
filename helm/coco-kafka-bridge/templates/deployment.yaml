@@ -13,7 +13,7 @@ metadata:
     visualize: "true" 
     app: {{ $bridge.name }} 
 spec:
-  replicas: {{ $global.Values.replicaCount }} 
+  replicas: {{ $bridge.replicas }}
   selector: 
     matchLabels:
       app: {{ $bridge.name }}
