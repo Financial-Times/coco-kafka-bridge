@@ -4,26 +4,29 @@
 bridges:
 # Cms bridge to pub cluster
 - name: cms-kafka-bridge-pub
-  kafkaProxyUrl: "" # use the pub cluster url
+  sourceKafkaProxyUrl: "" # use the pub cluster url
   groupIdPrefix: kafka-bridge-pub
   topic: NativeCmsPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-k8s-auth
+  type: "plainHTTP"
   replicas: 2
 # Cms metadata bridge to pub cluster
 - name: cms-metadata-kafka-bridge-pub
-  kafkaProxyUrl: "" # use the pub cluster url
+  sourceKafkaProxyUrl: "" # use the pub cluster url
   groupIdPrefix: metadata-kafka-bridge-pub
   topic: NativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-k8s-auth
+  type: "proxy"
   replicas: 2
 # Concepts bridge to pub cluster
 - name: concepts-kafka-bridge-pub
-  kafkaProxyUrl: "" # use the pub cluster url
+  sourceKafkaProxyUrl: "" # use the pub cluster url
   groupIdPrefix: concepts-kafka-bridge-pub
   topic: Concept
   authSecretName: pub-auth
   authSecretKey: pub-k8s-auth
+  type: "proxy"
   replicas: 1
 

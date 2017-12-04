@@ -6,49 +6,55 @@ bridges:
 # todo remove all bridges once we are 100% live and methode publishes directly to this staging. 
 ##CMS
 - name: cms-kafka-bridge-pub-staging-eu
-  kafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
+  sourceKafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
   groupIdPrefix: kafka-bridge-pub-staging-eu
   topic: NativeCmsPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  type: "plainHTTP"
   replicas: 2
 - name: cms-kafka-bridge-pub-staging-us
-  kafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
+  sourceKafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
   groupIdPrefix: kafka-bridge-pub-staging-us
   topic: NativeCmsPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  type: "plainHTTP"
   replicas: 2
 #CMS metadata
 - name: cms-metadata-kafka-bridge-pub-staging-eu
-  kafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
+  sourceKafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
   topic: NativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  type: "proxy"
   replicas: 2
 - name: cms-metadata-kafka-bridge-pub-staging-us
-  kafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
+  sourceKafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-us
   topic: NativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  type: "proxy"
   replicas: 2
 
 # Concepts
 - name: concepts-kafka-bridge-pub-pub-staging-eu
-  kafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
+  sourceKafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
   groupIdPrefix: concepts-kafka-bridge-pub-staging-eu
   topic: Concept
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  type: "proxy"
   replicas: 1
 - name: concepts-kafka-bridge-pub-pub-staging-us
-  kafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
+  sourceKafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
   groupIdPrefix: concepts-kafka-bridge-pub-staging-us
   topic: Concept
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
+  type: "proxy"
   replicas: 1
 
 ## END staging bridges
