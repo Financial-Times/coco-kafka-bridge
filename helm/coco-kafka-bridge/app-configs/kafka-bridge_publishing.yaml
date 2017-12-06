@@ -7,7 +7,7 @@ bridges:
 - name: cms-kafka-bridge-pub-prod-eu
   sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
   groupIdPrefix: kafka-bridge-pub-prod-eu
-  topic: NativeCmsPublicationEvents
+  topic: PreNativeCmsPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
   type: "plainHTTP"
@@ -15,7 +15,7 @@ bridges:
 - name: cms-kafka-bridge-pub-prod-us
   sourceKafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
   groupIdPrefix: kafka-bridge-pub-prod-us
-  topic: NativeCmsPublicationEvents
+  topic: PreNativeCmsPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
   type: "plainHTTP"
@@ -24,7 +24,7 @@ bridges:
 - name: cms-metadata-kafka-bridge-pub-prod-eu
   sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-prod-eu
-  topic: NativeCmsMetadataPublicationEvents
+  topic: PreNativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
   type: "proxy"
@@ -32,7 +32,7 @@ bridges:
 - name: cms-metadata-kafka-bridge-pub-prod-us
   sourceKafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-prod-us
-  topic: NativeCmsMetadataPublicationEvents
+  topic: PreNativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
   type: "proxy"
@@ -63,7 +63,7 @@ bridges:
 - name: cms-kafka-bridge-pub-staging-eu
   sourceKafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
   groupIdPrefix: kafka-bridge-pub-staging-eu
-  topic: NativeCmsPublicationEvents
+  topic: PreNativeCmsPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
   type: "plainHTTP"
@@ -71,7 +71,7 @@ bridges:
 - name: cms-kafka-bridge-pub-staging-us
   sourceKafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
   groupIdPrefix: kafka-bridge-pub-staging-us
-  topic: NativeCmsPublicationEvents
+  topic: PreNativeCmsPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
   type: "plainHTTP"
@@ -80,7 +80,7 @@ bridges:
 - name: cms-metadata-kafka-bridge-pub-staging-eu
   sourceKafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
-  topic: NativeCmsMetadataPublicationEvents
+  topic: PreNativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
   type: "proxy"
@@ -88,7 +88,7 @@ bridges:
 - name: cms-metadata-kafka-bridge-pub-staging-us
   sourceKafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-us
-  topic: NativeCmsMetadataPublicationEvents
+  topic: PreNativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
   type: "proxy"

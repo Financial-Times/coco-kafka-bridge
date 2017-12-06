@@ -8,16 +8,16 @@ bridges:
 - name: cms-kafka-bridge-pub-coco-prod-eu
   sourceKafkaProxyUrl: "https://pub-prod-uk-up.ft.com"
   groupIdPrefix: kafka-bridge-pub-coco-prod-eu
-  topic: NativeCmsPublicationEvents
+  topic: PreNativeCmsPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-coco-prod-auth
-  type: "plainHTTP"
+  type: "proxy"
   replicas: 2
 #CMS metadata
 - name: cms-metadata-kafka-bridge-pub-coco-prod-eu
   sourceKafkaProxyUrl: "https://pub-prod-uk-up.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-coco-prod-eu
-  topic: NativeCmsMetadataPublicationEvents
+  topic: PreNativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-coco-prod-auth
   type: "proxy"
