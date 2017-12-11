@@ -95,20 +95,5 @@ bridges:
   replicas: 2
 
 # Concepts
-- name: concepts-kafka-bridge-pub-pub-staging-eu
-  sourceKafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
-  groupIdPrefix: concepts-kafka-bridge-pub-staging-eu
-  topic: Concept
-  authSecretName: pub-auth
-  authSecretKey: pub-staging-auth
-  type: "proxy"
-  replicas: 1
-- name: concepts-kafka-bridge-pub-pub-staging-us
-  sourceKafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
-  groupIdPrefix: concepts-kafka-bridge-pub-staging-us
-  topic: Concept
-  authSecretName: pub-auth
-  authSecretKey: pub-staging-auth
-  type: "proxy"
-  replicas: 1
+# No concept bridges
 ## END staging bridges
