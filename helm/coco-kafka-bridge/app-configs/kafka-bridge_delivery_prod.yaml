@@ -41,7 +41,7 @@ bridges:
 # Concepts
 - name: concepts-kafka-bridge-pub-prod
   sourceKafkaProxyUrl: "https://upp-prod-publish.ft.com"
-  groupIdPrefix: concepts-kafka-bridge-pub-prod-eu
+  groupIdPrefix: concepts-kafka-bridge-pub-prod
   topic: Concept
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
