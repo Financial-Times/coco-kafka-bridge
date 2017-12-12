@@ -1,0 +1,84 @@
+# Default values that will be applied to team clusters.
+# In team clusters, in pub we have bridges to both Prod and Staging to all regions.
+
+bridges:
+## Begin prod bridges
+#CMS
+- name: cms-kafka-bridge-pub-prod-eu
+  sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
+  groupIdPrefix: kafka-bridge-pub-prod-eu
+  topic: PreNativeCmsPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "plainHTTP"
+  replicas: 2
+- name: cms-kafka-bridge-pub-prod-us
+  sourceKafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
+  groupIdPrefix: kafka-bridge-pub-prod-us
+  topic: PreNativeCmsPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "plainHTTP"
+  replicas: 2
+#CMS metadata
+- name: cms-metadata-kafka-bridge-pub-prod-eu
+  sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-prod-eu
+  topic: PreNativeCmsMetadataPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "proxy"
+  replicas: 2
+- name: cms-metadata-kafka-bridge-pub-prod-us
+  sourceKafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-prod-us
+  topic: PreNativeCmsMetadataPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "proxy"
+  replicas: 2
+
+# Concepts 
+# No concept bridges
+## END prod bridges
+
+## Start staging bridges
+# todo point the staging bridges to the k8s staging env, when we provision this env.
+##CMS
+- name: cms-kafka-bridge-pub-staging-eu
+  sourceKafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
+  groupIdPrefix: kafka-bridge-pub-staging-eu
+  topic: PreNativeCmsPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "plainHTTP"
+  replicas: 2
+- name: cms-kafka-bridge-pub-staging-us
+  sourceKafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
+  groupIdPrefix: kafka-bridge-pub-staging-us
+  topic: PreNativeCmsPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "plainHTTP"
+  replicas: 2
+#CMS metadata
+- name: cms-metadata-kafka-bridge-pub-staging-eu
+  sourceKafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
+  topic: PreNativeCmsMetadataPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "proxy"
+  replicas: 2
+- name: cms-metadata-kafka-bridge-pub-staging-us
+  sourceKafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-staging-us
+  topic: PreNativeCmsMetadataPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "proxy"
+  replicas: 2
+
+# Concepts
+# No concept bridges
+## END staging bridges

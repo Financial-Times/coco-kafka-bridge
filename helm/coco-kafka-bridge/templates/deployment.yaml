@@ -1,53 +1,67 @@
+{{- $global := . }}
+{{- /* Iterating through the defined bridges  */}}
+{{- range $bridge := $global.Values.bridges }}
+
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ .Values.service.name }} 
+  name: {{ $bridge.name }} 
   labels:
-    chart: "{{ .Chart.Name | trunc 63 }}"
-    chartVersion: "{{ .Chart.Version | trunc 63 }}" 
+    chart: "{{ $global.Chart.Name | trunc 63 }}"
+    chartVersion: "{{ $global.Chart.Version | trunc 63 }}" 
     visualize: "true" 
-    app: {{ .Values.service.name }} 
+    app: {{ $bridge.name }} 
 spec:
-  replicas: {{ .Values.replicaCount }} 
+  replicas: {{ $bridge.replicas }}
   selector: 
     matchLabels:
-      app: {{ .Values.service.name }}
+      app: {{ $bridge.name }}
   template:
     metadata:
       labels:
-        app: {{ .Values.service.name }}
+        app: {{ $bridge.name }}
         visualize: "true" 
     spec:
       containers: 
-      - name: {{ .Values.service.name }} 
-        image: "{{ .Values.image.repository }}:{{ .Chart.Version }}"
+      - name: {{ $bridge.name }} 
+        image: "{{ $global.Values.image.repository }}:{{ $global.Chart.Version }}"
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - mountPath: /etc/ssl/certs
           name: certificates-storage
         env: 
         - name: SERVICE_NAME
-          value: "{{ .Values.service.name }}"
+          value: "{{ $bridge.name }}"
+{{- if eq $bridge.type "proxy" }}
         - name: CONSUMER_AUTOCOMMIT_ENABLE
-          value: "true" 
+          value: "true"
         - name: PRODUCER_ADDRESS
           valueFrom:
             configMapKeyRef:
               name: global-config
               key: kafka.proxy.url.with.protocol
+{{- else }}
+        - name: PRODUCER_ADDRESS
+          value: "http://cms-notifier:8080"
+        - name: CONSUMER_AUTOCOMMIT_ENABLE
+          value: "false"
+{{- end }}
         - name: PRODUCER_TYPE
-          value: "proxy"
+          value: "{{ $bridge.type }}"
+{{- /* we'll be using the value of the publishing cluster if the sourceKafkaProxyUrl is not set on the bridge */}}
+{{- $proxyUrlValue := default $global.Values.cluster.publishing.url $bridge.sourceKafkaProxyUrl }}
         - name: QUEUE_PROXY_ADDRS
-          value: "{{ .Values.env.QUEUE_PROXY_ADDRS }}"
+          value: "{{ $proxyUrlValue }}/__kafka-rest-proxy"
         - name: GROUP_ID
-          value: {{ .Values.env.GROUP_ID }}-{{ template "env-full-name" . }}
+          value: {{ $bridge.groupIdPrefix }}-{{ template "env-full-name" $global }}
         - name: TOPIC
-          value: "{{ .Values.env.TOPIC }}"
+          value: "{{ $bridge.topic }}"
         - name: AUTHORIZATION_KEY
           valueFrom:
             secretKeyRef:
-              name: "{{ .Values.env.AUTHORIZATION_KEY_secret_name }}"
-              key: "{{ .Values.env.AUTHORIZATION_KEY_secret_key }}"
+              name: "{{ $bridge.authSecretName }}"
+              key: "{{ $bridge.authSecretKey }}"
         ports: 
         - containerPort: 8080 
         livenessProbe: 
@@ -61,9 +75,9 @@ spec:
           initialDelaySeconds: 10
           periodSeconds: 30 
         resources: 
-{{ toYaml .Values.resources | indent 12 }}
+{{ toYaml $global.Values.resources | indent 12 }}
       volumes:
       - name: certificates-storage
         hostPath:
           path: /usr/share/ca-certificates
-
+{{- end }}
