@@ -23,6 +23,16 @@ spec:
         app: {{ $bridge.name }}
         visualize: "true" 
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - {{ .Values.service.name }}
+            topologyKey: "kubernetes.io/hostname"
       containers: 
       - name: {{ $bridge.name }} 
         image: "{{ $global.Values.image.repository }}:{{ $global.Chart.Version }}"

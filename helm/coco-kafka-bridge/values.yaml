@@ -6,5 +6,8 @@ service:
 image:
   repository: coco/coco-kafka-bridge
 bridges: # The bridges should be defined in the app config file
-limits:
-  memory: 256Mi
+resources:
+  requests:
+    memory: 200Mi
+  limits:
+    memory: 256Mi
