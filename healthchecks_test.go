@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	fthealth "github.com/Financial-Times/go-fthealth/v1a"
+	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
 	"github.com/Financial-Times/message-queue-go-producer/producer"
 	"github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/stretchr/testify/assert"
@@ -97,7 +97,7 @@ func TestHealthHappyFlow(t *testing.T) {
 
 	req := httptest.NewRequest("GET", "http://example.com/__health", nil)
 	w := httptest.NewRecorder()
-	endpoint := hc.Health()
+	endpoint := hc.Health("kafka-bridge")
 
 	endpoint(w, req)
 	assert.Equal(t, http.StatusOK, w.Code, "HealthCheck should return 200")
@@ -114,7 +114,7 @@ func TestHealthBrokenProxyProducer(t *testing.T) {
 
 	req := httptest.NewRequest("GET", "http://example.com/__health", nil)
 	w := httptest.NewRecorder()
-	endpoint := hc.Health()
+	endpoint := hc.Health("kafka-bridge")
 
 	endpoint(w, req)
 	assert.Equal(t, http.StatusOK, w.Code, "HealthCheck should return 200")
@@ -135,7 +135,7 @@ func TestHealthBrokenPlainHTTPProducer(t *testing.T) {
 
 	req := httptest.NewRequest("GET", "http://example.com/__health", nil)
 	w := httptest.NewRecorder()
-	endpoint := hc.Health()
+	endpoint := hc.Health("kafka-bridge")
 
 	endpoint(w, req)
 	assert.Equal(t, http.StatusOK, w.Code, "HealthCheck should return 200")
@@ -156,7 +156,7 @@ func TestHealthBrokenConsumer(t *testing.T) {
 
 	req := httptest.NewRequest("GET", "http://example.com/__health", nil)
 	w := httptest.NewRecorder()
-	endpoint := hc.Health()
+	endpoint := hc.Health("kafka-bridge")
 
 	endpoint(w, req)
 	assert.Equal(t, http.StatusOK, w.Code, "HealthCheck should return 200")

@@ -2,8 +2,9 @@ package main
 
 import (
 	"net/http"
+	"time"
 
-	fthealth "github.com/Financial-Times/go-fthealth/v1a"
+	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
 	"github.com/Financial-Times/message-queue-go-producer/producer"
 	"github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/Financial-Times/service-status-go/gtg"
@@ -24,11 +25,30 @@ func NewHealthCheck(consumerConf *consumer.QueueConfig, p producer.MessageProduc
 	}
 }
 
-func (hc HealthCheck) Health() func(w http.ResponseWriter, r *http.Request) {
-	if hc.producerType == proxy {
-		return fthealth.HandlerParallel("Dependent services healthcheck", "Services: source-kafka-proxy, destination-kafka-proxy", hc.consumeHealthcheck(), hc.proxyForwarderHealthcheck())
+// Health returns a healthcheck handler
+func (hc HealthCheck) Health(serviceName string) func(w http.ResponseWriter, r *http.Request) {
+	description := "Services: source-kafka-proxy, cms-notifier"
+	checks := []fthealth.Check{
+		hc.consumeHealthcheck(), hc.httpForwarderHealthcheck(),
 	}
-	return fthealth.HandlerParallel("Dependent services healthcheck", "Services: source-kafka-proxy, cms-notifier", hc.consumeHealthcheck(), hc.httpForwarderHealthcheck())
+
+	if hc.producerType == proxy {
+		description = "Services: source-kafka-proxy, destination-kafka-proxy"
+		checks = []fthealth.Check{hc.consumeHealthcheck(), hc.proxyForwarderHealthcheck()}
+
+	}
+
+	healthCheck := fthealth.TimedHealthCheck{
+		HealthCheck: fthealth.HealthCheck{
+			SystemCode:  serviceName,
+			Name:        "Dependent services healthcheck",
+			Description: description,
+			Checks:      checks,
+		},
+		Timeout: 10 * time.Second,
+	}
+
+	return fthealth.Handler(healthCheck)
 }
 
 func (hc HealthCheck) consumeHealthcheck() fthealth.Check {

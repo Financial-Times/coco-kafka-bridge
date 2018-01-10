@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"fmt"
+
 	"github.com/Financial-Times/go-logger"
 	"github.com/Financial-Times/message-queue-go-producer/producer"
 	"github.com/Financial-Times/message-queue-gonsumer/consumer"
@@ -21,6 +22,7 @@ type BridgeApp struct {
 	producerInstance producer.MessageProducer
 	producerType     string
 	httpClient       *http.Client
+	serviceName      string
 }
 
 const (
@@ -28,7 +30,7 @@ const (
 	proxy     = "proxy"
 )
 
-func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerAddress string, producerVulcanAuth string, producerType string) *BridgeApp {
+func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerAddress string, producerVulcanAuth string, producerType string, serviceName string) *BridgeApp {
 	consumerConfig := consumer.QueueConfig{}
 	consumerConfig.Addrs = strings.Split(consumerAddrs, ",")
 	consumerConfig.Group = consumerGroupID
@@ -67,12 +69,12 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 		producerInstance: producerInstance,
 		producerType:     producerType,
 		httpClient:       httpClient,
+		serviceName:      serviceName,
 	}
 	return bridgeApp
 }
 
 func initBridgeApp() *BridgeApp {
-
 	consumerAddrs := flag.String("consumer_proxy_addr", "", "Comma separated kafka proxy hosts for message consuming.")
 	consumerGroup := flag.String("consumer_group_id", "", "Kafka qroup id used for message consuming.")
 	consumerOffset := flag.String("consumer_offset", "", "Kafka read offset.")
@@ -92,16 +94,13 @@ func initBridgeApp() *BridgeApp {
 	logger.InitDefaultLogger(*serviceName)
 	logger.Infof(nil, "Starting Kafka Bridge")
 
-	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerAddress, *producerVulcanAuth, *producerType)
+	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerAddress, *producerVulcanAuth, *producerType, *serviceName)
 }
 
-func (bridgeApp *BridgeApp) enableHealthchecksAndGTG() {
-	var gtgHandler func(http.ResponseWriter, *http.Request)
+func (bridgeApp *BridgeApp) enableHealthchecksAndGTG(serviceName string) {
 	hc := NewHealthCheck(bridgeApp.consumerConfig, bridgeApp.producerInstance, bridgeApp.producerType, bridgeApp.httpClient)
-	http.HandleFunc("/__health", hc.Health())
-
-	gtgHandler = httphandlers.NewGoodToGoHandler(hc.GTG)
-	http.HandleFunc(httphandlers.GTGPath, gtgHandler)
+	http.HandleFunc("/__health", hc.Health(serviceName))
+	http.HandleFunc(httphandlers.GTGPath, httphandlers.NewGoodToGoHandler(hc.GTG))
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
@@ -111,6 +110,6 @@ func (bridgeApp *BridgeApp) enableHealthchecksAndGTG() {
 
 func main() {
 	bridgeApp := initBridgeApp()
-	go bridgeApp.enableHealthchecksAndGTG()
+	go bridgeApp.enableHealthchecksAndGTG(bridgeApp.serviceName)
 	bridgeApp.consumeMessages()
 }

@@ -23,6 +23,16 @@ spec:
         app: {{ $bridge.name }}
         visualize: "true" 
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - {{ $bridge.name }}
+            topologyKey: "kubernetes.io/hostname"
       containers: 
       - name: {{ $bridge.name }} 
         image: "{{ $global.Values.image.repository }}:{{ $global.Chart.Version }}"
@@ -74,6 +84,7 @@ spec:
             port: 8080 
           initialDelaySeconds: 10
           periodSeconds: 30 
+          timeoutSeconds: 5
         resources: 
 {{ toYaml $global.Values.resources | indent 12 }}
       volumes:
