@@ -10,7 +10,7 @@ bridges:
   groupIdPrefix: kafka-bridge-pub-staging-us
   topic: PreNativeCmsPublicationEvents
   authSecretName: pub-auth
-  authSecretKey: pub-staging-auth
+  authSecretKey: pub-pre-prod-auth
   type: "proxy"
   replicas: 2
 #CMS metadata
@@ -19,7 +19,7 @@ bridges:
   groupIdPrefix: metadata-kafka-bridge-pub-staging-us
   topic: PreNativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
-  authSecretKey: pub-staging-auth
+  authSecretKey: pub-pre-prod-auth
   type: "proxy"
   replicas: 2
 
@@ -29,7 +29,7 @@ bridges:
   groupIdPrefix: concepts-kafka-bridge-pub-staging-us
   topic: Concept
   authSecretName: pub-auth
-  authSecretKey: pub-staging-auth
+  authSecretKey: pub-pre-prod-auth
   type: "proxy"
   replicas: 1
 
