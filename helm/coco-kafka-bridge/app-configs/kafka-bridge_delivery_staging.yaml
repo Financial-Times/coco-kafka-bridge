@@ -58,10 +58,9 @@ bridges:
 ## END prod bridges
 
 ## Start staging bridges
-# todo point the staging bridges to the k8s staging env, when we provision this env.
 ##CMS
 - name: cms-kafka-bridge-pub-staging-eu
-  sourceKafkaProxyUrl: "https://upp-prod-staging-eu.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
   groupIdPrefix: kafka-bridge-pub-staging-eu
   topic: NativeCmsPublicationEvents
   authSecretName: pub-auth
@@ -69,7 +68,7 @@ bridges:
   type: "plainHTTP"
   replicas: 2
 - name: cms-kafka-bridge-pub-staging-us
-  sourceKafkaProxyUrl: "https://upp-prod-staging-us.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.ft.com"
   groupIdPrefix: kafka-bridge-pub-staging-us
   topic: NativeCmsPublicationEvents
   authSecretName: pub-auth
@@ -78,7 +77,7 @@ bridges:
   replicas: 2
 #CMS metadata
 - name: cms-metadata-kafka-bridge-pub-staging-eu
-  sourceKafkaProxyUrl: "https://upp-prod-staging-eu.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
   topic: NativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
@@ -86,7 +85,7 @@ bridges:
   type: "proxy"
   replicas: 2
 - name: cms-metadata-kafka-bridge-pub-staging-us
-  sourceKafkaProxyUrl: "https://upp-prod-staging-us.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-us
   topic: NativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
@@ -96,7 +95,7 @@ bridges:
 
 # Concepts
 - name: concepts-kafka-bridge-pub-pub-staging-eu
-  sourceKafkaProxyUrl: "https://upp-prod-staging-eu.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
   groupIdPrefix: concepts-kafka-bridge-pub-staging-eu
   topic: Concept
   authSecretName: pub-auth
@@ -104,7 +103,7 @@ bridges:
   type: "proxy"
   replicas: 1
 - name: concepts-kafka-bridge-pub-pub-staging-us
-  sourceKafkaProxyUrl: "https://upp-prod-staging-us.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.ft.com"
   groupIdPrefix: concepts-kafka-bridge-pub-staging-us
   topic: Concept
   authSecretName: pub-auth

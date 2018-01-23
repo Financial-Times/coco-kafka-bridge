@@ -10,4 +10,4 @@ resources:
   requests:
     memory: 200Mi
   limits:
-    memory: 256Mi
+    memory: 300Mi
