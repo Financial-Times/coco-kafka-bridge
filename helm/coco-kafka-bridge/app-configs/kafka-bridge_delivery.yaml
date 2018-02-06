@@ -7,6 +7,7 @@ bridges:
   sourceKafkaProxyUrl: "" # use the pub cluster url
   groupIdPrefix: kafka-bridge-pub
   topic: NativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
   authSecretName: pub-auth
   authSecretKey: pub-k8s-auth
   type: "plainHTTP"

@@ -8,6 +8,7 @@ bridges:
   sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
   groupIdPrefix: kafka-bridge-pub-prod-eu
   topic: PreNativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
   type: "plainHTTP"
@@ -16,6 +17,7 @@ bridges:
   sourceKafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
   groupIdPrefix: kafka-bridge-pub-prod-us
   topic: PreNativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
   type: "plainHTTP"
@@ -25,17 +27,19 @@ bridges:
   sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-prod-eu
   topic: PreNativeCmsMetadataPublicationEvents
+  producer: "http://cms-metadata-notifier:8080/"
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
-  type: "proxy"
+  type: "plainHTTP"
   replicas: 2
 - name: cms-metadata-kafka-bridge-pub-prod-us
   sourceKafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-prod-us
+  producer: "http://cms-metadata-notifier:8080/"
   topic: PreNativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
-  type: "proxy"
+  type: "plainHTTP"
   replicas: 2
 
 # Concepts 
@@ -49,6 +53,7 @@ bridges:
   sourceKafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
   groupIdPrefix: kafka-bridge-pub-staging-eu
   topic: PreNativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
   type: "plainHTTP"
@@ -57,6 +62,7 @@ bridges:
   sourceKafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
   groupIdPrefix: kafka-bridge-pub-staging-us
   topic: PreNativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
   type: "plainHTTP"
@@ -66,17 +72,19 @@ bridges:
   sourceKafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
   topic: PreNativeCmsMetadataPublicationEvents
+  producer: "http://cms-metadata-notifier:8080/"
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
-  type: "proxy"
+  type: "plainHTTP"
   replicas: 2
 - name: cms-metadata-kafka-bridge-pub-staging-us
   sourceKafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-us
   topic: PreNativeCmsMetadataPublicationEvents
+  producer: "http://cms-metadata-notifier:8080/"
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
-  type: "proxy"
+  type: "plainHTTP"
   replicas: 2
 
 # Concepts
