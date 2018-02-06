@@ -48,3 +48,34 @@ bridges:
   type: "proxy"
   replicas: 1
 ## END prod bridges
+
+## Begin COCO prod bridges - TO BE REMOVED BEFORE COCO DECOMM
+#CMS
+- name: cms-kafka-bridge-pub-coco-prod-eu
+  sourceKafkaProxyUrl: "https://pub-prod-uk-up.ft.com"
+  groupIdPrefix: kafka-bridge-coco-pub-prod-eu
+  topic: NativeCmsMetadataPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-coco-prod-auth
+  type: "proxy"
+  replicas: 2
+#CMS metadata
+- name: cms-metadata-kafka-bridge-pub-coco-prod-eu
+  sourceKafkaProxyUrl: "https://pub-prod-uk-up.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-coco-pub-prod-eu
+  topic: NativeCmsMetadataPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-coco-prod-auth
+  type: "proxy"
+  replicas: 2
+
+# Concepts
+- name: concepts-kafka-bridge-pub-pub-coco-prod-eu
+  sourceKafkaProxyUrl: "https://pub-prod-uk-up.ft.com"
+  groupIdPrefix: concept-kafka-bridge-coco-pub-prod-eu
+  topic: Concept
+  authSecretName: pub-auth
+  authSecretKey: pub-coco-prod-auth
+  type: "proxy"
+  replicas: 1
+## END COCO prod bridges - TO BE REMOVED BEFORE COCO DECOMM
