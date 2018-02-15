@@ -8,6 +8,7 @@ bridges:
   sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
   groupIdPrefix: kafka-bridge-pub-prod-eu
   topic: NativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
   type: "plainHTTP"
@@ -16,6 +17,7 @@ bridges:
   sourceKafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
   groupIdPrefix: kafka-bridge-pub-prod-us
   topic: NativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
   type: "plainHTTP"

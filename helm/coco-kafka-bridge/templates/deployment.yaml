@@ -53,7 +53,7 @@ spec:
               key: kafka.proxy.url.with.protocol
 {{- else }}
         - name: PRODUCER_ADDRESS
-          value: "http://cms-notifier:8080"
+          value: "{{ $bridge.producer }}"
         - name: CONSUMER_AUTOCOMMIT_ENABLE
           value: "false"
 {{- end }}
