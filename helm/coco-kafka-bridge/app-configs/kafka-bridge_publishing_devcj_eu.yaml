@@ -1,0 +1,61 @@
+# Default values that will be applied to the prod cluster.
+# In delivery we have bridges only to the pub cluster of the prod env
+
+bridges:
+## Start staging bridges
+- name: cms-kafka-bridge-pub-staging-eu
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
+  groupIdPrefix: kafka-bridge-pub-staging-eu
+  topic: NativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "plainHTTP"
+  replicas: 2
+- name: cms-kafka-bridge-pub-staging-us
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.ft.com"
+  groupIdPrefix: kafka-bridge-pub-staging-us
+  topic: NativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "plainHTTP"
+  replicas: 2
+#CMS metadata
+- name: cms-metadata-kafka-bridge-pub-staging-eu
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
+  topic: NativeCmsMetadataPublicationEvents
+  producer: "http://cms-metadata-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "plainHTTP"
+  replicas: 2
+- name: cms-metadata-kafka-bridge-pub-staging-us
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-staging-us
+  topic: NativeCmsMetadataPublicationEvents
+  producer: "http://cms-metadata-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "plainHTTP"
+  replicas: 2
+
+# Concepts
+- name: concepts-kafka-bridge-pub-pub-staging-eu
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
+  groupIdPrefix: concepts-kafka-bridge-pub-staging-eu
+  topic: Concept
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "proxy"
+  replicas: 1
+- name: concepts-kafka-bridge-pub-pub-staging-us
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.ft.com"
+  groupIdPrefix: concepts-kafka-bridge-pub-staging-us
+  topic: Concept
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "proxy"
+  replicas: 1
+## END staging bridges
