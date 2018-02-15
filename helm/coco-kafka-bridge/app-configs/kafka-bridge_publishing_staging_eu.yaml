@@ -9,18 +9,20 @@ bridges:
   sourceKafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
   groupIdPrefix: kafka-bridge-pub-staging-eu
   topic: PreNativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
   authSecretName: pub-auth
   authSecretKey: pub-pre-prod-auth
-  type: "proxy"
+  type: "plainHTTP"
   replicas: 2
 #CMS metadata
 - name: cms-metadata-kafka-bridge-pub-staging-eu
   sourceKafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
   topic: PreNativeCmsMetadataPublicationEvents
+  producer: "http://cms-metadata-notifier:8080"
   authSecretName: pub-auth
   authSecretKey: pub-pre-prod-auth
-  type: "proxy"
+  type: "plainHTTP"
   replicas: 2
 
 # Concepts
