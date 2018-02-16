@@ -5,7 +5,7 @@ bridges:
 ## Start staging bridges
 - name: cms-kafka-bridge-pub-staging-eu
   sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
-  groupIdPrefix: kafka-bridge-pub-staging-eu
+  groupIdPrefix: kafka-bridge-pub-staging-eu-pub-cj
   topic: NativeCmsPublicationEvents
   producer: "http://cms-notifier:8080"
   authSecretName: pub-auth
@@ -14,7 +14,7 @@ bridges:
   replicas: 2
 - name: cms-kafka-bridge-pub-staging-us
   sourceKafkaProxyUrl: "https://upp-staging-publish-us.ft.com"
-  groupIdPrefix: kafka-bridge-pub-staging-us
+  groupIdPrefix: kafka-bridge-pub-staging-us-pub-cj
   topic: NativeCmsPublicationEvents
   producer: "http://cms-notifier:8080"
   authSecretName: pub-auth
@@ -24,7 +24,7 @@ bridges:
 #CMS metadata
 - name: cms-metadata-kafka-bridge-pub-staging-eu
   sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
-  groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
+  groupIdPrefix: metadata-kafka-bridge-pub-staging-eu-pub-cj
   topic: NativeCmsMetadataPublicationEvents
   producer: "http://cms-metadata-notifier:8080"
   authSecretName: pub-auth
@@ -33,7 +33,7 @@ bridges:
   replicas: 2
 - name: cms-metadata-kafka-bridge-pub-staging-us
   sourceKafkaProxyUrl: "https://upp-staging-publish-us.ft.com"
-  groupIdPrefix: metadata-kafka-bridge-pub-staging-us
+  groupIdPrefix: metadata-kafka-bridge-pub-staging-us-pub-cj
   topic: NativeCmsMetadataPublicationEvents
   producer: "http://cms-metadata-notifier:8080"
   authSecretName: pub-auth
@@ -44,7 +44,7 @@ bridges:
 # Concepts
 - name: concepts-kafka-bridge-pub-pub-staging-eu
   sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
-  groupIdPrefix: concepts-kafka-bridge-pub-staging-eu
+  groupIdPrefix: concepts-kafka-bridge-pub-staging-eu-pub-cj
   topic: Concept
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
@@ -52,10 +52,66 @@ bridges:
   replicas: 1
 - name: concepts-kafka-bridge-pub-pub-staging-us
   sourceKafkaProxyUrl: "https://upp-staging-publish-us.ft.com"
-  groupIdPrefix: concepts-kafka-bridge-pub-staging-us
+  groupIdPrefix: concepts-kafka-bridge-pub-staging-us-pub-cj
   topic: Concept
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
   type: "proxy"
   replicas: 1
 ## END staging bridges
+## Begin prod bridges
+#CMS
+- name: cms-kafka-bridge-pub-prod-eu
+  sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
+  groupIdPrefix: kafka-bridge-pub-prod-eu-pub-cj
+  topic: NativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "plainHTTP"
+  replicas: 2
+- name: cms-kafka-bridge-pub-prod-us
+  sourceKafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
+  groupIdPrefix: kafka-bridge-pub-prod-us-pub-cj
+  topic: NativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "plainHTTP"
+  replicas: 2
+#CMS metadata
+- name: cms-metadata-kafka-bridge-pub-prod-eu
+  sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-prod-eu-pub-cj
+  topic: NativeCmsMetadataPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "proxy"
+  replicas: 2
+- name: cms-metadata-kafka-bridge-pub-prod-us
+  sourceKafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-prod-us-pub-cj
+  topic: NativeCmsMetadataPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "proxy"
+  replicas: 2
+
+# Concepts
+- name: concepts-kafka-bridge-pub-pub-prod-eu
+  sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
+  groupIdPrefix: concepts-kafka-bridge-pub-prod-eu-pub-cj
+  topic: Concept
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "proxy"
+  replicas: 1
+- name: concepts-kafka-bridge-pub-pub-prod-us
+  sourceKafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
+  groupIdPrefix: concepts-kafka-bridge-pub-prod-us-pub-cj
+  topic: Concept
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "proxy"
+  replicas: 1
+## END prod bridges
