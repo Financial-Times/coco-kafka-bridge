@@ -56,7 +56,8 @@ bridges:
 - name: cms-kafka-bridge-pub-coco-prod-uk
   sourceKafkaProxyUrl: "https://pub-prod-uk-up.ft.com"
   groupIdPrefix: kafka-bridge-coco-pub-prod-uk
-  topic: NativeCmsMetadataPublicationEvents
+  topic: NativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
   authSecretName: pub-auth
   authSecretKey: pub-coco-prod-auth
   type: "plainHTTP"
@@ -64,7 +65,8 @@ bridges:
 - name: cms-kafka-bridge-pub-coco-prod-us
   sourceKafkaProxyUrl: "https://pub-prod-us-up.ft.com"
   groupIdPrefix: kafka-bridge-coco-pub-prod-us
-  topic: NativeCmsMetadataPublicationEvents
+  topic: NativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
   authSecretName: pub-auth
   authSecretKey: pub-coco-prod-auth
   type: "plainHTTP"
