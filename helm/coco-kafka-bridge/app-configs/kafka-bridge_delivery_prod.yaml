@@ -57,6 +57,7 @@ bridges:
   sourceKafkaProxyUrl: "https://pub-prod-uk-up.ft.com"
   groupIdPrefix: kafka-bridge-coco-pub-prod-uk
   topic: NativeCmsMetadataPublicationEvents
+  producer: "http://cms-notifier:8080"
   authSecretName: pub-auth
   authSecretKey: pub-coco-prod-auth
   type: "plainHTTP"
@@ -65,6 +66,7 @@ bridges:
   sourceKafkaProxyUrl: "https://pub-prod-us-up.ft.com"
   groupIdPrefix: kafka-bridge-coco-pub-prod-us
   topic: NativeCmsMetadataPublicationEvents
+  producer: "http://cms-notifier:8080"
   authSecretName: pub-auth
   authSecretKey: pub-coco-prod-auth
   type: "plainHTTP"
