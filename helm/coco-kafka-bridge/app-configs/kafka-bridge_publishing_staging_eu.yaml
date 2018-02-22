@@ -5,9 +5,9 @@ bridges:
 ## Start staging bridges
 # todo remove all bridges once we are 100% live and methode publishes directly to this staging. 
 ##CMS
-- name: cms-kafka-bridge-pub-staging-eu
+- name: cms-kafka-bridge-pub-prod-eu
   sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.cm"
-  groupIdPrefix: kafka-bridge-pub-staging-eu
+  groupIdPrefix: kafka-bridge-pub-prod-eu
   topic: PreNativeCmsPublicationEvents
   producer: "http://cms-notifier:8080"
   authSecretName: pub-auth
@@ -15,9 +15,9 @@ bridges:
   type: "plainHTTP"
   replicas: 2
 #CMS metadata
-- name: cms-metadata-kafka-bridge-pub-staging-eu
+- name: cms-metadata-kafka-bridge-pub-prod-eu
   sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.cm"
-  groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
+  groupIdPrefix: metadata-kafka-bridge-pub-prod-eu
   topic: PreNativeCmsMetadataPublicationEvents
   producer: "http://cms-metadata-notifier:8080"
   authSecretName: pub-auth
@@ -26,9 +26,9 @@ bridges:
   replicas: 2
 
 # Concepts
-- name: concepts-kafka-bridge-pub-pub-staging-eu
+- name: concepts-kafka-bridge-pub-pub-prod-eu
   sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.cm"
-  groupIdPrefix: concepts-kafka-bridge-pub-staging-eu
+  groupIdPrefix: concepts-kafka-bridge-pub-prod-eu
   topic: Concept
   authSecretName: pub-auth
   authSecretKey: pub-pre-prod-auth
