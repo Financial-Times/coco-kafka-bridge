@@ -47,7 +47,6 @@ bridges:
 ## END prod bridges
 
 ## Start staging bridges
-# todo point the staging bridges to the k8s staging env, when we provision this env.
 ##CMS
 - name: cms-kafka-bridge-pub-staging-eu
   sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
