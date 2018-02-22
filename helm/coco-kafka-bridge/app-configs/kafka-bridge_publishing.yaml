@@ -50,7 +50,7 @@ bridges:
 # todo point the staging bridges to the k8s staging env, when we provision this env.
 ##CMS
 - name: cms-kafka-bridge-pub-staging-eu
-  sourceKafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
   groupIdPrefix: kafka-bridge-pub-staging-eu
   topic: PreNativeCmsPublicationEvents
   producer: "http://cms-notifier:8080"
@@ -59,7 +59,7 @@ bridges:
   type: "plainHTTP"
   replicas: 2
 - name: cms-kafka-bridge-pub-staging-us
-  sourceKafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.ft.com"
   groupIdPrefix: kafka-bridge-pub-staging-us
   topic: PreNativeCmsPublicationEvents
   producer: "http://cms-notifier:8080"
@@ -69,7 +69,7 @@ bridges:
   replicas: 2
 #CMS metadata
 - name: cms-metadata-kafka-bridge-pub-staging-eu
-  sourceKafkaProxyUrl: "https://pub-pre-prod-uk-up.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
   topic: PreNativeCmsMetadataPublicationEvents
   producer: "http://cms-metadata-notifier:8080"
@@ -78,7 +78,7 @@ bridges:
   type: "plainHTTP"
   replicas: 2
 - name: cms-metadata-kafka-bridge-pub-staging-us
-  sourceKafkaProxyUrl: "https://pub-pre-prod-us-up.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-us
   topic: PreNativeCmsMetadataPublicationEvents
   producer: "http://cms-metadata-notifier:8080"
