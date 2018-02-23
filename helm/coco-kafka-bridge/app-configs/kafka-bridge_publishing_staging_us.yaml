@@ -11,7 +11,7 @@ bridges:
   topic: PreNativeCmsPublicationEvents
   producer: "http://cms-notifier:8080"
   authSecretName: pub-auth
-  authSecretKey: pub-pre-prod-auth
+  authSecretKey: pub-prod-auth
   type: "plainHTTP"
   replicas: 2
 #CMS metadata
@@ -21,7 +21,7 @@ bridges:
   topic: PreNativeCmsMetadataPublicationEvents
   producer: "http://cms-metadata-notifier:8080"
   authSecretName: pub-auth
-  authSecretKey: pub-pre-prod-auth
+  authSecretKey: pub-prod-auth
   type: "plainHTTP"
   replicas: 2
 
@@ -31,7 +31,7 @@ bridges:
   groupIdPrefix: concepts-kafka-bridge-pub-prod-us
   topic: Concept
   authSecretName: pub-auth
-  authSecretKey: pub-pre-prod-auth
+  authSecretKey: pub-prod-auth
   type: "proxy"
   replicas: 1
 
