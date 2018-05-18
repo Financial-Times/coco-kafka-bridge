@@ -41,6 +41,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "authorizationkey",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
+				"Content-Type":      "application/json",
 			},
 		},
 		{ //authorization missing
@@ -63,6 +64,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
+				"Content-Type":      "application/json",
 			},
 		},
 		{ //host header (queue) is missing
@@ -85,6 +87,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
+				"Content-Type":      "application/json",
 			},
 		},
 		{ //origin system id is missing
@@ -106,6 +109,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
+				"Content-Type":      "application/json",
 			},
 		},
 		{ // origin system id is invalid (but the bridge shouldn't care)
@@ -129,6 +133,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "authorizationkey",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
+				"Content-Type":      "application/json",
 			},
 		},
 		{ //Message-Timestamp is missing
@@ -150,6 +155,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "",
+				"Content-Type":      "application/json",
 			},
 		},
 		{ //native-hash forward
@@ -175,6 +181,7 @@ func TestSendMessage(t *testing.T) {
 				"Authorization":      "authorizationkey",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
 				"X-Native-Hash":      "27f79e6d884acdd642d1758c4fd30d43074f8384d552d1ebb1959345",
+				"Content-Type":      "application/json",
 			},
 		},
 	}
