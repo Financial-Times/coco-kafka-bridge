@@ -1,7 +1,6 @@
-FROM golang:1.7-alpine3.5
+FROM golang:1.10-alpine
 
-ADD *.go /kafka-bridge/
-ADD vendor /kafka-bridge/vendor
+COPY . /kafka-bridge/
 
 RUN apk update \
   && apk add git bzr curl \
