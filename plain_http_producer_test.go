@@ -44,6 +44,28 @@ func TestSendMessage(t *testing.T) {
 				"Content-Type":      "application/json",
 			},
 		},
+		{ //missing content-type
+			queueProducer.MessageProducerConfig{
+				Addr:          "address",
+				Authorization: "authorizationkey",
+			},
+			"",
+			queueProducer.Message{
+				Headers: map[string]string{
+					"Message-Id":        "fc429b46-2500-4fe7-88bb-fd507fbaf00c",
+					"Message-Timestamp": "2015-07-06T07:03:09.362Z",
+					"Message-Type":      "cms-content-published",
+					"Origin-System-Id":  "http://cmdb.ft.com/systems/methode-web-pub",
+					"X-Request-Id":      "t9happe59y",
+				},
+				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
+			map[string]string{
+				"X-Origin-System-Id": "http://cmdb.ft.com/systems/methode-web-pub",
+				"X-Request-Id":       "t9happe59y",
+				"Authorization":      "authorizationkey",
+				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
+			},
+		},
 		{ //authorization missing
 			queueProducer.MessageProducerConfig{
 				Addr: "address",
