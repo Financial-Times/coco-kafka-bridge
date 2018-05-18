@@ -22,8 +22,8 @@ jobs:
             mkdir -p ${CIRCLE_TEST_REPORTS}
             mkdir -p ${CIRCLE_COVERAGE_REPORT}
       - run:
-          name: Govendor Sync
-          command: govendor sync -v
+          name: Download vendored dependancies
+          command: dep ensure -v -vendor-only
       - run:
           name: Go Build
           command: go build -v
