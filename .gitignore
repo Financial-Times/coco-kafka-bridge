@@ -3,4 +3,4 @@
 coco-kafka-bridge.exe
 /coco-kafka-bridge
 /.project
-vendor/*/
+vendor/*

@@ -65,6 +65,11 @@ func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProduce
 		req.Header.Add("X-Native-Hash", nativeHash)
 	}
 
+	contentType, found := message.Headers["Content-Type"]
+	if found {
+		req.Header.Add("Content-Type", contentType)
+	}
+
 	resp, err := c.client.Do(req)
 	if err != nil {
 		errMsg := fmt.Sprintf("Error executing POST request to the ELB: %v", err.Error())

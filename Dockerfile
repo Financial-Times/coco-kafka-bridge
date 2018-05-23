@@ -1,16 +1,15 @@
-FROM golang:1.7-alpine3.5
+FROM golang:1.10-alpine
 
-ADD *.go /kafka-bridge/
-ADD vendor /kafka-bridge/vendor
+COPY . /kafka-bridge/
 
 RUN apk update \
-  && apk add git bzr \
+  && apk add git bzr curl \
   && REPO_PATH="github.com/Financial-Times/coco-kafka-bridge" \
   && mkdir -p $GOPATH/src/${REPO_PATH} \
   && mv /kafka-bridge/* $GOPATH/src/${REPO_PATH} \
   && cd $GOPATH/src/${REPO_PATH} \
-  && go get -u github.com/kardianos/govendor \
-  && $GOPATH/bin/govendor sync \
+  && curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh \
+  && $GOPATH/bin/dep ensure -vendor-only \
   && go build \
   && mv coco-kafka-bridge /coco-kafka-bridge \
   && apk del go git bzr libc-dev \
