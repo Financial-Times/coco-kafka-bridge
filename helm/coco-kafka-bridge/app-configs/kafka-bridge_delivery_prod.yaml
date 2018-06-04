@@ -39,14 +39,4 @@ bridges:
   authSecretKey: pub-prod-auth
   type: "proxy"
   replicas: 2
-
-# Concepts
-- name: concepts-kafka-bridge-pub-prod
-  sourceKafkaProxyUrl: "https://upp-prod-publish.ft.com"
-  groupIdPrefix: concepts-kafka-bridge-pub-prod
-  topic: Concept
-  authSecretName: pub-auth
-  authSecretKey: pub-prod-auth
-  type: "proxy"
-  replicas: 1
 ## END prod bridges

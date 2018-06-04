@@ -40,22 +40,4 @@ bridges:
   type: "proxy"
   replicas: 2
 
-# Concepts
-- name: concepts-kafka-bridge-pub-pub-staging-eu
-  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
-  groupIdPrefix: concepts-kafka-bridge-pub-staging-eu
-  topic: Concept
-  authSecretName: pub-auth
-  authSecretKey: pub-staging-auth
-  type: "proxy"
-  replicas: 1
-- name: concepts-kafka-bridge-pub-pub-staging-us
-  sourceKafkaProxyUrl: "https://upp-staging-publish-us.ft.com"
-  groupIdPrefix: concepts-kafka-bridge-pub-staging-us
-  topic: Concept
-  authSecretName: pub-auth
-  authSecretKey: pub-staging-auth
-  type: "proxy"
-  replicas: 1
-
 ## END staging bridges
