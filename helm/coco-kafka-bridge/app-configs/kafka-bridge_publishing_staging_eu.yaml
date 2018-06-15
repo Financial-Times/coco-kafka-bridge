@@ -3,7 +3,7 @@
 
 bridges:
 ## Start staging bridges
-# todo remove all bridges once we are 100% live and methode publishes directly to this staging. 
+# todo remove all bridges once we are 100% live and methode publishes directly to this staging.
 ##CMS
 - name: cms-kafka-bridge-pub-prod-eu
   sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
@@ -24,15 +24,4 @@ bridges:
   authSecretKey: pub-prod-auth
   type: "plainHTTP"
   replicas: 2
-
-# Concepts
-- name: concepts-kafka-bridge-pub-pub-prod-eu
-  sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
-  groupIdPrefix: concepts-kafka-bridge-pub-prod-eu
-  topic: Concept
-  authSecretName: pub-auth
-  authSecretKey: pub-prod-auth
-  type: "proxy"
-  replicas: 1
-
 ## END staging bridges

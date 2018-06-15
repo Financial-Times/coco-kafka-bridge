@@ -21,13 +21,3 @@ bridges:
   authSecretKey: pub-k8s-auth
   type: "proxy"
   replicas: 2
-# Concepts bridge to pub cluster
-- name: concepts-kafka-bridge-pub
-  sourceKafkaProxyUrl: "" # use the pub cluster url
-  groupIdPrefix: concepts-kafka-bridge-pub
-  topic: Concept
-  authSecretName: pub-auth
-  authSecretKey: pub-k8s-auth
-  type: "proxy"
-  replicas: 1
-

@@ -42,7 +42,7 @@ bridges:
   type: "plainHTTP"
   replicas: 2
 
-# Concepts 
+# Concepts
 # No concept bridges
 ## END prod bridges
 

@@ -22,13 +22,4 @@ bridges:
   authSecretKey: pub-dev-cj-auth
   type: "proxy"
   replicas: 2
-# Concepts
-- name: concepts-kafka-bridge-pub-dev-cj-eu
-  sourceKafkaProxyUrl: "https://upp-dev-cj-publish-eu.ft.com"
-  groupIdPrefix: concepts-kafka-bridge-pub-dev-cj-eu
-  topic: Concept
-  authSecretName: pub-auth
-  authSecretKey: pub-dev-cj-auth
-  type: "proxy"
-  replicas: 1
 ## END pub-cj bridges
