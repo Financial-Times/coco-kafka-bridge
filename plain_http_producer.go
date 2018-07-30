@@ -65,6 +65,12 @@ func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProduce
 		req.Header.Add("X-Native-Hash", nativeHash)
 	}
 
+	for k, v := range message.Headers {
+		if strings.HasPrefix(strings.ToUpper(k), "UPP-") {
+			req.Header.Add(k, v)
+		}
+	}
+
 	contentType, found := message.Headers["Content-Type"]
 	if found {
 		req.Header.Add("Content-Type", contentType)
