@@ -34,6 +34,8 @@ func TestSendMessage(t *testing.T) {
 					"Origin-System-Id":  "http://cmdb.ft.com/systems/methode-web-pub",
 					"Content-Type":      "application/json",
 					"X-Request-Id":      "t9happe59y",
+					"UPP-foo":           "bar",
+					"foo":               "baz",
 				},
 				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
 			map[string]string{
@@ -41,7 +43,9 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "authorizationkey",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
+				"UPP-foo":            "bar",
+				"foo":                "", // the zero-value of string
 			},
 		},
 		{ //missing content-type
@@ -86,7 +90,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ //host header (queue) is missing
@@ -109,7 +113,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ //origin system id is missing
@@ -131,7 +135,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ // origin system id is invalid (but the bridge shouldn't care)
@@ -155,7 +159,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "authorizationkey",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ //Message-Timestamp is missing
@@ -177,7 +181,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ //native-hash forward
@@ -203,7 +207,7 @@ func TestSendMessage(t *testing.T) {
 				"Authorization":      "authorizationkey",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
 				"X-Native-Hash":      "27f79e6d884acdd642d1758c4fd30d43074f8384d552d1ebb1959345",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 	}
