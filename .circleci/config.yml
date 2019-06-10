@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: /go/src/github.com/Financial-Times/coco-kafka-bridge
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.12
         environment:
           GOPATH: /go
           CIRCLE_TEST_REPORTS: /tmp/test-results
