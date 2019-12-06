@@ -5,7 +5,7 @@ bridges:
 ## Start staging bridges
 ##CMS
 - name: cms-kafka-bridge-pub-staging-eu
-  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com"
   groupIdPrefix: kafka-bridge-pub-staging-eu
   topic: NativeCmsPublicationEvents
   producer: "http://cms-notifier:8080"
@@ -24,7 +24,7 @@ bridges:
   replicas: 2
 #CMS metadata
 - name: cms-metadata-kafka-bridge-pub-staging-eu
-  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
   topic: NativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
