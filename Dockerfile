@@ -1,27 +1,28 @@
-FROM golang:1.10-alpine
+FROM golang:1
 
-COPY . /kafka-bridge/
+ENV PROJECT=kafka-bridge
 
-RUN apk update \
-  && apk add git bzr curl \
-  && REPO_PATH="github.com/Financial-Times/coco-kafka-bridge" \
-  && mkdir -p $GOPATH/src/${REPO_PATH} \
-  && mv /kafka-bridge/* $GOPATH/src/${REPO_PATH} \
-  && cd $GOPATH/src/${REPO_PATH} \
-  && curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh \
-  && $GOPATH/bin/dep ensure -vendor-only \
-  && go build \
-  && mv coco-kafka-bridge /coco-kafka-bridge \
-  && apk del go git bzr libc-dev \
-  && rm -rf $GOPATH /var/cache/apk/* /kafka-bridge
+COPY . /${PROJECT}/
+WORKDIR /${PROJECT}
 
-CMD exec /coco-kafka-bridge -consumer_proxy_addr=$QUEUE_PROXY_ADDRS \
-                            -consumer_group_id=$GROUP_ID \
-                            -consumer_offset=largest \
-                            -consumer_autocommit_enable=$CONSUMER_AUTOCOMMIT_ENABLE \
-                            -consumer_authorization_key="$AUTHORIZATION_KEY" \
-                            -topic=$TOPIC \
-                            -producer_address=$PRODUCER_ADDRESS \
-                            -producer_vulcan_auth="$PRODUCER_VULCAN_AUTH" \
-                            -producer_type=$PRODUCER_TYPE \
-                            -service_name=$SERVICE_NAME
+RUN LDFLAGS="-s -w" \
+  && CGO_ENABLED=0 go build -mod=readonly -a -o /artifacts/${PROJECT} -ldflags="${LDFLAGS}" \
+  && echo "Build flags: ${LDFLAGS}"
+
+
+# Multi-stage build - copy certs and the binary into the image
+FROM scratch
+WORKDIR /
+COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=0 /artifacts/* /
+
+CMD /kafka-bridge -consumer_proxy_addr=$QUEUE_PROXY_ADDRS \
+                  -consumer_group_id=$GROUP_ID \
+                  -consumer_offset=largest \
+                  -consumer_autocommit_enable=$CONSUMER_AUTOCOMMIT_ENABLE \
+                  -consumer_authorization_key="$AUTHORIZATION_KEY" \
+                  -topic=$TOPIC \
+                  -producer_address=$PRODUCER_ADDRESS \
+                  -producer_vulcan_auth="$PRODUCER_VULCAN_AUTH" \
+                  -producer_type=$PRODUCER_TYPE \
+                  -service_name=$SERVICE_NAME

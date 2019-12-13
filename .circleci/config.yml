@@ -1,9 +1,9 @@
 version: 2
 jobs:
   build:
-    working_directory: /go/src/github.com/Financial-Times/coco-kafka-bridge
+    working_directory: /kafka-bridge
     docker:
-      - image: circleci/golang:1.10
+      - image: golang:1
         environment:
           GOPATH: /go
           CIRCLE_TEST_REPORTS: /tmp/test-results
@@ -13,33 +13,34 @@ jobs:
       - run:
           name: External Dependencies
           command: |
-            go get -u github.com/mattn/goveralls
-            go get -u github.com/jstemmer/go-junit-report
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            GO111MODULE=off go get github.com/mattn/goveralls
+            GO111MODULE=off go get github.com/jstemmer/go-junit-report
+            curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.18.0
+            wget https://raw.githubusercontent.com/Financial-Times/upp-coding-standard/v1.0.0/golangci-config/.golangci.yml
       - run:
-          name: Test Results
+          name: Create result folders
           command: |
             mkdir -p ${CIRCLE_TEST_REPORTS}
             mkdir -p ${CIRCLE_COVERAGE_REPORT}
       - run:
-          name: Download vendored dependancies
-          command: dep ensure -v -vendor-only
-      - run:
           name: Go Build
-          command: go build -v
+          command: go build -mod=readonly -v
+      - run:
+          name: Run linters
+          command: golangci-lint run --new-from-rev=master --config .golangci.yml
       - run:
           name: Run Tests
           command: |
-            go test -race -cover -coverprofile=$CIRCLE_COVERAGE_REPORT/coverage.out ./... | go-junit-report > $CIRCLE_TEST_REPORTS/junit.xml
+            go test -mod=readonly -race -cover -coverprofile=${CIRCLE_COVERAGE_REPORT}/coverage.out ./... | go-junit-report > ${CIRCLE_TEST_REPORTS}/junit.xml
       - run:
           name: Upload Coverage
-          command: /go/bin/goveralls -coverprofile=${CIRCLE_COVERAGE_REPORT}/coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
+          command: goveralls -coverprofile=${CIRCLE_COVERAGE_REPORT}/coverage.out -service=circle-ci -repotoken=${COVERALLS_TOKEN}
       - store_test_results:
           path: /tmp/test-results
   dockerfile:
-    working_directory: /coco-kafka-bridge
+    working_directory: /kafka-bridge
     docker:
-      - image: docker:18.03
+      - image: docker
     steps:
       - checkout
       - setup_docker_engine
