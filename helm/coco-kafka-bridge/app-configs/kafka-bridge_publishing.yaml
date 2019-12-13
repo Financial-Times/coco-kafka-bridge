@@ -14,7 +14,7 @@ bridges:
   type: "plainHTTP"
   replicas: 2
 - name: cms-kafka-bridge-pub-prod-us
-  sourceKafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
+  sourceKafkaProxyUrl: "https://upp-prod-publish-us.upp.ft.com"
   groupIdPrefix: kafka-bridge-pub-prod-us
   topic: PreNativeCmsPublicationEvents
   producer: "http://cms-notifier:8080"
@@ -33,7 +33,7 @@ bridges:
   type: "plainHTTP"
   replicas: 2
 - name: cms-metadata-kafka-bridge-pub-prod-us
-  sourceKafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
+  sourceKafkaProxyUrl: "https://upp-prod-publish-us.upp.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-prod-us
   producer: "http://cms-metadata-notifier:8080"
   topic: PreNativeCmsMetadataPublicationEvents
