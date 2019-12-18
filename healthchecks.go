@@ -5,8 +5,9 @@ import (
 	"time"
 
 	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
+	log "github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/message-queue-go-producer/producer"
-	"github.com/Financial-Times/message-queue-gonsumer/consumer"
+	consumer "github.com/Financial-Times/message-queue-gonsumer"
 	"github.com/Financial-Times/service-status-go/gtg"
 )
 
@@ -16,8 +17,8 @@ type HealthCheck struct {
 	producerType string
 }
 
-func NewHealthCheck(consumerConf *consumer.QueueConfig, p producer.MessageProducer, producerType string, client *http.Client) *HealthCheck {
-	c := consumer.NewConsumer(*consumerConf, func(m consumer.Message) {}, client)
+func NewHealthCheck(consumerConf *consumer.QueueConfig, p producer.MessageProducer, producerType string, client *http.Client, logger *log.UPPLogger) *HealthCheck {
+	c := consumer.NewConsumer(*consumerConf, func(m consumer.Message) {}, client, logger)
 	return &HealthCheck{
 		consumer:     c,
 		producer:     p,

@@ -2,16 +2,15 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"net"
 	"net/http"
 	"strings"
 	"time"
 
-	"fmt"
-
-	"github.com/Financial-Times/go-logger"
+	log "github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/message-queue-go-producer/producer"
-	"github.com/Financial-Times/message-queue-gonsumer/consumer"
+	consumer "github.com/Financial-Times/message-queue-gonsumer"
 	"github.com/Financial-Times/service-status-go/httphandlers"
 )
 
@@ -23,6 +22,7 @@ type BridgeApp struct {
 	producerType     string
 	httpClient       *http.Client
 	serviceName      string
+	logger           *log.UPPLogger
 }
 
 const (
@@ -30,7 +30,7 @@ const (
 	proxy     = "proxy"
 )
 
-func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerAddress string, producerVulcanAuth string, producerType string, serviceName string) *BridgeApp {
+func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerAddress string, producerVulcanAuth string, producerType string, serviceName string, logger *log.UPPLogger) *BridgeApp {
 	consumerConfig := consumer.QueueConfig{}
 	consumerConfig.Addrs = strings.Split(consumerAddrs, ",")
 	consumerConfig.Group = consumerGroupID
@@ -49,9 +49,9 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 	case proxy:
 		producerInstance = producer.NewMessageProducer(producerConfig)
 	case plainHTTP:
-		producerInstance = newPlainHTTPMessageProducer(producerConfig)
+		producerInstance = newPlainHTTPMessageProducer(producerConfig, logger)
 	default:
-		logger.Fatalf(nil, fmt.Errorf("Unknown producer type %s", producerType), "The provided producer type '%v' is invalid", producerType)
+		logger.WithError(fmt.Errorf("unknown producer type %s", producerType)).Fatalf("The provided producer type '%v' is invalid", producerType)
 	}
 
 	httpClient := &http.Client{
@@ -63,15 +63,16 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 			}).Dial,
 		}}
 
-	bridgeApp := &BridgeApp{
+	app := &BridgeApp{
 		consumerConfig:   &consumerConfig,
 		producerConfig:   &producerConfig,
 		producerInstance: producerInstance,
 		producerType:     producerType,
 		httpClient:       httpClient,
 		serviceName:      serviceName,
+		logger:           logger,
 	}
-	return bridgeApp
+	return app
 }
 
 func initBridgeApp() *BridgeApp {
@@ -91,25 +92,26 @@ func initBridgeApp() *BridgeApp {
 
 	flag.Parse()
 
-	logger.InitDefaultLogger(*serviceName)
-	logger.Infof(nil, "Starting Kafka Bridge")
+	logConf := log.KeyNamesConfig{KeyTime: "@time"}
+	logger := log.NewUPPLogger(*serviceName, "INFO", logConf)
+	logger.Info("Starting Kafka Bridge")
 
-	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerAddress, *producerVulcanAuth, *producerType, *serviceName)
+	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerAddress, *producerVulcanAuth, *producerType, *serviceName, logger)
 }
 
-func (bridgeApp *BridgeApp) enableHealthchecksAndGTG(serviceName string) {
-	hc := NewHealthCheck(bridgeApp.consumerConfig, bridgeApp.producerInstance, bridgeApp.producerType, bridgeApp.httpClient)
+func (app *BridgeApp) enableHealthchecksAndGTG(serviceName string) {
+	hc := NewHealthCheck(app.consumerConfig, app.producerInstance, app.producerType, app.httpClient, app.logger)
 	http.HandleFunc("/__health", hc.Health(serviceName))
 	http.HandleFunc(httphandlers.GTGPath, httphandlers.NewGoodToGoHandler(hc.GTG))
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
-		logger.Errorf(nil, err, "Couldn't set up HTTP listener for healthcheck")
+		app.logger.WithError(err).Error("Couldn't set up HTTP listener for healthcheck")
 	}
 }
 
 func main() {
-	bridgeApp := initBridgeApp()
-	go bridgeApp.enableHealthchecksAndGTG(bridgeApp.serviceName)
-	bridgeApp.consumeMessages()
+	app := initBridgeApp()
+	go app.enableHealthchecksAndGTG(app.serviceName)
+	app.consumeMessages()
 }
