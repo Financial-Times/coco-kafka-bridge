@@ -1,10 +1,11 @@
 package main
 
 import (
-	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"regexp"
 	"strings"
 	"testing"
+
+	queueConsumer "github.com/Financial-Times/message-queue-gonsumer"
 )
 
 func TestExtractTID(t *testing.T) {

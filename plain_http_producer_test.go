@@ -7,13 +7,12 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/Financial-Times/go-logger"
+	log "github.com/Financial-Times/go-logger/v2"
 	queueProducer "github.com/Financial-Times/message-queue-go-producer/producer"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSendMessage(t *testing.T) {
-	logger.InitDefaultLogger("kafka-bridge")
 	var tests = []struct {
 		config          queueProducer.MessageProducerConfig
 		uuid            string
@@ -41,7 +40,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "authorizationkey",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ //missing content-type
@@ -86,7 +85,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ //host header (queue) is missing
@@ -109,7 +108,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ //origin system id is missing
@@ -131,7 +130,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ // origin system id is invalid (but the bridge shouldn't care)
@@ -155,7 +154,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "authorizationkey",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ //Message-Timestamp is missing
@@ -177,7 +176,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ //native-hash forward
@@ -203,15 +202,16 @@ func TestSendMessage(t *testing.T) {
 				"Authorization":      "authorizationkey",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
 				"X-Native-Hash":      "27f79e6d884acdd642d1758c4fd30d43074f8384d552d1ebb1959345",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 	}
 
+	logger := log.NewUPPLogger("Test", "FATAL")
 	for _, test := range tests {
 		cmsNotifierTest := &plainHTTPMessageProducer{
-			test.config,
-			&dummyHttpClient{
+			config: test.config,
+			client: &dummyHttpClient{
 				assert:  assert.New(t),
 				address: test.config.Addr,
 				headers: test.expectedHeaders,
@@ -220,6 +220,7 @@ func TestSendMessage(t *testing.T) {
 					Body:       ioutil.NopCloser(bytes.NewBuffer([]byte{})),
 				},
 			},
+			logger: logger,
 		}
 		err := cmsNotifierTest.SendMessage(test.uuid, test.message)
 		if err != nil {
