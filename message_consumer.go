@@ -9,14 +9,14 @@ import (
 	"syscall"
 	"time"
 
-	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
+	queueConsumer "github.com/Financial-Times/message-queue-gonsumer"
 )
 
-func (bridge BridgeApp) consumeMessages() {
-	consumerConfig := bridge.consumerConfig
+func (app BridgeApp) consumeMessages() {
+	consumerConfig := app.consumerConfig
 
-	consumer := queueConsumer.NewAgeingConsumer(*consumerConfig, bridge.forwardMsg, queueConsumer.AgeingClient{
-		Client: &http.Client{
+	cl, _ := queueConsumer.NewAgeingClient(
+		&http.Client{
 			Timeout: 60 * time.Second,
 			Transport: &http.Transport{
 				MaxIdleConnsPerHost: 100,
@@ -25,8 +25,9 @@ func (bridge BridgeApp) consumeMessages() {
 				}).Dial,
 			},
 		},
-		MaxAge: time.Duration(2) * time.Minute,
-	})
+		time.Duration(2)*time.Minute,
+		app.logger)
+	consumer := queueConsumer.NewAgeingConsumer(*consumerConfig, app.forwardMsg, cl)
 
 	var wg sync.WaitGroup
 	wg.Add(1)
