@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
+	log "github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/message-queue-go-producer/producer"
 	"github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/stretchr/testify/assert"
@@ -56,11 +57,13 @@ func initializeHealthcheck(isProducerConnectionHealthy bool, isConsumerConnectio
 }
 
 func TestNewHealthCheck(t *testing.T) {
+	logger := log.NewUPPLogger("Test", "FATAL")
 	hc := NewHealthCheck(
 		&consumer.QueueConfig{},
 		producer.NewMessageProducer(producer.MessageProducerConfig{}),
 		"proxy",
 		http.DefaultClient,
+		logger,
 	)
 
 	assert.NotNil(t, hc.consumer)
