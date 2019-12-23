@@ -11,7 +11,7 @@ bridges:
   authSecretName: pub-auth
   authSecretKey: pub-k8s-auth
   type: "plainHTTP"
-  replicas: 2
+  replicas: 1
 # Cms metadata bridge to pub cluster
 - name: cms-metadata-kafka-bridge-pub
   sourceKafkaProxyUrl: "" # use the pub cluster url
@@ -20,4 +20,4 @@ bridges:
   authSecretName: pub-auth
   authSecretKey: pub-k8s-auth
   type: "proxy"
-  replicas: 2
+  replicas: 1
