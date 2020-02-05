@@ -18,11 +18,12 @@ COPY --from=0 /artifacts/* /
 
 CMD /kafka-bridge -consumer_proxy_addr=$QUEUE_PROXY_ADDRS \
                   -consumer_group_id=$GROUP_ID \
-                  -consumer_offset=largest \
+                  -consumer_offset=latest \
                   -consumer_autocommit_enable=$CONSUMER_AUTOCOMMIT_ENABLE \
                   -consumer_authorization_key="$AUTHORIZATION_KEY" \
                   -topic=$TOPIC \
                   -producer_address=$PRODUCER_ADDRESS \
                   -producer_vulcan_auth="$PRODUCER_VULCAN_AUTH" \
                   -producer_type=$PRODUCER_TYPE \
-                  -service_name=$SERVICE_NAME
+                  -service_name=$SERVICE_NAME \
+                  -region=$REGION
