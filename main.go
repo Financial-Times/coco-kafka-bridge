@@ -23,6 +23,7 @@ type BridgeApp struct {
 	httpClient       *http.Client
 	serviceName      string
 	logger           *log.UPPLogger
+	region           string
 }
 
 const (
@@ -30,7 +31,7 @@ const (
 	proxy     = "proxy"
 )
 
-func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerAddress string, producerVulcanAuth string, producerType string, serviceName string, logger *log.UPPLogger) *BridgeApp {
+func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerAddress string, producerVulcanAuth string, producerType string, serviceName string, logger *log.UPPLogger, region string) *BridgeApp {
 	consumerConfig := consumer.QueueConfig{}
 	consumerConfig.Addrs = strings.Split(consumerAddrs, ",")
 	consumerConfig.Group = consumerGroupID
@@ -71,6 +72,7 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 		httpClient:       httpClient,
 		serviceName:      serviceName,
 		logger:           logger,
+		region:           region,
 	}
 	return app
 }
@@ -89,6 +91,7 @@ func initBridgeApp() *BridgeApp {
 	producerVulcanAuth := flag.String("producer_vulcan_auth", "", "Authentication string by which you access cms-notifier via vulcand.")
 	producerType := flag.String("producer_type", proxy, "Two possible values are accepted: proxy - if the requests are going through the kafka-proxy; or plainHTTP if a normal http request is required.")
 	serviceName := flag.String("service_name", "kafka-bridge", "The full name for the bridge app, like: `cms-kafka-bridge-pub-xp`")
+	region := flag.String("region", "", `Region in which the service is residing. Valid values: "eu", "us", or ""`)
 
 	flag.Parse()
 
@@ -96,7 +99,7 @@ func initBridgeApp() *BridgeApp {
 	logger := log.NewUPPLogger(*serviceName, "INFO", logConf)
 	logger.Info("Starting Kafka Bridge")
 
-	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerAddress, *producerVulcanAuth, *producerType, *serviceName, logger)
+	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerAddress, *producerVulcanAuth, *producerType, *serviceName, logger, *region)
 }
 
 func (app *BridgeApp) enableHealthchecksAndGTG(serviceName string) {
