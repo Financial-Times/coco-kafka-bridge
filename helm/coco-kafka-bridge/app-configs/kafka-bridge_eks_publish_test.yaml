@@ -7,7 +7,7 @@ target_env: test
 bridges:
 ## Start staging bridges
 - name: cms-kafka-bridge-pub-staging-eu
-  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com"
   groupIdPrefix: kafka-bridge-pub-staging-eu
   topic: PreNativeCmsPublicationEvents
   producer: "http://cms-notifier:8080"
@@ -16,7 +16,7 @@ bridges:
   type: "plainHTTP"
   replicas: 2
 - name: cms-kafka-bridge-pub-staging-us
-  sourceKafkaProxyUrl: "https://upp-staging-publish-us.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.upp.ft.com"
   groupIdPrefix: kafka-bridge-pub-staging-us
   topic: PreNativeCmsPublicationEvents
   producer: "http://cms-notifier:8080"
@@ -26,7 +26,7 @@ bridges:
   replicas: 2
 #CMS metadata
 - name: cms-metadata-kafka-bridge-pub-staging-eu
-  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
   topic: PreNativeCmsMetadataPublicationEvents
   producer: "http://cms-metadata-notifier:8080"
@@ -35,7 +35,7 @@ bridges:
   type: "plainHTTP"
   replicas: 2
 - name: cms-metadata-kafka-bridge-pub-staging-us
-  sourceKafkaProxyUrl: "https://upp-staging-publish-us.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.upp.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-us
   topic: PreNativeCmsMetadataPublicationEvents
   producer: "http://cms-metadata-notifier:8080"
@@ -47,7 +47,7 @@ bridges:
 ## Begin prod bridges
 #CMS
 - name: cms-kafka-bridge-pub-prod-eu
-  sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
+  sourceKafkaProxyUrl: "https://upp-prod-publish-eu.upp.ft.com"
   groupIdPrefix: kafka-bridge-pub-prod-eu
   topic: PreNativeCmsPublicationEvents
   producer: "http://cms-notifier:8080"
@@ -56,7 +56,7 @@ bridges:
   type: "plainHTTP"
   replicas: 2
 - name: cms-kafka-bridge-pub-prod-us
-  sourceKafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
+  sourceKafkaProxyUrl: "https://upp-prod-publish-us.upp.ft.com"
   groupIdPrefix: kafka-bridge-pub-prod-us
   topic: PreNativeCmsPublicationEvents
   producer: "http://cms-notifier:8080"
@@ -66,7 +66,7 @@ bridges:
   replicas: 2
 #CMS metadata
 - name: cms-metadata-kafka-bridge-pub-prod-eu
-  sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
+  sourceKafkaProxyUrl: "https://upp-prod-publish-eu.upp.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-prod-eu
   topic: PreNativeCmsMetadataPublicationEvents
   producer: "http://cms-metadata-notifier:8080"
@@ -75,7 +75,7 @@ bridges:
   type: "plainHTTP"
   replicas: 2
 - name: cms-metadata-kafka-bridge-pub-prod-us
-  sourceKafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
+  sourceKafkaProxyUrl: "https://upp-prod-publish-us.upp.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub-prod-us
   topic: PreNativeCmsMetadataPublicationEvents
   producer: "http://cms-metadata-notifier:8080"
