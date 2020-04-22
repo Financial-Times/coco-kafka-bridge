@@ -96,5 +96,9 @@ spec:
       volumes:
       - name: certificates-storage
         hostPath:
+{{- if $global.Values.eksCluster }}
+          path: /etc/pki/ca-trust/extracted/pem
+{{- else }}
           path: /usr/share/ca-certificates
+{{- end}}
 {{- end }}
