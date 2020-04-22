@@ -1,0 +1,83 @@
+# Default values that will be applied to the prod cluster.
+# In delivery we have bridges only to the pub cluster of the prod env
+
+bridges:
+## Start staging bridges
+- name: cms-kafka-bridge-pub-staging-eu
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
+  groupIdPrefix: kafka-bridge-pub-staging-eu
+  topic: PreNativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "plainHTTP"
+  replicas: 2
+- name: cms-kafka-bridge-pub-staging-us
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.ft.com"
+  groupIdPrefix: kafka-bridge-pub-staging-us
+  topic: PreNativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "plainHTTP"
+  replicas: 2
+#CMS metadata
+- name: cms-metadata-kafka-bridge-pub-staging-eu
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
+  topic: PreNativeCmsMetadataPublicationEvents
+  producer: "http://cms-metadata-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "plainHTTP"
+  replicas: 2
+- name: cms-metadata-kafka-bridge-pub-staging-us
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-staging-us
+  topic: PreNativeCmsMetadataPublicationEvents
+  producer: "http://cms-metadata-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "plainHTTP"
+  replicas: 2
+## END staging bridges
+## Begin prod bridges
+#CMS
+- name: cms-kafka-bridge-pub-prod-eu
+  sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
+  groupIdPrefix: kafka-bridge-pub-prod-eu
+  topic: PreNativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "plainHTTP"
+  replicas: 2
+- name: cms-kafka-bridge-pub-prod-us
+  sourceKafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
+  groupIdPrefix: kafka-bridge-pub-prod-us
+  topic: PreNativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "plainHTTP"
+  replicas: 2
+#CMS metadata
+- name: cms-metadata-kafka-bridge-pub-prod-eu
+  sourceKafkaProxyUrl: "https://upp-prod-publish-eu.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-prod-eu
+  topic: PreNativeCmsMetadataPublicationEvents
+  producer: "http://cms-metadata-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "plainHTTP"
+  replicas: 2
+- name: cms-metadata-kafka-bridge-pub-prod-us
+  sourceKafkaProxyUrl: "https://upp-prod-publish-us.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-prod-us
+  topic: PreNativeCmsMetadataPublicationEvents
+  producer: "http://cms-metadata-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "plainHTTP"
+  replicas: 2
+## END prod bridges
