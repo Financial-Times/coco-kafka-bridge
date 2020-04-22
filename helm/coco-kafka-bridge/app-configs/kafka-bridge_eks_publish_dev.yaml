@@ -1,5 +1,8 @@
 # Default values that will be applied to the prod cluster.
 # In delivery we have bridges only to the pub cluster of the prod env
+eksCluster: true
+region: eu
+target_env: dev
 
 bridges:
 ## Start staging bridges
