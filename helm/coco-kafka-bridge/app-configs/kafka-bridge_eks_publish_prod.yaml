@@ -1,0 +1,4 @@
+# Default values that will be applied to the prod cluster.
+# In pub we shouldn't have any bridges.
+# For now we bridge prod k8s to the coco prod
+bridges:
