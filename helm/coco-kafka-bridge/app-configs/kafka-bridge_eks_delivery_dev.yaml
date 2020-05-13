@@ -1,0 +1,29 @@
+# Default values that will be applied to the prod cluster.
+# In delivery we have bridges only to the pub cluster of the prod env
+eksCluster: true
+region: eu
+target_env: dev
+pubAauth:
+  pub-k8s-auth: "AgBwqqvBsK05hFfSDafR16FW7//6dn6ntlklQUghaHUQDBarBY3KzzKSO4ccxVGbWMoY2FH23nfNJEi7DKQbUxRLgaXhuvoxNpaW1HG309JNQ4qIiWE1FVe/RJiP6jrN2amKYy5YHN62qP+2y+UxNxMWMs70+TJO1fL27WCGJUtshK+fFYmDgR2MHJu/sS6PpSwta910jInJinX3430lgeGXqhFcqs31RlIzcMx46LbmLG8KX1H91UC6HwUrNGYaBi/n9rP7IAm/bsxsRBbPXVsz0uanR9Eilqfu+g6kHgovbZGJeUaYlaaSdDo+7kRzaGvyzVvSy4ufQqa8sYKhQABYi6yQ1R0+S6qDLIbPTeavm5zMoTo+CtC7l6axeOFQPAyab6zZx3d0vlUxJVvFMO64+PlL8XPrR2TA4BThco9kTLRulHyKp9XI5kEeUyb/ockj0M3K0vh066Os/oxozfbl89+DFsSYwjw4w8xA/bCV0Jo46FyTRIunTGofw8Kkn2Nw8+q9zDBCLf3kWg6ZzvjkCzlXXXhlPkr8dvmz8qBW0qRf/ej1/uY57AZfRJHa235k+mSnPYeaJiA2BTOzDLXVX2Y69A4zuWQnRnsOJNd3yqcC5D6x83zDl69IlQbBpWxiokBIMbw+AznDxP/yddaCILkV3/F5h4wwkk0U3TduBsfPVL1cZVgq+d7LMGO+DwCDJpSZoQ4U4oGElt/wQvz/w9uMwByj8awuZaOYiP5P9dPOp3/M77m1TvZCBueguyaXcg==",
+  pub-pre-prod-auth: "AgAtrOQeKhxdTalE1V09mNlX4oIswE7lau/ZlFn3i2SWNP+U+AcuMmE0xLNkpd1bc6EW4sbyDeNiEMG7VHJ3g4TRmilXAH1szmYteqvthVpUku9FHd8opAq0WOIQEEFZnebIMKmsl98NCCvr/Yt6syVkvbhncAuErlKo8iaKFidszEBxcMnUjhaswnOJIG677CXcwDK7XYDzGgyyfQl6hBQPKV43WQpiPmiR6qDybmgFKyp3/bFqA20zNbSf3U+t8UZZGYuCCxP+cx4c8IBtWg/pTsXYoRNqIzksCHGuJ0nQ8efqaHOX72tPaKXw1ynGxBIuxSxemrXUO0+atqDX94asoHdz5Yc/ktT5ws2PmE++vnLdKSmS7cnWQXPytn3drK1cYU+wiLQWmn4Q+w5DHuYr8q739FNnUb+jFV1UEAx4i/+j5QNp6yldgs96E0I3hjKELDeELENGu9XLIpjfdlOk9lnTfqGql3h8HPdJDOta6qLoaj63tICJxr+h8xFuaYm3K3uSjWVnpsXR3yjxiZjajFBe6TU5LA0jFDmxzOKFOlukkbHUmivQZkOZMGJUNtI3myBKTPpBHd+dRyoJELATW1uZ+ZGPzGaWgH4gGOObQI4KO3CFQ3DYjaDVFHbs7fSZY1u3zapcIHUMvQHhTbj1ij3m7j7X+u4H4pRLHreyxVuA9E6/ZlE8ps91LOAHZ8Fo1ksxmWUWbObdE0aJX9KKoTxhTG7eEi1JsKOr58yN3nwrEjbi2CZRGMsNlNKMWslTIN4d8tcXFTymvCqaaA=="
+
+  bridges:
+    # Cms bridge to pub cluster
+    - name: cms-kafka-bridge-pub
+      sourceKafkaProxyUrl: "" # use the pub cluster url
+      groupIdPrefix: kafka-bridge-pub
+      topic: NativeCmsPublicationEvents
+      producer: "http://cms-notifier:8080"
+      authSecretName: pub-auth
+      authSecretKey: pub-k8s-auth
+      type: "plainHTTP"
+      replicas: 2
+    # Cms metadata bridge to pub cluster
+    - name: cms-metadata-kafka-bridge-pub
+      sourceKafkaProxyUrl: "" # use the pub cluster url
+      groupIdPrefix: metadata-kafka-bridge-pub
+      topic: NativeCmsMetadataPublicationEvents
+      authSecretName: pub-auth
+      authSecretKey: pub-k8s-auth
+      type: "proxy"
+      replicas: 2
