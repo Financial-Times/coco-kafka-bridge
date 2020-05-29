@@ -3,7 +3,7 @@
 {{- range $bridge := $global.Values.bridges }}
 
 ---
-{{- if .Values.eksCluster }}
+{{- if $global.Values.eksCluster }}
 apiVersion: apps/v1
 {{- else }}
 apiVersion: extensions/v1beta1
