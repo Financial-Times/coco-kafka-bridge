@@ -3,25 +3,29 @@
 {{- range $bridge := $global.Values.bridges }}
 
 ---
+{{- if $global.Values.eksCluster }}
+apiVersion: apps/v1
+{{- else }}
 apiVersion: extensions/v1beta1
+{{- end }}
 kind: Deployment
 metadata:
-  name: {{ $bridge.name }} 
+  name: {{ $bridge.name }}
   labels:
     chart: "{{ $global.Chart.Name | trunc 63 }}"
-    chartVersion: "{{ $global.Chart.Version | trunc 63 }}" 
-    visualize: "true" 
-    app: {{ $bridge.name }} 
+    chartVersion: "{{ $global.Chart.Version | trunc 63 }}"
+    visualize: "true"
+    app: {{ $bridge.name }}
 spec:
   replicas: {{ $bridge.replicas }}
-  selector: 
+  selector:
     matchLabels:
       app: {{ $bridge.name }}
   template:
     metadata:
       labels:
         app: {{ $bridge.name }}
-        visualize: "true" 
+        visualize: "true"
     spec:
       affinity:
         podAntiAffinity:
@@ -33,14 +37,14 @@ spec:
                 values:
                 - {{ $bridge.name }}
             topologyKey: "kubernetes.io/hostname"
-      containers: 
-      - name: {{ $bridge.name }} 
+      containers:
+      - name: {{ $bridge.name }}
         image: "{{ $global.Values.image.repository }}:{{ $global.Chart.Version }}"
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - mountPath: /etc/ssl/certs
           name: certificates-storage
-        env: 
+        env:
         - name: SERVICE_NAME
           value: "{{ $bridge.name }}"
 {{- if eq $bridge.type "proxy" }}
@@ -59,10 +63,16 @@ spec:
 {{- end }}
         - name: PRODUCER_TYPE
           value: "{{ $bridge.type }}"
+{{- if $global.Values.eksCluster }}
+{{- $proxyUrlValue := $bridge.sourceKafkaProxyUrl }}
+        - name: QUEUE_PROXY_ADDRS
+          value: "{{ $proxyUrlValue }}/__kafka-rest-proxy"
+{{- else}}
 {{- /* we'll be using the value of the publishing cluster if the sourceKafkaProxyUrl is not set on the bridge */}}
 {{- $proxyUrlValue := default $global.Values.cluster.publishing.url $bridge.sourceKafkaProxyUrl }}
         - name: QUEUE_PROXY_ADDRS
           value: "{{ $proxyUrlValue }}/__kafka-rest-proxy"
+{{- end}}
         - name: GROUP_ID
           value: {{ $bridge.groupIdPrefix }}-{{ template "env-full-name" $global }}
         - name: TOPIC
@@ -72,23 +82,27 @@ spec:
             secretKeyRef:
               name: "{{ $bridge.authSecretName }}"
               key: "{{ $bridge.authSecretKey }}"
-        ports: 
-        - containerPort: 8080 
-        livenessProbe: 
-          tcpSocket: 
-            port: 8080 
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          tcpSocket:
+            port: 8080
           initialDelaySeconds: 5
-        readinessProbe: 
-          httpGet: 
-            path: "/__gtg" 
-            port: 8080 
+        readinessProbe:
+          httpGet:
+            path: "/__gtg"
+            port: 8080
           initialDelaySeconds: 10
-          periodSeconds: 30 
+          periodSeconds: 30
           timeoutSeconds: 5
-        resources: 
+        resources:
 {{ toYaml $global.Values.resources | indent 12 }}
       volumes:
       - name: certificates-storage
         hostPath:
+{{- if $global.Values.eksCluster }}
+          path: /etc/pki/ca-trust/extracted/pem
+{{- else }}
           path: /usr/share/ca-certificates
+{{- end}}
 {{- end }}

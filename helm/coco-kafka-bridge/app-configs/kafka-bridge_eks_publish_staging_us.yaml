@@ -1,0 +1,37 @@
+# Default values that will be applied to the prod cluster.
+# In delivery we have bridges only to the pub cluster of the prod env
+eksCluster: true
+region: us
+target_env: staging
+pubAauth:
+  pub-coco-prod-auth: AgDD6zlGUFXmf15TKV7fkS9vHKuKowX67PXgIlr/PLtSd4K0MOmCCNWbhmh3Bc0GmbEUZ0rpBYg6gYXB7ood6EssEvZKXUHTA4CqvqUGvQjahgfg5jtXrOP4zkgmLZyRF85MxVaCTg9k9KUmum0bN+RH987nEElnowru6eeUMnvGgM9AK8vKll/4mxP9UekRrHMkHb18q/8fYOCe4w1n/oIgUD+pKf5C2v17vnd0MUG5pDN00Ou3UMU0y+9pnMIf8IkprM5fgn6S7Z2/rPRpXrjm2Jh+Av3xzrep/pXXH3bVtU+Y6Yql4sJipKoqdWF7XOoz7UkM6xNcrxuaE61p5MORdr5v5Z2sTLagJ2+z3FdqYKbbtQpJWRmFeXJ1GWaxt2BEbb8h5bZvi6G80cLKJIauY0A6WWoW+Z9aTu8H0bB9HYr3qADC6RvraJgeqIff/WjSKqnbcY0YeaTEvfQUI+fbuLL4w2ZfBPHZ+ybNF5P5s1Bn80dfVSbDVDiOLXbh8lEXNgupEOsWi52RPJpHkdJaC9eHD87Nk1mJSPWSxafp2PvcfSRgXj3d4WyqwSniO2mu5dwBTBJp4RZ1xIipMSjGGuCNEzzY1gM6SrUJvDyeWkrMB1Wztx+mkD6TFZ7RusmEUpLORAfAq5gWfMyzYKd3AHa/oPNEHFYiVUEC6HD1s80DyhNAPZIaaQjgp4z+MpB6tpFBdlo/PBSMbB6kxkYHXh279nmZKomflDUd+Ot1m3icSVT0DSeBMCyDzvo7Nb5CHlfHRgE=
+  pub-pre-prod-auth: AgABg+etTn2CtEAx8ULHXsmhCLJvqiqe9uPjV5kwwl6oMhpb7fWuwoEHJRveqNC3HIZD4Ud21aXf/6+MYytyhIrRScpdibh4gxmFbKCrkXEONro5JdWbbCxfgN4+oP84lCMl2I4LLsKUe1sty+0W86QswC+6G5+How7pOY4VcqVuhMpkoxKwXO0fF/kKODU1abIBHSVprtHYJ6rBuD1KFHF7mLXwJrK26RWmUqtcAo2+TDvRosnZdaqovUJVN0U/DPn8EfIQQQvYYsAqZ7zIoac/JhbpQuc+gPVYItWi0LGvHFCYcLawulZMC5oRApQWzETOzYTRERblz7z7yxx/MBDVs+9IJ38sltKypoa2mI6RFYLgDv518MQojvN6r+uwLIqJW61uWKxa8iFSQ5jlb0su8dnXedz4+Ngs79xhpBXT8qDSgRCrCg3/bKSxMq6dVwTXeysLdlF3xxbUllXjGRh2TggOhB5r1pqqflakLOS4rFXvvw8P2C2HHKmAto/DNlEfao/4lbG1YiW9szBjQszpspQLbQaTfGEDRw3WpA51tIQDnQKrgdbqNzJ9WHQItRUzsDZopjQt4m+AATG05Di8ZmsveiZ7bVHxsihG8sTIt1/lQcZUCuQrirSXz37K5irsRtyQdcm3tSFmmaOqSCNzN79nnnAcppecnSIQ6gnu3IX54dgorKLKIc3/YFQueV3mc0zNRDeWDeO6k8PMEeUVv/03bvygYjq8DZN1uNysyRYmrh2lhcHGNF6ObheB8C5F18bDJlsijdEUAM3UjQ==
+  pub-prod-auth: AgBSFHWgdiRVCZBWeImNLSHE5UvANZdNEhasi03ufdeTfqbjDCYeDvHjbkZW1BssHn9qrpQHzYvmiVp2EGxXrf5UDPmKv7vS0C/TAJIGjGoqgBlwTwa8NAH9G9RGlYolSPkLIcRdwyRzHunXX70g/IkawTQo5I5Z6Ws5XHBUgkO7ZVALI0FBL70d/vHj+jdgmyUKADlSs3HCGlKFo0yOHSTNLV3cais7359iu/LJfwONIjxqRLACpcWDMBTH/7dLLcmTW7eIDqPA0JFjC9KDEGO0gOYv05u3uiQWQY0OvLn63oZRWsPxMJCP0zLZLOQZGxSR1UuKhHSf0rqQy6dGJ0tuzPV5YAJA/v9f+g3FknlLm1yzNwP6CGPw75qdOhVPIBtEd6eC2T1vJI261mzDrgg5kVb6Q41l+Cis7spstQR/IHFV+Z5Vv8zQnyZAC0Pt+j4kPiJRGJNsOSh7u4fgLh8thOhe7umFgLuzT0gV4kqNKTbP2DsLakTjEm9/oS21Np5q3yxocznzG/q/07bVViowdYY4/kiI1B3QmhJvOioFnJIQqKlCgOC1JZ36WZQK/d9vCt7XXRaR1U4qW0jqQgXC2fkrFl3ljJqwiQWKfEotm2QS+ahFZtHfpkBS6s88WRbTHcI6e43Tk5FrSsO8zXeoruZ4iFClwXJOagAJJ6v7HdB9UXmewyS2iIlciVaqc9f3qZiAJoHYfcjt8iio2fCpQB5yg64MIqbyJYNclgAJp4oFETs4YqA2zW3yAm/pAH99C6rB3oA=
+  pub-staging-auth: AgA2S24WwcnqnVqHUy9omFsHPwltV/dsuDHyyG6miTbiScZuX9OZvJd/moKGtpnSM8uQxTi7PhhDrNf0hb2AWgQ9JmoCCwxRjkHJdJgIlLuAe25G7tNz5r+3bbyFncrZzGzHa72BAOI4IrCcz+k7i+Rn/y3iFjcOjnjFkz3nJhE/wuyH8lwNNDTu/gpCPxm6xdjEpakleM7n17f3OgFMxmpmIeU9UH3+EGYQDoHVywq8chD2ZmGhzlahNLP75SvFVXrPmGvTYK1Zv5IfS+f9/V6t9CyB9OgY+nVThvCzpAVQNw5eTQgs25dzK+FJ9++eY+e1tKJb7NG/3B6zmiozzyK4XTvQEOIIFvHS6AgHzAckMNxgDZGdMBw/GK6aSEziUGF3/Ni24AzktCv+9ncSBr7Y+oMyMeN1dX9mboY01DAe07+MmVIucDcTeXk9mnNaVU8dSUJa9Nvjk2MGo4E8dBJy7hNWRIHsqFt5OGBdtpQDC3ZxOnYDxD4HhjorLk/IsKdJgB6bqD+OZQAGsaHoEJg7oXbOyI1f54Pt09Sj3INeRxJCQInGLxv85INyrAF18hHgmo5lb3ibSXfjoqCKLWb0gl5PB//RQ0q4MpMU7g4WWFCrfnhMUnP926wMgjfxXgAIwcIjwQIqXOI5Np0qMjEc2sdSJtih+i8L6coxms1fmgRRadzZAC0NtXwwC2pNfi36IQcHbXSx6kLGtD/a3MvxJjak595B/zxIntHwS4PemtXnLTDAzunnF+SnflNdN2HQ20LN2K5LWHQVEwQN00be+yk=
+
+bridges:
+  ## Start staging bridges
+  # todo remove all bridges once we are 100% live and methode publishes directly to this staging.
+  ##CMS
+  - name: cms-kafka-bridge-pub-prod-us
+    sourceKafkaProxyUrl: "https://upp-prod-publish-us.upp.ft.com"
+    groupIdPrefix: kafka-bridge-pub-prod-us
+    topic: PreNativeCmsPublicationEvents
+    producer: "http://cms-notifier:8080"
+    authSecretName: pub-auth
+    authSecretKey: pub-prod-auth
+    type: "plainHTTP"
+    replicas: 2
+  #CMS metadata
+  - name: cms-metadata-kafka-bridge-pub-prod-us
+    sourceKafkaProxyUrl: "https://upp-prod-publish-us.upp.ft.com"
+    groupIdPrefix: metadata-kafka-bridge-pub-prod-us
+    topic: PreNativeCmsMetadataPublicationEvents
+    producer: "http://cms-metadata-notifier:8080"
+    authSecretName: pub-auth
+    authSecretKey: pub-prod-auth
+    type: "plainHTTP"
+    replicas: 2
+  
+  ## END staging bridges
+  

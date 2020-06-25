@@ -1,0 +1,90 @@
+# Default values that will be applied to the prod cluster.
+# In delivery we have bridges only to the pub cluster of the prod env
+eksCluster: true
+region: eu
+target_env: test
+pubAauth:
+  pub-pre-prod-auth: "AgCUojuHTuFym/gze0RRYshiKMlesRjRyzyBN+kA7rlqY9PD+wbx2cOQcRJrn0rgSMlXS1u2doCPLZF/6Ry83nVdmhQb2jeMrwH7Q9hydwBtj2Eyg2DpX1Dq6oXwI8rHMMhIOSrBXiDVjkmO+Yj3Tpkrr0xfeCdyu2UrP9WjF3rHiv6MuKK0lY9o4ujwHv6yewpdAc6/O1WeuRrlXVrzUsvhQAF1RbJ1yy9MgmvXYuPwS3ghWiSXStuA9aolI10TGFtMLaOXV2yR69bjNFPNyrL0dQpAi0sLIaDMMP+0NT9ZnNGt5tD+GOfMJCC5N6oByBaOH2wUOqu6cIBHzez9fpYwERX23z0iTw58rz6kxcpDNSZ9FILrB2200pL27PGa5jVgBjOIANWvwdj+yGYyKebJ0Gu9gQNIwe/zPYNlhGAYyRBJGoGgUSda3Fyx0k9r/3HgPeArJMp5V9OSWcbc06AXF84PEGlFQqT2Y2evRY1EHbHlQF7vhzvKaRF8lpQfiWjhmanewiz0GUmTHDqaZMKigDVzXaMkqCizKzLLD3eHbDopHi2ZgLFBMgUbrPpO36YHzgQ8QHdjFhoaxb8sKMr1P8CSiD2TKG4JD8fphATNOP3HJzS3xwPP0iiJGlcSwbsGdgj9xhHXjd2J+6MfvYlSzwFbxdx8ATpLwA4EdTBlgsb/Egunp+IMJnV1GWOuvp+44WrelX/iiFu+oPA0NJMkwMUk5CfPHUlOTl9EcuNY6uGz1uVGWxQpVcYriJy6UkysLa0aYdpWClnFw9/99Q=="
+  pub-prod-auth: "AgCWHCRhzzfws/nhny/xCrAI2cRooPiQ+Evgpt9D/E9dw7iEXtxTRKT0hyfTB7B17eyZwn4O+HUUJgeIfgWvWl2ynfW2qXAObIS6jSotxIKYuTATJJ4moT2qRK6SqTIYu24aP+uUBNPdw0HxH9OtMmLBVm7jVyY3kK8H+O7zPNBV+s8k6eJD7A3TgFD7KYZYAeCtp0wyryFaHzDKeKYcMo1XlphYbpgr6HnuQDZCJ+NtW8Ki+hWuywm0jVmQIIctswdFZxklOo1YiVuTUmzKpL4SF8l53lO4AkQqSf09qfHMrN72AIHhsA3cpmVGxgkmlWXyTzvvPETqbKu77tJik9FLXu4NcEku02oqfuJSFREp002SQGqISkDfgX77i9xCApBJNqtnFz8+abG65y334QhcOhPIUZyvBmtJjRRJ70yltzsGlMxgwVF9MMDzWPiVj/vKkfmar/dXWsUycYA8e90QZK3Uy+aI8Mm4wCJSeaEKAgAUEqhWSNvER0cJtuRTZj+5zghnE96TYoFCaXpqPl2AplWH1yomXlbiHFXs36wqn6UCHa361P+hriXcvp2BBmwSTG+ho8uBzLfVSm9YNvYg3lei6uEdJ1QgClUoqbr4RmiKZu1r+JixnI7D1JchAXwB9eFexChrEx1TK4HUw3RbN+TfuO4dMcLzKV/jETHw4wFP79jbsbowALjLr+4r5A1JxWd4K31jHp4H0L6TLYEqCOjckUbPnXK5KHHNBugYxY3uLcW+3MnspXOVKgwn9qYlrtDZDS8l9kKEo2fNfCgUo8NimRWO3vLbCA=="
+  pub-staging-auth: "AgC+zfEQ01xK7iXXiHDYAkGtntgUN+jJzbp1toc9TfIiFN0nOKy0S71FvkVvNDqXXf6GMijw6dIIdoUgv7euVgq3S3HmSUtJEB4BYBSLhupkarzjqgjgDocFlFC+TzmNRPIo7/Hoe3DhoOFNyeQHufDXWHtqIYngvFklm6B3ySf94OH/jAJDgTTUZuW87NgqfU0ToKys8wHoFKvKvQfcngREoQ2dCO9vq5hHTy8k+MxPpkpOixGcPqsOfQVKhAIm3cbGgF4Su5PW2z395HwI/FCtMKDJpWDWOPUEXFtUKIjAaO96pTqwr2M9ETsDbtZlMpvG78H5SQK89qBVgNYatSUxQD+LhEtNZVjWA3ulYgUbGvQDddI71Ejv2WmAEq0FwKmVYzqaw3PnOqzqYyM1sKpvq6j1jIDjkSwSL8NU9hPnH6eZa+db3eV8Mlg2dHjZbiye5zm4jRHfssQYO2k0J9aMbCGpltj5IL0mYS1BgxSaKrtc8GQpgij1Z4NaH6iGg6jDD2s0usY/fa9ujl0l9z35dIaTuhwNdhGgU8WraNQ9gJglNA1i4XVLzgb2CoaaYeqZ6j8by1VKmMRUDv05r+OjaSZnJHdTnc0BmOiTqDpS96+GMxBOYafQT0AELOftsMhxFsisSpWKTjznCpVYgbOxPkAw1OvhheAHRKRHnrxQq48hAlNLgbnl6HXABLE9Gy14w4zkCxDM/6+vJgZN/I2f48ma4iR7Qdo22NlNckaWKGysZYlt6dJw2DiihXSgaDnrYSbHZC2AAPfFQRkKjw=="
+
+bridges:
+## Start staging bridges
+- name: cms-kafka-bridge-pub-staging-eu
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com"
+  groupIdPrefix: kafka-bridge-pub-staging-eu
+  topic: PreNativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "plainHTTP"
+  replicas: 2
+- name: cms-kafka-bridge-pub-staging-us
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.upp.ft.com"
+  groupIdPrefix: kafka-bridge-pub-staging-us
+  topic: PreNativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "plainHTTP"
+  replicas: 2
+#CMS metadata
+- name: cms-metadata-kafka-bridge-pub-staging-eu
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
+  topic: PreNativeCmsMetadataPublicationEvents
+  producer: "http://cms-metadata-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "plainHTTP"
+  replicas: 2
+- name: cms-metadata-kafka-bridge-pub-staging-us
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.upp.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-staging-us
+  topic: PreNativeCmsMetadataPublicationEvents
+  producer: "http://cms-metadata-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "plainHTTP"
+  replicas: 2
+## END staging bridges
+## Begin prod bridges
+#CMS
+- name: cms-kafka-bridge-pub-prod-eu
+  sourceKafkaProxyUrl: "https://upp-prod-publish-eu.upp.ft.com"
+  groupIdPrefix: kafka-bridge-pub-prod-eu
+  topic: PreNativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "plainHTTP"
+  replicas: 2
+- name: cms-kafka-bridge-pub-prod-us
+  sourceKafkaProxyUrl: "https://upp-prod-publish-us.upp.ft.com"
+  groupIdPrefix: kafka-bridge-pub-prod-us
+  topic: PreNativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "plainHTTP"
+  replicas: 2
+#CMS metadata
+- name: cms-metadata-kafka-bridge-pub-prod-eu
+  sourceKafkaProxyUrl: "https://upp-prod-publish-eu.upp.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-prod-eu
+  topic: PreNativeCmsMetadataPublicationEvents
+  producer: "http://cms-metadata-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-prod-auth
+  type: "plainHTTP"
+  replicas: 2
+- name: cms-metadata-kafka-bridge-pub-prod-us
+  sourceKafkaProxyUrl: "https://upp-prod-publish-us.upp.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-prod-us
+  topic: PreNativeCmsMetadataPublicationEvents
+  producer: "http://cms-metadata-notifier:8080"
+  authSecretName: pub-auth  
+  authSecretKey: pub-prod-auth
+  type: "plainHTTP"
+  replicas: 2
+## END prod bridges
