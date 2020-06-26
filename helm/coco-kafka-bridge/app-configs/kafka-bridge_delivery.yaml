@@ -4,7 +4,7 @@
 bridges:
 # Cms bridge to pub cluster
 - name: cms-kafka-bridge-pub
-  sourceKafkaProxyUrl: "" # use the pub cluster url
+  sourceKafkaProxyUrl: "https://upp-k8s-dev-publish-eu.upp.ft.com"
   groupIdPrefix: kafka-bridge-pub
   topic: NativeCmsPublicationEvents
   producer: "http://cms-notifier:8080"
@@ -14,7 +14,7 @@ bridges:
   replicas: 2
 # Cms metadata bridge to pub cluster
 - name: cms-metadata-kafka-bridge-pub
-  sourceKafkaProxyUrl: "" # use the pub cluster url
+  sourceKafkaProxyUrl: "https://upp-k8s-dev-publish-eu.upp.ft.com"
   groupIdPrefix: metadata-kafka-bridge-pub
   topic: NativeCmsMetadataPublicationEvents
   authSecretName: pub-auth
