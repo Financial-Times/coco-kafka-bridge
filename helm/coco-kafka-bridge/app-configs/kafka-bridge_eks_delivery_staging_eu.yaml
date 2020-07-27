@@ -1,0 +1,52 @@
+# Default values that will be applied to the prod cluster.
+# In delivery we have bridges only to the pub cluster of the prod env
+eksCluster: true
+region: eu
+target_env: staging
+
+pubAauth:
+  pub-k8s-auth: AgB63VrvqZd5kLiGSTNwfMFq5TlZvGvSmd5EFgwNUlU4YEPW0Y8zcP+3A4sqKay9mW/cddxgFkP1kAhSZRy+3DlBNSqSnoRpw6jYyVm840Ln3izE+YMoRqUauRZNGkDWCyyT8iI0T6bzo3EtXLcMqtGQ40aQnHIJCm0klCtYU6ASMG/51EoPbDOZsuI0Tv4zyKX/9I5SWQNeFiqPquhDFHrxzIkLMMM739rh/CcR2lBd1iXFHqLlf4oZBSrouTZvipAltXBkaGOmZ8OyPR4txCWmH7fHXtYKR/hJvz4iLu4GFzN9SltwQ8H4H8OPDmLIZ3VZlFLqzLQqXYjUHfuh1HTRvI8quzJME24mevcIoCJnvssEt9Si4M7FLtenirJzGHcDFv1kRheZAZopM+x931hTW3bsbVIczqicw2kJkCQ3oArABJoNXY3HvPcHeGI7vsXfO7qhTrzmKaCeSAYOJnSZlZWkmRvHE7RHKP/V21HIu5c8VCScKk+W15dOLgwc7JOqFd9C3G1WEQwlq1KRIdNrGe+BtbRfSuyjGsgTZ+zSWAF9TVc4FFpCQhzIQsxLWAbFhx2YxtJ5+OyBvkqWKCwC8EdqUYaMAQ5UP/KfXQEeabao4xLyeGFXMj1b7X7mEEsLpI/GxSlx1U0nmPlz1wdjpAGX8g9Ss/jAGuJi6ImECoqWnwN4qZWOIz9LaPc5ThCArmhLA0d+oJgmMYvlFjquCPRpk0+EIfeuROYkw3xPe5SRzr4B3Tj9xqpnX8+Cn90bdNHLjvJbf+BeS5Hq8vFpzOg=
+  pub-pre-prod-auth: AgAD61Eo3nMcB+yZKfXYy9a/GUDbG/2FzneBWu/wX2o9sMYMly41xyyH0PnvXpaXkKnnPnIbyYZaeYvviXrvd/mGRcsEdBP9by5rf27EubM87PXpxtSHpZVYAxSNBgl+1aJxa0LXDlz622RPcWZ+d9OeCBX5wMo+V+HMrB1bz26w+n8TubImzKGVkX22nGxbfw+qJbemYxvJVv3kfmELCWlglmc5ITKOiUVlQgpvkyBUh1HITvqS9G43T1KzZRR/gox+F3wOvaDiUoeoeIfre3fQaEfkqg+RkR5/hBiIY81R0smVCeUqxaTL+aNLlyqnxv5bkpusZHkeuhqi0kJVc0QWUY0DhOS7U2graw7KJmn0cecfr0KBbwCXy4GCvIPjeOprqXtHBsSU3neqp+GwgWM6zlG74vkAXUTGI7TIJbNYZoMyaBEwOTFdl0X1BcGi6mZoMIJlBaCOKbR6LPz0DionkBOEPaQ/JkaHUmw2EQMOCVaH+1bb3denTcZY8u1dfBft7GQFPBwNthDCiIizVOY2IE1sPQeKkdUTOfKK4GRA+3TfEGtdmdnJIpwpdxUdM9A5b5lVry3XC7Yn0EIjJf9qcS5RlgpEHujwLQY+493YuqfL/OBQQqjBUCeqURtGxgMKdHd6lQKEHZdxmO53qTkTNeMWo5D0DXM6vLC1VwIi9b9hRzC6qHESgcM0z1fjSdPkFIXEs+oZ00JvIN74oybcOQ+4s8d91lNRh+yY8RweKscLmP9m6gxZa/GziuVOYvp/CHs+HnWWluxA0j37NQ==
+  pub-prod-auth: AgCXueXirW9TLRKqhbSRWIvgUR+98zUH/EjQvkkJWFtvZv0u1i4U7be5aPenTCbNax0RzepGjdjzovSX9FUJrRfrCXk6cbSBO241IMrVv8DhHG99r8KPlbtvvljb0brFQbA04FTOfpGs8iiCYWDDIBNdiSgEaF6qOhF6MjKNbLCvdGhJRsIU1GoCk9V4vxqmNolGPCxISPSpLKmqh09OuCnF6GEHrF5ZHUaxeXVUziv47JTdsxVEwom/aAw3fAYZRZl7/GGin+LMB2GGx2qol4T/QMOPrhM6E2O8mBl/r0wdIvjBv4NwzMfaQgFsevN/953rZH7MxGoeK+pY9xhXPK3yMZTE8UggXnL71Dd2KqXEW6lTx0RiqZ5+zXrcfsZOwlt+GPmjp8o4GKxaac1wz5w8Sk0CeuZPgq/bEs3dqiuafNcw90QmranDe11xJcTbr42ox/Gn3onD3f9p5IGfhWnRhB8BX/Ta+2yMhSM1CYaMtJ8Y731Pa1DKA+hLdNhuaLBzH7mgtdtwBbDxb4bp1pORd5uPcrpdAnCAEFD8Dag/mqEYq96nDz5EMCPmq9ED3Nih+ZExIZLIG7Ani6iXcebkeFhwND9Xbf1bblusg8QMHhylw9VJ/x7NblliASKqUVPv9qgeAdRJyO4YbziPohj/eVc3NcLWexV4nMvMCggzSHvx3frl/jT/ba0ZLLpNLBGCJgu0Sv6X9H15i4QjK2YgvlpfEqmnMGNOzHb6asUk+dBufS6S34Ha7NzC8UnzMRxGAI1MhEo3fZZU8NQoC3TgpFb30Q0t/Y2dig==
+  pub-staging-auth: AgCTvOnKpva+e4poUqrv4Tu9BuE599bp8qx2g5b4GIXciWtmOPu/ia6xWEYTfTTP4dhuRfw4UtdB7eJq0b5goFxzT/yBYkrHdq7+P/BB4+FvAW4At3BwRG7igmAYAlm5FDhlJQVuar/a7EhgGYetbo0c/ZWbxcLbxjd8V62WBlz7LorVaVEmXlHb+/8yqpIVftaEaZ+tRfy1wb4/dj9DPZvb2udcG/rH1jWH1/OhpQqS3eE8VV6qK/jNq8ozUwKjDcaP+BRzBBj3objvfoTAnLBQxZMXBMyGOpthqYJI63N3V6+FBoXG3XE7jK/y4AKS/rCl05idRospH2KaPY8USKQppDW/UHF0ScmLu9tjc4bS/3t11tBDq0mqUQCFuZ6jFFdayoahPhM+sNPcK5iBXlczprgER/U2tRhSpCcUhZLf9FK3A49LIO+tOtOsMqgCk3uUYOjknEyRg1JMaQghmgCdU/0o36MjGQxE83PD+ybvM2f7fySPc/taLFdOcXv/oz6MOLRBZiJSDNa1tN6MgTTUqWATrOiUqF0JU9y7NFiSDhk2RThabxP2lAbx2pSDgWhXsdED+xZ6pJEkLPnaiUCxXUOMzFUJd5VwgGuC2CRPIYRBJojnUVPdKj5IyjS9+b9o2jeEJDGzS6MWSv9bjImedayNAn+/Sr/JzMAiMzFWEUlfrl3Pi9aMWT7lhwv83m5YNyRZaNaV/mHA8KGQwVNRaDJrpw/XBh7NYn8ym4FlCtJroU7Z/5pxNUPO+2OgPkhRpbumTbal34F+jej1dXnRuMA=
+
+bridges:
+## Start staging bridges
+##CMS
+- name: cms-kafka-bridge-pub-staging-eu
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com"
+  groupIdPrefix: kafka-bridge-pub-staging-eu
+  topic: NativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "plainHTTP"
+  replicas: 2
+- name: cms-kafka-bridge-pub-staging-us
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.upp.ft.com"
+  groupIdPrefix: kafka-bridge-pub-staging-us
+  topic: NativeCmsPublicationEvents
+  producer: "http://cms-notifier:8080"
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "plainHTTP"
+  replicas: 2
+#CMS metadata
+- name: cms-metadata-kafka-bridge-pub-staging-eu
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
+  topic: NativeCmsMetadataPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "proxy"
+  replicas: 2
+- name: cms-metadata-kafka-bridge-pub-staging-us
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.upp.ft.com"
+  groupIdPrefix: metadata-kafka-bridge-pub-staging-us
+  topic: NativeCmsMetadataPublicationEvents
+  authSecretName: pub-auth
+  authSecretKey: pub-staging-auth
+  type: "proxy"
+  replicas: 2
+
+## END staging bridges
