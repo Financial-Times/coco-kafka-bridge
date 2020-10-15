@@ -3,11 +3,7 @@
 {{- range $bridge := $global.Values.bridges }}
 
 ---
-{{- if $global.Values.eksCluster }}
 apiVersion: apps/v1
-{{- else }}
-apiVersion: extensions/v1beta1
-{{- end }}
 kind: Deployment
 metadata:
   name: {{ $bridge.name }}
