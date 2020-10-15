@@ -11,4 +11,3 @@ resources:
     memory: 200Mi
   limits:
     memory: 300Mi
-eksCluster: false
