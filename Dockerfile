@@ -4,6 +4,7 @@ COPY . /kafka-bridge/
 
 RUN apk update \
   && apk add git bzr curl \
+  && apk -U add ca-certificates \
   && REPO_PATH="github.com/Financial-Times/coco-kafka-bridge" \
   && mkdir -p $GOPATH/src/${REPO_PATH} \
   && mv /kafka-bridge/* $GOPATH/src/${REPO_PATH} \
