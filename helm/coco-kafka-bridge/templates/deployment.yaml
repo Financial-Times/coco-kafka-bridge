@@ -3,11 +3,7 @@
 {{- range $bridge := $global.Values.bridges }}
 
 ---
-{{- if $global.Values.eksCluster }}
 apiVersion: apps/v1
-{{- else }}
-apiVersion: extensions/v1beta1
-{{- end }}
 kind: Deployment
 metadata:
   name: {{ $bridge.name }}
@@ -93,9 +89,5 @@ spec:
       volumes:
       - name: certificates-storage
         hostPath:
-{{- if $global.Values.eksCluster }}
           path: /etc/pki/ca-trust/extracted/pem
-{{- else }}
-          path: /usr/share/ca-certificates
-{{- end}}
 {{- end }}
