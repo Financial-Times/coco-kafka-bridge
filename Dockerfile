@@ -21,6 +21,9 @@ WORKDIR /
 COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=0 /artifacts/* /
 
+CMD [ "/coco-kafka-bridge" ]
+
+
 # TL;TR : The service must be adapted to load ENV VAR within the binary instead of being passed due the lack of support and tools from scratch image
 #
 # The service have been migrated successfuly to Go Modules and Orb config but as it's it cann't be deployed to production
