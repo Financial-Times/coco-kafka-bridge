@@ -1,18 +1,19 @@
 package main
 
 import (
-	"flag"
+	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
-	"fmt"
-
-	"github.com/Financial-Times/go-logger"
+	logger "github.com/Financial-Times/go-logger"
 	"github.com/Financial-Times/message-queue-go-producer/producer"
 	"github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/Financial-Times/service-status-go/httphandlers"
+
+	cli "github.com/jawher/mow.cli"
 )
 
 // BridgeApp wraps the config and represents the API for the bridge
@@ -30,7 +31,7 @@ const (
 	proxy     = "proxy"
 )
 
-func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerAddress string, producerVulcanAuth string, producerType string, serviceName string) *BridgeApp {
+func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerAddress string, producerAuth string, producerType string, serviceName string) *BridgeApp {
 	consumerConfig := consumer.QueueConfig{}
 	consumerConfig.Addrs = strings.Split(consumerAddrs, ",")
 	consumerConfig.Group = consumerGroupID
@@ -42,7 +43,7 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 	producerConfig := producer.MessageProducerConfig{}
 	producerConfig.Addr = producerAddress
 	producerConfig.Topic = topic
-	producerConfig.Authorization = producerVulcanAuth
+	producerConfig.Authorization = producerAuth
 
 	var producerInstance producer.MessageProducer
 	switch producerType {
@@ -74,29 +75,6 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 	return bridgeApp
 }
 
-func initBridgeApp() *BridgeApp {
-	consumerAddrs := flag.String("consumer_proxy_addr", "", "Comma separated kafka proxy hosts for message consuming.")
-	consumerGroup := flag.String("consumer_group_id", "", "Kafka qroup id used for message consuming.")
-	consumerOffset := flag.String("consumer_offset", "", "Kafka read offset.")
-	consumerAutoCommitEnable := flag.Bool("consumer_autocommit_enable", false, "Enable autocommit for small messages.")
-	consumerAuthorizationKey := flag.String("consumer_authorization_key", "", "The authorization key required to UCS access.")
-
-	topic := flag.String("topic", "", "Kafka topic.")
-
-	producerAddress := flag.String("producer_address", "", "The address the messages are forwarded to.")
-
-	producerVulcanAuth := flag.String("producer_vulcan_auth", "", "Authentication string by which you access cms-notifier via vulcand.")
-	producerType := flag.String("producer_type", proxy, "Two possible values are accepted: proxy - if the requests are going through the kafka-proxy; or plainHTTP if a normal http request is required.")
-	serviceName := flag.String("service_name", "kafka-bridge", "The full name for the bridge app, like: `cms-kafka-bridge-pub-xp`")
-
-	flag.Parse()
-
-	logger.InitDefaultLogger(*serviceName)
-	logger.Infof(nil, "Starting Kafka Bridge")
-
-	return newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerAddress, *producerVulcanAuth, *producerType, *serviceName)
-}
-
 func (bridgeApp *BridgeApp) enableHealthchecksAndGTG(serviceName string) {
 	hc := NewHealthCheck(bridgeApp.consumerConfig, bridgeApp.producerInstance, bridgeApp.producerType, bridgeApp.httpClient)
 	http.HandleFunc("/__health", hc.Health(serviceName))
@@ -109,7 +87,84 @@ func (bridgeApp *BridgeApp) enableHealthchecksAndGTG(serviceName string) {
 }
 
 func main() {
-	bridgeApp := initBridgeApp()
-	go bridgeApp.enableHealthchecksAndGTG(bridgeApp.serviceName)
-	bridgeApp.consumeMessages()
+	appDescription := "The purpose of the Kafka Bridge is to replicate (bridge) messages from one UPP Kubernetes cluster to another."
+	appName := "kafka-bridge"
+
+	app := cli.App(appName, appDescription)
+
+	consumerAddrs := app.String(cli.StringOpt{
+		Name:   "consumer_proxy_addr",
+		Value:  "",
+		Desc:   "Comma separated kafka proxy hosts for message consuming.",
+		EnvVar: "QUEUE_PROXY_ADDRS",
+	})
+	consumerGroup := app.String(cli.StringOpt{
+		Name:   "consumer_group_id",
+		Value:  "",
+		Desc:   "Kafka group id used for message consuming.",
+		EnvVar: "GROUP_ID",
+	})
+	consumerOffset := app.String(cli.StringOpt{
+		Name:   "consumer_offset",
+		Value:  "largest",
+		Desc:   "Kafka read offset.",
+		EnvVar: "CONSUMER_OFFSET",
+	})
+	consumerAutoCommitEnable := app.Bool(cli.BoolOpt{
+		Name:   "consumer_autocommit_enable",
+		Value:  false,
+		Desc:   "Enable autocommit for small messages.",
+		EnvVar: "CONSUMER_AUTOCOMMIT_ENABLE",
+	})
+	consumerAuthorizationKey := app.String(cli.StringOpt{
+		Name:   "consumer_authorization_key",
+		Value:  "",
+		Desc:   "The authorization key required to UCS access.",
+		EnvVar: "AUTHORIZATION_KEY",
+	})
+	topic := app.String(cli.StringOpt{
+		Name:   "topic",
+		Value:  "",
+		Desc:   "Kafka topic.",
+		EnvVar: "TOPIC",
+	})
+	producerAddress := app.String(cli.StringOpt{
+		Name:   "producer_address",
+		Value:  "",
+		Desc:   "The address the messages are forwarded to.",
+		EnvVar: "PRODUCER_ADDRESS",
+	})
+	producerAuth := app.String(cli.StringOpt{
+		Name:   "producer_auth",
+		Value:  "",
+		Desc:   "Producer authentication string.",
+		EnvVar: "PRODUCER_AUTH",
+	})
+	producerType := app.String(cli.StringOpt{
+		Name:   "producer_type",
+		Value:  proxy,
+		Desc:   "Two possible values are accepted: proxy - if the requests are going through the kafka-proxy; or plainHTTP if a normal http request is required.",
+		EnvVar: "PRODUCER_TYPE",
+	})
+	serviceName := app.String(cli.StringOpt{
+		Name:   "service_name",
+		Value:  appName,
+		Desc:   "The full name for the bridge app, like: `cms-kafka-bridge-pub-xp`",
+		EnvVar: "SERVICE_NAME",
+	})
+
+	logger.InitDefaultLogger(*serviceName)
+	logger.Infof(nil, "Starting Kafka Bridge")
+
+	app.Action = func() {
+		bridgeApp := newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerAddress, *producerAuth, *producerType, *serviceName)
+		go bridgeApp.enableHealthchecksAndGTG(bridgeApp.serviceName)
+		bridgeApp.consumeMessages()
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		logger.Errorf(nil, err, "App could not start")
+		return
+	}
 }

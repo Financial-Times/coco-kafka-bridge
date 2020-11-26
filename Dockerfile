@@ -21,22 +21,4 @@ WORKDIR /
 COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=0 /artifacts/* /
 
-# TL;TR : The service must be adapted to load ENV VAR within the binary instead of being passed due the lack of support and tools from scratch image
-#
-# The service have been migrated successfuly to Go Modules and Orb config but as it's it cann't be deployed to production
-# due the way the golang program loads its variables from the system:
-# with the current Dockerfile configuration - our standard- it cannot log in any way the variable that have been set from the system
-# due the lack of any sys programs especially /bin/sh in the scratch image, so CMD and ENTRYPOINT commands are useless.
-# Therefore the only way to load ENV VAR is from within the provided golang binary, The service must be adapted to load variables and
-#  not be passed as parameters, just as any other go service.
-# To be deleted
-#CMD exec /coco-kafka-bridge -consumer_proxy_addr=$QUEUE_PROXY_ADDRS \
-#                            -consumer_group_id=$GROUP_ID \
-#                            -consumer_offset=largest \
-#                            -consumer_autocommit_enable=$CONSUMER_AUTOCOMMIT_ENABLE \
-#                            -consumer_authorization_key="$AUTHORIZATION_KEY" \
-#                            -topic=$TOPIC \
-#                            -producer_address=$PRODUCER_ADDRESS \
-#                            -producer_vulcan_auth="$PRODUCER_VULCAN_AUTH" \
-#                            -producer_type=$PRODUCER_TYPE \
-#                            -service_name=$SERVICE_NAME
+CMD [ "/coco-kafka-bridge" ]
