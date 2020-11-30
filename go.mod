@@ -1,6 +1,6 @@
-module github.com/Financial-Times/coco-kafka-bridge
+module github.com/Financial-Times/coco-kafka-bridge/v17
 
-go 1.14
+go 1.15
 
 require (
 	github.com/Financial-Times/go-fthealth v0.0.0-20171204124831-1b007e2b37b7
@@ -13,7 +13,6 @@ require (
 	github.com/jawher/mow.cli v1.1.0
 	github.com/onsi/ginkgo v1.14.2 // indirect
 	github.com/onsi/gomega v1.10.3 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.0.4-0.20170822132746-89742aefa4b2 // indirect
 	github.com/stretchr/testify v1.3.0
 	gopkg.in/airbrake/gobrake.v2 v2.0.9 // indirect
