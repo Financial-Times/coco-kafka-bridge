@@ -2,3 +2,5 @@
 # In pub we shouldn't have any bridges.
 # For now we bridge prod k8s to the coco prod
 bridges:
+create_sealed_secret: false
+

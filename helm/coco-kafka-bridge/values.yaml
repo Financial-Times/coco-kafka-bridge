@@ -11,3 +11,4 @@ resources:
     memory: 200Mi
   limits:
     memory: 300Mi
+create_sealed_secret: true
