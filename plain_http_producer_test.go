@@ -41,7 +41,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "authorizationkey",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ //missing content-type
@@ -86,7 +86,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ //host header (queue) is missing
@@ -109,7 +109,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ //origin system id is missing
@@ -131,7 +131,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ // origin system id is invalid (but the bridge shouldn't care)
@@ -155,7 +155,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "authorizationkey",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ //Message-Timestamp is missing
@@ -177,7 +177,7 @@ func TestSendMessage(t *testing.T) {
 				"X-Request-Id":       "t9happe59y",
 				"Authorization":      "",
 				"Message-Timestamp":  "",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 		{ //native-hash forward
@@ -203,7 +203,7 @@ func TestSendMessage(t *testing.T) {
 				"Authorization":      "authorizationkey",
 				"Message-Timestamp":  "2015-07-06T07:03:09.362Z",
 				"X-Native-Hash":      "27f79e6d884acdd642d1758c4fd30d43074f8384d552d1ebb1959345",
-				"Content-Type":      "application/json",
+				"Content-Type":       "application/json",
 			},
 		},
 	}
@@ -211,7 +211,7 @@ func TestSendMessage(t *testing.T) {
 	for _, test := range tests {
 		cmsNotifierTest := &plainHTTPMessageProducer{
 			test.config,
-			&dummyHttpClient{
+			&dummyHTTPClient{
 				assert:  assert.New(t),
 				address: test.config.Addr,
 				headers: test.expectedHeaders,
@@ -226,10 +226,9 @@ func TestSendMessage(t *testing.T) {
 			t.Errorf("\nExpected error was nil \nActual: %s", err.Error())
 		}
 	}
-
 }
 
-type dummyHttpClient struct {
+type dummyHTTPClient struct {
 	assert  *assert.Assertions
 	address string
 	headers map[string]string
@@ -237,9 +236,9 @@ type dummyHttpClient struct {
 	host    string
 }
 
-func (d *dummyHttpClient) Do(req *http.Request) (resp *http.Response, err error) {
+func (d *dummyHTTPClient) Do(req *http.Request) (resp *http.Response, err error) {
 	// Check url
-	d.assert.Contains(req.URL.String(), fmt.Sprintf("%s/notify", d.address), fmt.Sprintf("Expected URL incorrect"))
+	d.assert.Contains(req.URL.String(), fmt.Sprintf("%s/notify", d.address), "Expected URL incorrect")
 
 	// Check that the correct headers were set
 	for key, value := range d.headers {

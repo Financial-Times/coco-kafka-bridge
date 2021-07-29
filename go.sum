@@ -14,6 +14,8 @@ github.com/Financial-Times/message-queue-go-producer v0.1.1-0.20210728114901-dd8
 github.com/Financial-Times/message-queue-go-producer v0.1.1-0.20210728114901-dd89c7140d11/go.mod h1:O+R/PyICNDU76FSWeusXl/crkwUBo1X6J9Te8Q6fQ0I=
 github.com/Financial-Times/message-queue-go-producer v0.1.1-0.20210728120155-bd0f255f821a h1:6hmJtu00PKdlpERIGHPJ4BgzcAOqrITw4SUmVV4ROrg=
 github.com/Financial-Times/message-queue-go-producer v0.1.1-0.20210728120155-bd0f255f821a/go.mod h1:O+R/PyICNDU76FSWeusXl/crkwUBo1X6J9Te8Q6fQ0I=
+github.com/Financial-Times/message-queue-go-producer v0.1.1-0.20210805085551-b267a0f9582d h1:H4YIluCZesW3nUwW1bGpcg76dlFHR8c+umFvulnsa8Y=
+github.com/Financial-Times/message-queue-go-producer v0.1.1-0.20210805085551-b267a0f9582d/go.mod h1:O+R/PyICNDU76FSWeusXl/crkwUBo1X6J9Te8Q6fQ0I=
 github.com/Financial-Times/message-queue-gonsumer v0.0.0-20180518165041-cd41937c7566 h1:RZ8LXUuj6nDvGoXKF5m+TmHlR0PxG8hU85PLHV8GRBE=
 github.com/Financial-Times/message-queue-gonsumer v0.0.0-20180518165041-cd41937c7566/go.mod h1:A88i3psx3Zm80Ai2OYTrwzKkZGKj+x5KL02z+YrRd10=
 github.com/Financial-Times/post-publication-combiner/v2 v2.0.0-20200429053931-78b45d72d0ff h1:1CcRc4KcKU5ouy9VCoRclnX0+wBSUqtiU6C/uyv9zag=

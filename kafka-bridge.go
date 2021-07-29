@@ -54,7 +54,7 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 	case plainHTTP:
 		producerInstance = newPlainHTTPMessageProducer(producerConfig)
 	default:
-		logger.Fatalf(nil, fmt.Errorf("Unknown producer type %s", producerType), "The provided producer type '%v' is invalid", producerType)
+		logger.Fatalf(nil, fmt.Errorf("unknown producer type %s", producerType), "The provided producer type '%v' is invalid", producerType)
 	}
 
 	httpClient := &http.Client{
@@ -156,9 +156,9 @@ func main() {
 	})
 
 	logger.InitDefaultLogger(*serviceName)
-	argument2Encoding := map[string]int {
+	argument2Encoding := map[string]int{
 		"base64": producer.Base64E,
-		"model": producer.CombinedModelE,
+		"model":  producer.CombinedModelE,
 	}
 	producerEncoding := app.String(cli.StringOpt{
 		Name:   "producer_encoding",
@@ -188,7 +188,7 @@ func main() {
 			*producerType,
 			*serviceName,
 			argument2Encoding[*producerEncoding],
-			)
+		)
 		go bridgeApp.enableHealthchecksAndGTG(bridgeApp.serviceName)
 		bridgeApp.consumeMessages()
 	}
