@@ -5,7 +5,7 @@ go 1.15
 require (
 	github.com/Financial-Times/go-fthealth v0.0.0-20171204124831-1b007e2b37b7
 	github.com/Financial-Times/go-logger v0.0.0-20170914081945-83fc3e64dc55
-	github.com/Financial-Times/message-queue-go-producer v0.1.1-0.20170622111849-0bb065111416
+	github.com/Financial-Times/message-queue-go-producer v0.1.1-0.20210728120155-bd0f255f821a
 	github.com/Financial-Times/message-queue-gonsumer v0.0.0-20180518165041-cd41937c7566
 	github.com/Financial-Times/service-status-go v0.0.0-20160323111542-3f5199736a3d
 	github.com/dchest/uniuri v0.0.0-20160212164326-8902c56451e9
