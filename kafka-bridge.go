@@ -166,16 +166,16 @@ func main() {
 		Desc:   "Two possible values are accepted: model - if you want to send data encoded in a json mapping the model; or base64 if you want a base64 encoding.",
 		EnvVar: "PRODUCER_ENCODING",
 	})
-	if _, ok := argument2Encoding[*producerEncoding]; !ok {
-		var options []string
-		for k := range argument2Encoding {
-			options = append(options, k)
-		}
-		logger.Fatalf(map[string]interface{}{"valid options": options}, errors.New("producer_encoding"), "invalid argument")
-	}
-	logger.Infof(nil, "Starting Kafka Bridge")
-
 	app.Action = func() {
+		if _, ok := argument2Encoding[*producerEncoding]; !ok {
+			var options []string
+			for k := range argument2Encoding {
+				options = append(options, k)
+			}
+			logger.Errorf(map[string]interface{}{"valid options": options}, errors.New("producer_encoding"), "invalid argument")
+			app.PrintHelp()
+			cli.Exit(-1)
+		}
 		bridgeApp := newBridgeApp(
 			*consumerAddrs,
 			*consumerGroup,
@@ -192,6 +192,7 @@ func main() {
 		go bridgeApp.enableHealthchecksAndGTG(bridgeApp.serviceName)
 		bridgeApp.consumeMessages()
 	}
+	logger.Infof(nil, "Starting Kafka Bridge")
 
 	err := app.Run(os.Args)
 	if err != nil {
