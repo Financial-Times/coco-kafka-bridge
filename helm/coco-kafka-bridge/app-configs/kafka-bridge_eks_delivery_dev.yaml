@@ -5,11 +5,10 @@ target_env: dev
 pubAauth:
   pub-k8s-auth: "AgAgqqd2kv5LlPTe1w8s48ygmWksU7W+Pzp+y1V60uMzDn6/OWW7EaHqDWWgKGnZJ3Fru+wswE8ZFlrevBgAfOjsr0NeZmSdHK90ZBS19udtbPUo2mfzca5qN7oQuBGghp/ggpvPKQeTXrZl/mNyg3qTwAAe6e2drC1vadgqYy4XsbNmJG9oA58PIFXg/hu7ZcSESYWTN6vmdPFJfuG+7eivAq1a6owDrc9ILIFVbdPUv8DhPt9EWuMiMi7jvJurqn/ioONbU9NP5cI8nZe1C2moESjP1gxjVF7eTmlIWb0UOUmqqwHvTVqzASOUQxy9EfuT+536MYhxoxl/GNgWwezeJHK+qW4XgcM4UK5EXUkPEN5SOiwTKRMY+v6E2LpL0jUD1R+Xn2ZKYSFqhvWPufhZhF9c2Za9HTVf8DJlkzs3ANqipPQHFP/lDVQvc3qtrai2FVLbY7XX7Uh59oEJPeS2Hht07hQ/osSrgn04uS56QonWyqgPzhiuzAI8JqtdnIpmNzfZQewG4e6/tu0pxZOJHRF436m3yclZgTnenQvx5d5GkBnEoFNJ3elALVAAJaxFHfnS3kDfcpwgs0dCWh7199U1ettedDqNixCctIdwyZur38EueBMpLK+TZMC5eC1L0lAALfWeJ5otJbR2w3/k8DdkH6IItH44GmffkGYJisnlxhPefRssvYv2WJ51/JYmZEJqEIL4jRJVKz9ZrI+Hp2BrC/aQVxOpkHBkke/IQVC5eSBk7jYMcvyw8js9KpRyCwOWU3TpnvUQscV5fK521JPPxmU1eDnAy+1urqM="
   pub-pre-prod-auth: "AgAtrOQeKhxdTalE1V09mNlX4oIswE7lau/ZlFn3i2SWNP+U+AcuMmE0xLNkpd1bc6EW4sbyDeNiEMG7VHJ3g4TRmilXAH1szmYteqvthVpUku9FHd8opAq0WOIQEEFZnebIMKmsl98NCCvr/Yt6syVkvbhncAuErlKo8iaKFidszEBxcMnUjhaswnOJIG677CXcwDK7XYDzGgyyfQl6hBQPKV43WQpiPmiR6qDybmgFKyp3/bFqA20zNbSf3U+t8UZZGYuCCxP+cx4c8IBtWg/pTsXYoRNqIzksCHGuJ0nQ8efqaHOX72tPaKXw1ynGxBIuxSxemrXUO0+atqDX94asoHdz5Yc/ktT5ws2PmE++vnLdKSmS7cnWQXPytn3drK1cYU+wiLQWmn4Q+w5DHuYr8q739FNnUb+jFV1UEAx4i/+j5QNp6yldgs96E0I3hjKELDeELENGu9XLIpjfdlOk9lnTfqGql3h8HPdJDOta6qLoaj63tICJxr+h8xFuaYm3K3uSjWVnpsXR3yjxiZjajFBe6TU5LA0jFDmxzOKFOlukkbHUmivQZkOZMGJUNtI3myBKTPpBHd+dRyoJELATW1uZ+ZGPzGaWgH4gGOObQI4KO3CFQ3DYjaDVFHbs7fSZY1u3zapcIHUMvQHhTbj1ij3m7j7X+u4H4pRLHreyxVuA9E6/ZlE8ps91LOAHZ8Fo1ksxmWUWbObdE0aJX9KKoTxhTG7eEi1JsKOr58yN3nwrEjbi2CZRGMsNlNKMWslTIN4d8tcXFTymvCqaaA=="
-
 bridges:
   # Cms bridge to pub cluster
   - name: cms-kafka-bridge-pub
-    sourceKafkaProxyUrl: "https://upp-k8s-dev-publish-eu.upp.ft.com" # use the pub cluster url
+    sourceKafkaProxyUrl: "https://upp-k8s-dev-publish-eu.upp.ft.com/__kafka-rest-proxy" # use the pub cluster url
     groupIdPrefix: kafka-bridge-pub
     topic: NativeCmsPublicationEvents
     producer: "http://cms-notifier:8080"
@@ -19,9 +18,20 @@ bridges:
     replicas: 2
   # Cms metadata bridge to pub cluster
   - name: cms-metadata-kafka-bridge-pub
-    sourceKafkaProxyUrl: "https://upp-k8s-dev-publish-eu.upp.ft.com" # use the pub cluster url
+    sourceKafkaProxyUrl: "https://upp-k8s-dev-publish-eu.upp.ft.com/__kafka-rest-proxy" # use the pub cluster url
     groupIdPrefix: metadata-kafka-bridge-pub
     topic: NativeCmsMetadataPublicationEvents
+    producer: "http://kafka-rest-proxy:8080"
+    authSecretName: pub-auth
+    authSecretKey: pub-k8s-auth
+    type: "proxy"
+    replicas: 2
+  # Bridge to MSK
+  - name: msk-kafka-bridge-delivery
+    sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
+    groupIdPrefix: kafka-msk-bridge
+    topic: CombinedPostPublicationEvents
+    producer: "http://kafka-rest-proxy-msk:8080"
     authSecretName: pub-auth
     authSecretKey: pub-k8s-auth
     type: "proxy"
