@@ -27,11 +27,20 @@ bridges:
     type: "proxy"
     replicas: 2
   # Bridge to MSK
-  - name: msk-kafka-bridge-delivery
+  - name: kafka-to-msk-bridge
     sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
     groupIdPrefix: kafka-msk-bridge
     topic: CombinedPostPublicationEvents
     producer: "http://kafka-rest-proxy-msk:8080"
+    authSecretName: pub-auth
+    authSecretKey: pub-k8s-auth
+    type: "proxy"
+    replicas: 2
+  - name: msk-to-kafka-bridge
+    sourceKafkaProxyUrl: "http://kafka-rest-proxy-msk:8080"
+    groupIdPrefix: kafka-msk-bridge
+    topic: NativeCmsPublicationEvents
+    producer: "http://kafka-rest-proxy:8080"
     authSecretName: pub-auth
     authSecretKey: pub-k8s-auth
     type: "proxy"
