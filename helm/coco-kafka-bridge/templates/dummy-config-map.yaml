@@ -2,6 +2,7 @@
 ## Dummy config map, needed if no bridge is configured for an environment,
 ## because helm can not install a chart that contains NO k8s manifests
 apiVersion: v1
+immutable: false
 data:
 kind: ConfigMap
 metadata:
