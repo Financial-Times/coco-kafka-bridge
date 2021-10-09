@@ -16,10 +16,10 @@ import (
 
 type plainHTTPMessageProducer struct {
 	config queueProducer.MessageProducerConfig
-	client plainHttpClient
+	client plainHTTPClient
 }
 
-type plainHttpClient interface {
+type plainHTTPClient interface {
 	Do(req *http.Request) (resp *http.Response, err error)
 }
 
@@ -76,7 +76,9 @@ func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProduce
 		return errors.New(errMsg)
 	}
 	defer func() {
-		io.Copy(ioutil.Discard, resp.Body)
+		if n, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+			logger.Fatalf(map[string]interface{}{"written": n, "body": resp.Body}, err, "discarding body")
+		}
 		resp.Body.Close()
 	}()
 
@@ -100,7 +102,9 @@ func (c *plainHTTPMessageProducer) ConnectivityCheck() (string, error) {
 	}
 
 	defer func() {
-		io.Copy(ioutil.Discard, resp.Body)
+		if n, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+			logger.Fatalf(map[string]interface{}{"written": n, "body": resp.Body}, err, "discarding body")
+		}
 		resp.Body.Close()
 	}()
 

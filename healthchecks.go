@@ -35,7 +35,6 @@ func (hc HealthCheck) Health(serviceName string) func(w http.ResponseWriter, r *
 	if hc.producerType == proxy {
 		description = "Services: source-kafka-proxy, destination-kafka-proxy"
 		checks = []fthealth.Check{hc.consumeHealthcheck(), hc.proxyForwarderHealthcheck()}
-
 	}
 
 	healthCheck := fthealth.TimedHealthCheck{

@@ -1,10 +1,12 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"os"
+	"reflect"
 	"strings"
 	"time"
 
@@ -31,7 +33,7 @@ const (
 	proxy     = "proxy"
 )
 
-func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerAddress string, producerAuth string, producerType string, serviceName string) *BridgeApp {
+func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerAddress string, producerAuth string, producerType string, serviceName string, producerEncoding int) *BridgeApp {
 	consumerConfig := consumer.QueueConfig{}
 	consumerConfig.Addrs = strings.Split(consumerAddrs, ",")
 	consumerConfig.Group = consumerGroupID
@@ -48,11 +50,11 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 	var producerInstance producer.MessageProducer
 	switch producerType {
 	case proxy:
-		producerInstance = producer.NewMessageProducer(producerConfig)
+		producerInstance = producer.NewMessageProducerWithEncoder(producerConfig, producer.NewEncoder(producerEncoding))
 	case plainHTTP:
 		producerInstance = newPlainHTTPMessageProducer(producerConfig)
 	default:
-		logger.Fatalf(nil, fmt.Errorf("Unknown producer type %s", producerType), "The provided producer type '%v' is invalid", producerType)
+		logger.Fatalf(nil, fmt.Errorf("unknown producer type %s", producerType), "The provided producer type '%v' is invalid", producerType)
 	}
 
 	httpClient := &http.Client{
@@ -154,13 +156,43 @@ func main() {
 	})
 
 	logger.InitDefaultLogger(*serviceName)
-	logger.Infof(nil, "Starting Kafka Bridge")
-
+	argument2Encoding := map[string]int{
+		"base64": producer.Base64E,
+		"model":  producer.CombinedModelE,
+	}
+	producerEncoding := app.String(cli.StringOpt{
+		Name:   "producer_encoding",
+		Value:  reflect.ValueOf(argument2Encoding).MapKeys()[0].String(),
+		Desc:   "Two possible values are accepted: model - if you want to send data encoded in a json mapping the model; or base64 if you want a base64 encoding.",
+		EnvVar: "PRODUCER_ENCODING",
+	})
 	app.Action = func() {
-		bridgeApp := newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerAddress, *producerAuth, *producerType, *serviceName)
+		if _, ok := argument2Encoding[*producerEncoding]; !ok {
+			var options []string
+			for k := range argument2Encoding {
+				options = append(options, k)
+			}
+			logger.Errorf(map[string]interface{}{"valid options": options}, errors.New("producer_encoding"), "invalid argument")
+			app.PrintHelp()
+			cli.Exit(-1)
+		}
+		bridgeApp := newBridgeApp(
+			*consumerAddrs,
+			*consumerGroup,
+			*consumerOffset,
+			*consumerAutoCommitEnable,
+			*consumerAuthorizationKey,
+			*topic,
+			*producerAddress,
+			*producerAuth,
+			*producerType,
+			*serviceName,
+			argument2Encoding[*producerEncoding],
+		)
 		go bridgeApp.enableHealthchecksAndGTG(bridgeApp.serviceName)
 		bridgeApp.consumeMessages()
 	}
+	logger.Infof(nil, "Starting Kafka Bridge")
 
 	err := app.Run(os.Args)
 	if err != nil {

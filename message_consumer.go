@@ -12,10 +12,10 @@ import (
 	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
 )
 
-func (bridge BridgeApp) consumeMessages() {
-	consumerConfig := bridge.consumerConfig
+func (bridgeApp BridgeApp) consumeMessages() {
+	consumerConfig := bridgeApp.consumerConfig
 
-	consumer := queueConsumer.NewAgeingConsumer(*consumerConfig, bridge.forwardMsg, queueConsumer.AgeingClient{
+	consumer := queueConsumer.NewAgeingConsumer(*consumerConfig, bridgeApp.forwardMsg, queueConsumer.AgeingClient{
 		Client: &http.Client{
 			Timeout: 60 * time.Second,
 			Transport: &http.Transport{
@@ -36,7 +36,7 @@ func (bridge BridgeApp) consumeMessages() {
 		wg.Done()
 	}()
 
-	ch := make(chan os.Signal)
+	ch := make(chan os.Signal, 2)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 	<-ch
 	consumer.Stop()

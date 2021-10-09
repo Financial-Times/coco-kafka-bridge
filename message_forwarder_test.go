@@ -1,10 +1,11 @@
 package main
 
 import (
-	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"regexp"
 	"strings"
 	"testing"
+
+	queueConsumer "github.com/Financial-Times/message-queue-gonsumer/consumer"
 )
 
 func TestExtractTID(t *testing.T) {
@@ -37,7 +38,7 @@ func TestExtractTID(t *testing.T) {
 				},
 				Body: `{"uuid":"7543220a-2389-11e5-bd83-71cb60e8f08c","type":"EOM::CompoundStory","value":"test"}`},
 			"",
-			"X-Request-Id header could not be found",
+			"header X-Request-Id could not be found",
 		},
 		{
 			queueConsumer.Message{
@@ -83,7 +84,6 @@ func TestExtractTID_TIDRegexp(t *testing.T) {
 	}
 	validRegexp := regexp.MustCompile(tidValidRegexp)
 	for _, test := range tests {
-
 		actualTID := validRegexp.FindString(test.header)
 		if actualTID != test.tid {
 			t.Errorf("\nHeader: %s\nExpectedTID: %s\nActualTID: %s\n", test.header, test.tid, actualTID)

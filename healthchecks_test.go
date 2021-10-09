@@ -30,7 +30,7 @@ func (p *mockProducerInstance) ConnectivityCheck() (string, error) {
 		return "", nil
 	}
 
-	return "", errors.New("Error connecting to the queue")
+	return "", errors.New("error connecting to the queue")
 }
 
 func (c *mockConsumerInstance) Start() {
@@ -44,7 +44,7 @@ func (c *mockConsumerInstance) ConnectivityCheck() (string, error) {
 		return "", nil
 	}
 
-	return "", errors.New("Error connecting to the queue")
+	return "", errors.New("error connecting to the queue")
 }
 
 func initializeHealthcheck(isProducerConnectionHealthy bool, isConsumerConnectionHealthy bool, producerType string) HealthCheck {
@@ -81,7 +81,7 @@ func TestGTGBrokenConsumer(t *testing.T) {
 
 	status := hc.GTG()
 	assert.False(t, status.GoodToGo)
-	assert.Equal(t, "Error connecting to the queue", status.Message)
+	assert.Equal(t, "error connecting to the queue", status.Message)
 }
 
 func TestGTGCheckBrokenProducer(t *testing.T) {
@@ -89,7 +89,7 @@ func TestGTGCheckBrokenProducer(t *testing.T) {
 
 	status := hc.GTG()
 	assert.False(t, status.GoodToGo)
-	assert.Equal(t, "Error connecting to the queue", status.Message)
+	assert.Equal(t, "error connecting to the queue", status.Message)
 }
 
 func TestHealthHappyFlow(t *testing.T) {
