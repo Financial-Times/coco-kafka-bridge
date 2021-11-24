@@ -52,6 +52,11 @@ func (c *plainHTTPMessageProducer) SendMessage(uuid string, message queueProduce
 		req.Header.Add("X-Origin-System-Id", originSystem)
 	}
 
+	schemaVersion, found := message.Headers["X-Schema-Version"]
+	if found {
+		req.Header.Add("X-Schema-Version", schemaVersion)
+	}
+
 	timestamp := message.Headers["Message-Timestamp"]
 	if timestamp != "" {
 		req.Header.Add("Message-Timestamp", timestamp)
