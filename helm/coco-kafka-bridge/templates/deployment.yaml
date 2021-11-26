@@ -60,11 +60,13 @@ spec:
           value: {{ $bridge.groupIdPrefix }}-{{ template "env-full-name" $global }}
         - name: TOPIC
           value: "{{ $bridge.topic }}"
+{{- if hasKey $bridge "authSecretName" }}
         - name: AUTHORIZATION_KEY
           valueFrom:
             secretKeyRef:
               name: "{{ $bridge.authSecretName }}"
               key: "{{ $bridge.authSecretKey }}"
+{{- end }}
         ports:
         - containerPort: 8080
         livenessProbe:

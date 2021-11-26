@@ -32,8 +32,6 @@ bridges:
     groupIdPrefix: kafka-msk-CombinedPostPublicationEvents-bridge
     topic: CombinedPostPublicationEvents
     producer: "http://kafka-rest-proxy-msk:8080"
-    authSecretName: pub-auth
-    authSecretKey: pub-k8s-auth
     type: "proxy"
     replicas: 0
   - name: kafka-to-msk-forced-combined-post-publication-events-bridge
@@ -41,8 +39,6 @@ bridges:
     groupIdPrefix: kafka-msk-ForcedCombinedPostPublicationEvents-bridge
     topic: ForcedCombinedPostPublicationEvents
     producer: "http://kafka-rest-proxy-msk:8080"
-    authSecretName: pub-auth
-    authSecretKey: pub-k8s-auth
     type: "proxy"
     replicas: 0
   # MSK -> Kafka
@@ -51,8 +47,6 @@ bridges:
     groupIdPrefix: msk-kafka-CombinedPostPublicationEvents-bridge
     topic: CombinedPostPublicationEvents
     producer: "http://kafka-rest-proxy:8080"
-    authSecretName: pub-auth
-    authSecretKey: pub-k8s-auth
     type: "proxy"
     replicas: 0
   - name: msk-to-kafka-forced-combined-post-publication-events-bridge
@@ -60,7 +54,5 @@ bridges:
     groupIdPrefix: msk-kafka-ForcedCombinedPostPublicationEvents-bridge
     topic: ForcedCombinedPostPublicationEvents
     producer: "http://kafka-rest-proxy:8080"
-    authSecretName: pub-auth
-    authSecretKey: pub-k8s-auth
     type: "proxy"
     replicas: 0
