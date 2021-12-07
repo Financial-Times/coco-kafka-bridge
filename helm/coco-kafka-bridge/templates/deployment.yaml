@@ -43,34 +43,30 @@ spec:
         env:
         - name: SERVICE_NAME
           value: "{{ $bridge.name }}"
+        - name: PRODUCER_ADDRESS
+          value: "{{ $bridge.producer }}"
 {{- if eq $bridge.type "proxy" }}
         - name: CONSUMER_AUTOCOMMIT_ENABLE
           value: "true"
-        - name: PRODUCER_ADDRESS
-          valueFrom:
-            configMapKeyRef:
-              name: global-config
-              key: kafka.proxy.url.with.protocol
 {{- else }}
-        - name: PRODUCER_ADDRESS
-          value: "{{ $bridge.producer }}"
         - name: CONSUMER_AUTOCOMMIT_ENABLE
           value: "false"
 {{- end }}
         - name: PRODUCER_TYPE
           value: "{{ $bridge.type }}"
-{{- $proxyUrlValue := $bridge.sourceKafkaProxyUrl }}
         - name: QUEUE_PROXY_ADDRS
-          value: "{{ $proxyUrlValue }}/__kafka-rest-proxy"
+          value: "{{ $bridge.sourceKafkaProxyUrl }}"
         - name: GROUP_ID
           value: {{ $bridge.groupIdPrefix }}-{{ template "env-full-name" $global }}
         - name: TOPIC
           value: "{{ $bridge.topic }}"
+{{- if hasKey $bridge "authSecretName" }}
         - name: AUTHORIZATION_KEY
           valueFrom:
             secretKeyRef:
               name: "{{ $bridge.authSecretName }}"
               key: "{{ $bridge.authSecretKey }}"
+{{- end }}
         ports:
         - containerPort: 8080
         livenessProbe:

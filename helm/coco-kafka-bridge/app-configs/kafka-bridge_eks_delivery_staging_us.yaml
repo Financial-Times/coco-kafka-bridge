@@ -13,7 +13,7 @@ bridges:
 ## Start staging bridges
 ##CMS
 - name: cms-kafka-bridge-pub-staging-eu
-  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com/__kafka-rest-proxy"
   groupIdPrefix: kafka-bridge-pub-staging-eu
   topic: NativeCmsPublicationEvents
   producer: "http://cms-notifier:8080"
@@ -22,7 +22,7 @@ bridges:
   type: "plainHTTP"
   replicas: 2
 - name: cms-kafka-bridge-pub-staging-us
-  sourceKafkaProxyUrl: "https://upp-staging-publish-us.upp.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.upp.ft.com/__kafka-rest-proxy"
   groupIdPrefix: kafka-bridge-pub-staging-us
   topic: NativeCmsPublicationEvents
   producer: "http://cms-notifier:8080"
@@ -32,20 +32,51 @@ bridges:
   replicas: 2
 #CMS metadata
 - name: cms-metadata-kafka-bridge-pub-staging-eu
-  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com/__kafka-rest-proxy"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
   topic: NativeCmsMetadataPublicationEvents
+  producer: "http://kafka-rest-proxy:8080"
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
   type: "proxy"
   replicas: 2
 - name: cms-metadata-kafka-bridge-pub-staging-us
-  sourceKafkaProxyUrl: "https://upp-staging-publish-us.upp.ft.com"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.upp.ft.com/__kafka-rest-proxy"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-us
   topic: NativeCmsMetadataPublicationEvents
+  producer: "http://kafka-rest-proxy:8080"
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
   type: "proxy"
   replicas: 2
-
+# Kafka -> MSK
+- name: kafka-to-msk-combined-post-publication-events-bridge
+  sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
+  groupIdPrefix: kafka-msk-CombinedPostPublicationEvents-bridge
+  topic: CombinedPostPublicationEvents
+  producer: "http://kafka-rest-proxy-msk:8080"
+  type: "proxy"
+  replicas: 0
+- name: kafka-to-msk-forced-combined-post-publication-events-bridge
+  sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
+  groupIdPrefix: kafka-msk-ForcedCombinedPostPublicationEvents-bridge
+  topic: ForcedCombinedPostPublicationEvents
+  producer: "http://kafka-rest-proxy-msk:8080"
+  type: "proxy"
+  replicas: 0
+  # MSK -> Kafka
+- name: msk-to-kafka-combined-post-publication-events-bridge
+  sourceKafkaProxyUrl: "http://kafka-rest-proxy-msk:8080"
+  groupIdPrefix: msk-kafka-CombinedPostPublicationEvents-bridge
+  topic: CombinedPostPublicationEvents
+  producer: "http://kafka-rest-proxy:8080"
+  type: "proxy"
+  replicas: 0
+- name: msk-to-kafka-forced-combined-post-publication-events-bridge
+  sourceKafkaProxyUrl: "http://kafka-rest-proxy-msk:8080"
+  groupIdPrefix: msk-kafka-ForcedCombinedPostPublicationEvents-bridge
+  topic: ForcedCombinedPostPublicationEvents
+  producer: "http://kafka-rest-proxy:8080"
+  type: "proxy"
+  replicas: 0
 ## END staging bridges
