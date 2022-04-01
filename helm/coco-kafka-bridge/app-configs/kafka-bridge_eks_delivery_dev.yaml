@@ -41,6 +41,13 @@ bridges:
     producer: "http://kafka-rest-proxy-msk:8080"
     type: "proxy"
     replicas: 0
+  - name: kafka-to-msk-post-publication-events-bridge
+    sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
+    groupIdPrefix: kafka-msk-PostPublicationEvents-bridge
+    topic: PostPublicationEvents
+    producer: "http://kafka-rest-proxy-msk:8080"
+    type: "proxy"
+    replicas: 0
   # MSK -> Kafka
   - name: msk-to-kafka-combined-post-publication-events-bridge
     sourceKafkaProxyUrl: "http://kafka-rest-proxy-msk:8080"
@@ -56,3 +63,11 @@ bridges:
     producer: "http://kafka-rest-proxy:8080"
     type: "proxy"
     replicas: 0
+  - name: msk-to-kafka-publication-notification-events-bridge
+    sourceKafkaProxyUrl: "http://kafka-rest-proxy-msk:8080"
+    groupIdPrefix: msk-kafka-PublicationNotificationEvents-bridge
+    topic: PublicationNotificationEvents
+    producer: "http://kafka-rest-proxy:8080"
+    type: "proxy"
+    replicas: 0
+## END dev bridges
