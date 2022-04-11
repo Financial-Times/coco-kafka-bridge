@@ -10,6 +10,8 @@ import (
 	"github.com/Financial-Times/service-status-go/gtg"
 )
 
+const systemCode = "kafka-bridge"
+
 type HealthCheck struct {
 	consumer     consumer.MessageConsumer
 	producer     producer.MessageProducer
@@ -40,7 +42,7 @@ func (hc HealthCheck) Health(serviceName string) func(w http.ResponseWriter, r *
 
 	healthCheck := fthealth.TimedHealthCheck{
 		HealthCheck: fthealth.HealthCheck{
-			SystemCode:  serviceName,
+			SystemCode:  systemCode,
 			Name:        "Dependent services healthcheck",
 			Description: description,
 			Checks:      checks,
