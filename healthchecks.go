@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -57,7 +58,7 @@ func (hc HealthCheck) consumeHealthcheck() fthealth.Check {
 	return fthealth.Check{
 		BusinessImpact:   "Consuming messages through kafka-proxy won't work. Publishing in the containerised stack won't work.",
 		Name:             "Consume messages from kafka-proxy",
-		PanicGuide:       "https://dewey.ft.com/kafka-bridge.html",
+		PanicGuide:       fmt.Sprintf("https://runbooks.ftops.tech/%s", systemCode),
 		Severity:         1,
 		TechnicalSummary: "Consuming messages is broken. Check if source proxy is reachable.",
 		Checker:          hc.consumer.ConnectivityCheck,
@@ -68,7 +69,7 @@ func (hc HealthCheck) proxyForwarderHealthcheck() fthealth.Check {
 	return fthealth.Check{
 		BusinessImpact:   "Forwarding messages to kafka-proxy in coco won't work. Publishing in the containerised stack won't work.",
 		Name:             "Forward messages to kafka-proxy.",
-		PanicGuide:       "https://dewey.ft.com/kafka-bridge.html",
+		PanicGuide:       fmt.Sprintf("https://runbooks.ftops.tech/%s", systemCode),
 		Severity:         1,
 		TechnicalSummary: "Forwarding messages is broken. Check if destination proxy is reachable.",
 		Checker:          hc.producer.ConnectivityCheck,
@@ -79,7 +80,7 @@ func (hc HealthCheck) httpForwarderHealthcheck() fthealth.Check {
 	return fthealth.Check{
 		BusinessImpact:   "Forwarding messages to cms-notifier in coco won't work. Publishing in the containerised stack won't work.",
 		Name:             "Forward messages to cms-notifier",
-		PanicGuide:       "https://dewey.ft.com/kafka-bridge.html",
+		PanicGuide:       fmt.Sprintf("https://runbooks.ftops.tech/%s", systemCode),
 		Severity:         1,
 		TechnicalSummary: "Forwarding messages is broken. Check networking, cluster reachability and/or cms-notifier state.",
 		Checker:          hc.producer.ConnectivityCheck,
