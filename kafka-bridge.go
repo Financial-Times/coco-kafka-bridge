@@ -23,7 +23,6 @@ type BridgeApp struct {
 	producerInstance producer.MessageProducer
 	producerType     string
 	httpClient       *http.Client
-	serviceName      string
 }
 
 const (
@@ -31,7 +30,7 @@ const (
 	proxy     = "proxy"
 )
 
-func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerAddress string, producerAuth string, producerType string, serviceName string) *BridgeApp {
+func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset string, consumerAutoCommitEnable bool, consumerAuthorizationKey string, topic string, producerAddress string, producerAuth string, producerType string) *BridgeApp {
 	consumerConfig := consumer.QueueConfig{}
 	consumerConfig.Addrs = strings.Split(consumerAddrs, ",")
 	consumerConfig.Group = consumerGroupID
@@ -70,14 +69,13 @@ func newBridgeApp(consumerAddrs string, consumerGroupID string, consumerOffset s
 		producerInstance: producerInstance,
 		producerType:     producerType,
 		httpClient:       httpClient,
-		serviceName:      serviceName,
 	}
 	return bridgeApp
 }
 
-func (bridgeApp *BridgeApp) enableHealthchecksAndGTG(serviceName string) {
+func (bridgeApp *BridgeApp) enableHealthchecksAndGTG() {
 	hc := NewHealthCheck(bridgeApp.consumerConfig, bridgeApp.producerInstance, bridgeApp.producerType, bridgeApp.httpClient)
-	http.HandleFunc("/__health", hc.Health(serviceName))
+	http.HandleFunc("/__health", hc.Health())
 	http.HandleFunc(httphandlers.GTGPath, httphandlers.NewGoodToGoHandler(hc.GTG))
 
 	err := http.ListenAndServe(":8080", nil)
@@ -157,8 +155,8 @@ func main() {
 	logger.Infof(nil, "Starting Kafka Bridge")
 
 	app.Action = func() {
-		bridgeApp := newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerAddress, *producerAuth, *producerType, *serviceName)
-		go bridgeApp.enableHealthchecksAndGTG(bridgeApp.serviceName)
+		bridgeApp := newBridgeApp(*consumerAddrs, *consumerGroup, *consumerOffset, *consumerAutoCommitEnable, *consumerAuthorizationKey, *topic, *producerAddress, *producerAuth, *producerType)
+		go bridgeApp.enableHealthchecksAndGTG()
 		bridgeApp.consumeMessages()
 	}
 

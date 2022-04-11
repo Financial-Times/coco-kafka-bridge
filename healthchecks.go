@@ -28,7 +28,7 @@ func NewHealthCheck(consumerConf *consumer.QueueConfig, p producer.MessageProduc
 }
 
 // Health returns a healthcheck handler
-func (hc HealthCheck) Health(serviceName string) func(w http.ResponseWriter, r *http.Request) {
+func (hc HealthCheck) Health() func(w http.ResponseWriter, r *http.Request) {
 	description := "Services: source-kafka-proxy, cms-notifier"
 	checks := []fthealth.Check{
 		hc.consumeHealthcheck(), hc.httpForwarderHealthcheck(),
