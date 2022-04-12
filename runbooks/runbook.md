@@ -90,9 +90,7 @@ Manual
 
 ## Release Details
 
-Failover is recommended during release in order to avoid publishing delays and monitoring alerts.
-The failover guide for the Delivery cluster is located here:
-<https://github.com/Financial-Times/upp-docs/tree/master/failover-guides/delivery-cluster>
+It is safe to release the service without failover.
 
 <!-- Placeholder - remove HTML comment markers to activate
 ## Heroku Pipeline Name
