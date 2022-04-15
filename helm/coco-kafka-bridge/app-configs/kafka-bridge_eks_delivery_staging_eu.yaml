@@ -57,12 +57,11 @@ bridges:
   producer: "http://kafka-rest-proxy-msk:8080"
   type: "proxy"
   replicas: 1
-# MSK -> Kafka
-- name: msk-to-kafka-publication-notification-events-bridge
-  sourceKafkaProxyUrl: "http://kafka-rest-proxy-msk:8080"
-  groupIdPrefix: msk-kafka-PublicationNotificationEvents-bridge
-  topic: PublicationNotificationEvents
-  producer: "http://kafka-rest-proxy:8080"
+- name: kafka-to-msk-post-concept-annotations-bridge
+  sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
+  groupIdPrefix: kafka-msk-PostConceptAnnotations-bridge
+  topic: PostConceptAnnotations
+  producer: "http://kafka-rest-proxy-msk:8080"
   type: "proxy"
   replicas: 1
 ## END staging bridges
