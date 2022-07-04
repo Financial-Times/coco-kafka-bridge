@@ -34,13 +34,6 @@ bridges:
     producer: "http://kafka-rest-proxy-msk:8080"
     type: "proxy"
     replicas: 1
-  - name: kafka-to-msk-post-concept-annotations-bridge
-    sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
-    groupIdPrefix: kafka-msk-PostConceptAnnotations-bridge
-    topic: PostConceptAnnotations
-    producer: "http://kafka-rest-proxy-msk:8080"
-    type: "proxy"
-    replicas: 1
   - name: kafka-to-msk-concept-annotations-bridge
     sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
     groupIdPrefix: kafka-msk-ConceptAnnotations-bridge
