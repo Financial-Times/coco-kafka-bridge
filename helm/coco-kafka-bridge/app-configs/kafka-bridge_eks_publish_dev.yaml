@@ -87,12 +87,3 @@ bridges:
   type: "plainHTTP"
   replicas: 2
 ## END prod bridges
-## Begin MSK bridges
--  name: kafka-to-msk-smartlogic-concept-bridge
-   sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
-   groupIdPrefix: kafka-msk-SmartlogicConcept-bridge
-   topic: SmartlogicConcept
-   producer: "http://kafka-rest-proxy-msk:8080"
-   type: "proxy"
-   replicas: 1
-## END MSK bridges
