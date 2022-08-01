@@ -48,4 +48,11 @@ bridges:
     producer: "http://kafka-rest-proxy-msk:8080"
     type: "proxy"
     replicas: 1
+  - name: kafka-to-msk-native-cms-pub-events-bridge
+    sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
+    groupIdPrefix: kafka-msk-NativeCmsPublicationEvents-bridge
+    topic: NativeCmsPublicationEvents
+    producer: "http://kafka-rest-proxy-msk:8080"
+    type: "proxy"
+    replicas: 1
 ## END dev bridges
