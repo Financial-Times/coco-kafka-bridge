@@ -35,7 +35,7 @@ bridges:
   sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com/__kafka-rest-proxy"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
   topic: NativeCmsMetadataPublicationEvents
-  producer: "http://kafka-rest-proxy:8080"
+  producer: "http://kafka-rest-proxy-msk:8080"
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
   type: "proxy"
