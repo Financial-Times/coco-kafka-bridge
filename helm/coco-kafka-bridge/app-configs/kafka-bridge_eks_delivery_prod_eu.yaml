@@ -50,13 +50,6 @@ bridges:
   type: "proxy"
   replicas: 2
 # Kafka -> MSK
-- name: kafka-to-msk-post-publication-events-bridge
-  sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
-  groupIdPrefix: kafka-msk-PostPublicationEvents-bridge
-  topic: PostPublicationEvents
-  producer: "http://kafka-rest-proxy-msk:8080"
-  type: "proxy"
-  replicas: 1
 - name: kafka-to-msk-concept-annotations-bridge
   sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
   groupIdPrefix: kafka-msk-ConceptAnnotations-bridge
