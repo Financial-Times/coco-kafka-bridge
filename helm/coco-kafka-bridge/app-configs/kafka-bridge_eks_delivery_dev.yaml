@@ -11,10 +11,10 @@ bridges:
     sourceKafkaProxyUrl: "https://upp-k8s-dev-publish-eu.upp.ft.com/__kafka-rest-proxy" # use the pub cluster url
     groupIdPrefix: kafka-bridge-pub
     topic: NativeCmsPublicationEvents
-    producer: "http://cms-notifier:8080"
+    producer: "http://kafka-rest-proxy:8080"
     authSecretName: pub-auth
     authSecretKey: pub-k8s-auth
-    type: "plainHTTP"
+    type: "proxy"
     replicas: 2
   # Cms metadata bridge to pub cluster
   - name: cms-metadata-kafka-bridge-pub

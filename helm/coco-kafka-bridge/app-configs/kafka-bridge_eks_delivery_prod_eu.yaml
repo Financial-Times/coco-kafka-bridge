@@ -16,19 +16,19 @@ bridges:
   sourceKafkaProxyUrl: "https://upp-prod-publish-eu.upp.ft.com/__kafka-rest-proxy"
   groupIdPrefix: kafka-bridge-pub-prod-eu
   topic: NativeCmsPublicationEvents
-  producer: "http://cms-notifier:8080"
+  producer: "http://kafka-rest-proxy:8080"
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
-  type: "plainHTTP"
+  type: "proxy"
   replicas: 2
 - name: cms-kafka-bridge-pub-prod-us
   sourceKafkaProxyUrl: "https://upp-prod-publish-us.upp.ft.com/__kafka-rest-proxy"
   groupIdPrefix: kafka-bridge-pub-prod-us
   topic: NativeCmsPublicationEvents
-  producer: "http://cms-notifier:8080"
+  producer: "http://kafka-rest-proxy:8080"
   authSecretName: pub-auth
   authSecretKey: pub-prod-auth
-  type: "plainHTTP"
+  type: "proxy"
   replicas: 2
 #CMS metadata
 - name: cms-metadata-kafka-bridge-pub-prod-eu
