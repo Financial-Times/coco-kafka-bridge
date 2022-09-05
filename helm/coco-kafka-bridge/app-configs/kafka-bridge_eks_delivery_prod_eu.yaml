@@ -65,11 +65,4 @@ bridges:
   producer: "http://kafka-rest-proxy:8080"
   type: "proxy"
   replicas: 1
-- name: msk-to-kafka-concept-suggestions-backup-bridge
-  sourceKafkaProxyUrl: "http://kafka-rest-proxy-msk:8080"
-  groupIdPrefix: msk-kafka-ConceptSuggestionsBackup-bridge
-  topic: ConceptSuggestionsBackup
-  producer: "http://kafka-rest-proxy:8080"
-  type: "proxy"
-  replicas: 1  
 ## END prod bridges
