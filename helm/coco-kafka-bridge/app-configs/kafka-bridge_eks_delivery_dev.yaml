@@ -27,13 +27,6 @@ bridges:
     type: "proxy"
     replicas: 2
   # Kafka -> MSK
-  - name: kafka-to-msk-cms-publication-events-bridge
-    sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
-    groupIdPrefix: kafka-msk-CmsPublicationEvents-bridge
-    topic: CmsPublicationEvents
-    producer: "http://kafka-rest-proxy-msk:8080"
-    type: "proxy"
-    replicas: 1
   - name: kafka-to-msk-native-cms-pub-events-bridge
     sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
     groupIdPrefix: kafka-msk-NativeCmsPublicationEvents-bridge
