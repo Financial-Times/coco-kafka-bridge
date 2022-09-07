@@ -11,7 +11,7 @@ bridges:
     sourceKafkaProxyUrl: "https://upp-k8s-dev-publish-eu.upp.ft.com/__kafka-rest-proxy" # use the pub cluster url
     groupIdPrefix: kafka-bridge-pub
     topic: NativeCmsPublicationEvents
-    producer: "http://kafka-rest-proxy:8080"
+    producer: "http://kafka-rest-proxy-msk:8080"
     authSecretName: pub-auth
     authSecretKey: pub-k8s-auth
     type: "proxy"
@@ -26,14 +26,6 @@ bridges:
     authSecretKey: pub-k8s-auth
     type: "proxy"
     replicas: 2
-  # Kafka -> MSK
-  - name: kafka-to-msk-native-cms-pub-events-bridge
-    sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
-    groupIdPrefix: kafka-msk-NativeCmsPublicationEvents-bridge
-    topic: NativeCmsPublicationEvents
-    producer: "http://kafka-rest-proxy-msk:8080"
-    type: "proxy"
-    replicas: 1
   # MSK -> Kafka
   - name: msk-to-kafka-concept-suggestions-bridge
     sourceKafkaProxyUrl: "http://kafka-rest-proxy-msk:8080"

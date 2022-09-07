@@ -16,7 +16,7 @@ bridges:
   sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com/__kafka-rest-proxy"
   groupIdPrefix: kafka-bridge-pub-staging-eu
   topic: NativeCmsPublicationEvents
-  producer: "http://kafka-rest-proxy:8080"
+  producer: "http://kafka-rest-proxy-msk:8080"
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
   type: "proxy"
@@ -25,7 +25,7 @@ bridges:
   sourceKafkaProxyUrl: "https://upp-staging-publish-us.upp.ft.com/__kafka-rest-proxy"
   groupIdPrefix: kafka-bridge-pub-staging-us
   topic: NativeCmsPublicationEvents
-  producer: "http://kafka-rest-proxy:8080"
+  producer: "http://kafka-rest-proxy-msk:8080"
   authSecretName: pub-auth
   authSecretKey: pub-staging-auth
   type: "proxy"
@@ -49,14 +49,6 @@ bridges:
   authSecretKey: pub-staging-auth
   type: "proxy"
   replicas: 2
-# Kafka -> MSK
-- name: kafka-to-msk-native-cms-pub-events-bridge
-  sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
-  groupIdPrefix: kafka-msk-NativeCmsPublicationEvents-bridge
-  topic: NativeCmsPublicationEvents
-  producer: "http://kafka-rest-proxy-msk:8080"
-  type: "proxy"
-  replicas: 1
 # MSK -> Kafka
 - name: msk-to-kafka-concept-suggestions-bridge
   sourceKafkaProxyUrl: "http://kafka-rest-proxy-msk:8080"
