@@ -1,0 +1,21 @@
+# Default values that will be applied to the prod cluster.
+region: us
+target_env: prod
+
+bridges:
+  # Kafka -> MSK
+  - name: kafka-to-msk-pre-native-cms-pub-events-bridge
+    sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
+    groupIdPrefix: kafka-msk-PreNativeCmsPublicationEvents-bridge
+    topic: PreNativeCmsPublicationEvents
+    producer: "http://kafka-rest-proxy-msk:8080"
+    type: "proxy"
+    replicas: 1
+  - name: kafka-to-msk-pre-native-cms-metadata-pub-events-bridge
+    sourceKafkaProxyUrl: "http://kafka-rest-proxy:8080"
+    groupIdPrefix: kafka-msk-PreNativeCmsMetadataPublicationEvents-bridge
+    topic: PreNativeCmsMetadataPublicationEvents
+    producer: "http://kafka-rest-proxy-msk:8080"
+    type: "proxy"
+    replicas: 1
+create_sealed_secret: false
