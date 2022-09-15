@@ -22,7 +22,7 @@ bridges:
   type: "proxy"
   replicas: 2
 - name: cms-kafka-bridge-pub-staging-us
-  sourceKafkaProxyUrl: "https://upp-staging-publish-us.upp.ft.com/__kafka-rest-proxy"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.upp.ft.com/__kafka-rest-proxy-msk"
   groupIdPrefix: kafka-bridge-pub-staging-us
   topic: NativeCmsPublicationEvents
   producer: "http://kafka-rest-proxy-msk:8080"
@@ -41,7 +41,7 @@ bridges:
   type: "proxy"
   replicas: 2
 - name: cms-metadata-kafka-bridge-pub-staging-us
-  sourceKafkaProxyUrl: "https://upp-staging-publish-us.upp.ft.com/__kafka-rest-proxy"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-us.upp.ft.com/__kafka-rest-proxy-msk"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-us
   topic: NativeCmsMetadataPublicationEvents
   producer: "http://kafka-rest-proxy-msk:8080"
