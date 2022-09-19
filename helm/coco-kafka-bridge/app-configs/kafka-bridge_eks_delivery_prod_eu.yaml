@@ -49,12 +49,4 @@ bridges:
   authSecretKey: pub-prod-auth
   type: "proxy"
   replicas: 2
-# MSK -> Kafka
-- name: msk-to-kafka-concept-suggestions-bridge
-  sourceKafkaProxyUrl: "http://kafka-rest-proxy-msk:8080"
-  groupIdPrefix: msk-kafka-ConceptSuggestions-bridge
-  topic: ConceptSuggestions
-  producer: "http://kafka-rest-proxy:8080"
-  type: "proxy"
-  replicas: 1
 ## END prod bridges
