@@ -13,7 +13,7 @@ bridges:
 ## Start staging bridges
 ##CMS
 - name: cms-kafka-bridge-pub-staging-eu
-  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com/__kafka-rest-proxy-msk"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com/__kafka-rest-proxy"
   groupIdPrefix: kafka-bridge-pub-staging-eu
   topic: NativeCmsPublicationEvents
   producer: "http://kafka-rest-proxy-msk:8080"
@@ -32,7 +32,7 @@ bridges:
   replicas: 2
 #CMS metadata
 - name: cms-metadata-kafka-bridge-pub-staging-eu
-  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com/__kafka-rest-proxy-msk"
+  sourceKafkaProxyUrl: "https://upp-staging-publish-eu.upp.ft.com/__kafka-rest-proxy"
   groupIdPrefix: metadata-kafka-bridge-pub-staging-eu
   topic: NativeCmsMetadataPublicationEvents
   producer: "http://kafka-rest-proxy-msk:8080"
